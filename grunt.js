@@ -65,7 +65,7 @@ module.exports = function(grunt) {
     less: {
         development: {
             files: {
-                "dist/<%= pkg.name %>.css": "src/less/<% pkg.name %>.less"
+                "dist/<%= pkg.name %>.css": "src/less/<%= pkg.name %>.less"
             }
         },
         production: {
@@ -73,13 +73,13 @@ module.exports = function(grunt) {
                 yuicompress: true
             },
             files: {
-                "dist/<%= pkg.name %>.min.css": "src/less/<% pkg.name %>.less"
+                "dist/<%= pkg.name %>.min.css": "src/less/<%= pkg.name %>.less"
             }
         }
     }
   });
 
   // Default task.
-  grunt.registerTask('default', 'lint qunit concat min less:production');
+  grunt.registerTask('default', 'lint qunit concat min less');
 
 };
