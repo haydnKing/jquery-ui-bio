@@ -1,9 +1,16 @@
+
+function stripBanner( files ) {
+    return files.map(function( file ) {
+        return "<file_strip_banners:" + file + ">";
+    });
+}
+
 /*global module:false*/
 module.exports = function(grunt) {
 
   // Project configuration.
   grunt.initConfig({
-    pkg: '<json:jquery-ui-bio.jquery.json>',
+    pkg: '<json:package.json>',
     meta: {
       banner: '/*! <%= pkg.title || pkg.name %> - v<%= pkg.version %> - ' +
         '<%= grunt.template.today("yyyy-mm-dd") %>\n' +
@@ -13,7 +20,7 @@ module.exports = function(grunt) {
     },
     concat: {
       dist: {
-        src: ['<banner:meta.banner>', '<file_strip_banner:src/<%= pkg.name %>.js>'],
+        src: ['<banner:meta.banner>', stripBanner(grunt.file.expandFiles('src/js/*.js'))],
         dest: 'dist/<%= pkg.name %>.js'
       }
     },
