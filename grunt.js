@@ -1,7 +1,7 @@
 
 function stripBanner( files ) {
     return files.map(function( file ) {
-        return "<file_strip_banners:" + file + ">";
+        return "<file_strip_banner:" + file + ">";
     });
 }
 
@@ -41,7 +41,7 @@ module.exports = function(grunt) {
     },
     watch: {
       files: '<config:lint.files>',
-      tasks: 'lint qunit less:development'
+      tasks: 'lint qunit concat less:development'
     },
     jshint: {
       options: {
@@ -55,7 +55,8 @@ module.exports = function(grunt) {
         undef: true,
         boss: true,
         eqnull: true,
-        browser: true
+        browser: true,
+        devel: true
       },
       globals: {
         jQuery: true

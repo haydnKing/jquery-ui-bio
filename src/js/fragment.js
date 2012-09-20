@@ -11,7 +11,7 @@ var baseClasses = 'bio-fragment ui-widget ui-state-default',
     hoverClasses = 'ui-state-hover ui-state-active',
     disabledClasses = 'ui-state-disabled';
 
-$.widget("bio.jFragment", $.ui.draggable, {
+$.widget("bio.fragment", $.ui.draggable, {
     options: {
         name: 'Unnamed Fragment',
         description: '',
@@ -20,6 +20,7 @@ $.widget("bio.jFragment", $.ui.draggable, {
         color: undefined
     },
     _create: function() {
+        console.log('fragment._create');
         var o = this.options;
         var el = this.el = $(this.element[0])
             .addClass(baseClasses);
@@ -36,6 +37,9 @@ $.widget("bio.jFragment", $.ui.draggable, {
         }
 
         el.draggable(o);
+    },
+    _init: function() {
+        console.log('fragment._init');
     },
     option: function(name, value)
     {
@@ -69,4 +73,4 @@ $.widget("bio.jFragment", $.ui.draggable, {
     }
 }); 
 
-}());
+}(jQuery));
