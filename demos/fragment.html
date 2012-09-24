@@ -7,9 +7,14 @@
 <script type="text/javascript" src="../libs/jquery-loader.js"></script>
 
 <script type="text/javascript" src="../src/js/fragment.js"></script>
+<script type="text/javascript" src="../src/js/tooltip.js"></script>
 <link rel="stylesheet" type="text/css" href="../dist/jquery-ui-bio.css" />
 
 <style type='text/css'>
+    * {
+        margin: 0;
+        padding: 0;
+    }
     .frag-pad{
         margin: 25px;
     }
@@ -18,7 +23,9 @@
 <script type="text/javascript">
 $(window).ready( function(){
     $('#the_fragment').fragment({
-        name: 'Fragment Name'
+        name: 'Fragment Name',
+        url: 'http://news.bbc.co.uk',
+        helper: 'clone'
     });
 });
 </script>
