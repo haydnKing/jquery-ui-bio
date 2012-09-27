@@ -173,8 +173,11 @@
     }
 }
 
-.bio-fragment-list > .ui-widget-header > .bio-filter {
-    margin: 2px 2em;
+.bio-fragment-list {
+    background-image: none;
+    & > .ui-widget-header > .bio-filter {
+        margin: 2px 2em;
+    }
 }
 
 .bio-filter{
@@ -194,6 +197,10 @@
             background: none;
         }
     }
+    & > .hint{
+        font-style: italic;
+        cursor: text;
+    }
     & > .ui-icon{
         position: absolute;
         margin-top: -8px;
@@ -205,6 +212,10 @@
     & > .ui-icon-close{
         right: 0;
         cursor: pointer;
+        opacity: 0.6;
+        &:hover{
+            opacity: 1.0;
+        }
     }
 }
 

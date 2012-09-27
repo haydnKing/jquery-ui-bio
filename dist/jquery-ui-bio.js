@@ -28,6 +28,13 @@
 
 var baseClasses = 'bio-fragment-list ui-widget ui-state-default';
 
+var test_frag = function(f, filter){
+    var r = filter.test(f.fragment('option','name')) || 
+        filter.test(f.fragment('option','desc'));
+    console.log('test_frag(f,' + filter + ') -> ' + r);
+    return r;
+};
+
 $.widget("bio.fragmentSelect", {
     options: {
         text: {
@@ -43,20 +50,53 @@ $.widget("bio.fragmentSelect", {
             o = this.options,
             el = this.el = $(this.element[0]).addClass(baseClasses);
 
-        var header = $('<div>').addClass('ui-widget-header').appendTo(el);
+        this.timeout = null;
+
+        var header  = this.header = $('<div>').addClass('ui-widget-header').appendTo(el);
         var filter = $('<div>')
             .addClass('bio-filter ui-state-default ui-corner-all')
             .appendTo(header);
         this.input = $('<input type="text">')
-            .appendTo($('<div>').appendTo(filter));
-        $('<span>').addClass('ui-icon ui-icon-search').appendTo(filter);
-        $('<span>').addClass('ui-icon ui-icon-close').appendTo(filter)
+            .appendTo($('<div>').appendTo(filter))
             .on({
-                'mouseenter': function(){$(this).addClass('ui-state-hover');},
-                'mouseleave': function(){$(this).removeClass('ui-state-hover');}
+                'focus': function(){self.filter_hint.hide();},
+                'blur': function(){
+                    if(!$(this).val()){ 
+                        self.filter_hint.show();
+                        self.filter_clear.hide();
+                    }
+                },
+                'keyup': function(){
+                    var v = self.input.val();
+                    if(v){
+                        self.filter_clear.show();
+                    } else{
+                        self.filter_clear.hide();
+                    }
+                    if(self.timeout)
+                    {
+                        clearTimeout(self.timeout);
+                    }
+                    self.timeout = setTimeout(function() {
+                        self.timeout = null;
+                        self.filter(v);
+                    }, 500);
+                }
+            });
+        this.filter_hint = $('<div>')
+            .addClass('hint')
+            .text(o.text.filter)
+            .appendTo(filter)
+            .on('click', function() {self.input.focus();});
+        $('<span>').addClass('ui-icon ui-icon-search').appendTo(filter);
+        this.filter_clear = $('<span>').addClass('ui-icon ui-icon-close')
+            .hide()
+            .appendTo(filter)
+            .on('click', function(){
+               
             });
 
-        var panel = $('<div>').addClass('bio-panel').appendTo(el);
+        var panel = this.panel = $('<div>').addClass('bio-panel').appendTo(el);
 
         //copy any initial fragments
         var list = el.find('ul');
@@ -83,7 +123,26 @@ $.widget("bio.fragmentSelect", {
             }
         }, 'ul > li');
 
-
+        self._set_height();
+    },
+    filter: function(str){
+        console.log('str = '+str);
+        var reg = new RegExp(str, 'i');
+        this.el.find(':bio-fragment').each( function(){
+            var f = $(this);
+            if(test_frag(f, reg)){
+                f.parent().show();
+            }
+            else{
+                f.parent().hide();
+            }
+        });
+    },
+    showAll: function(){
+        this.el.find(':bio-fragment').show();
+    },
+    _set_height: function(){
+        this.panel.outerHeight(this.options.height - this.header.outerHeight());
     }
 });
 

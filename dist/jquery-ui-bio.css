@@ -101,7 +101,10 @@
   color: white;
   background-color: gray;
 }
-.bio-fragment-list > .ui-widget-header > .bio-filter {
+.bio-fragment-list {
+  background-image: none;
+}
+.bio-fragment-list  > .ui-widget-header > .bio-filter {
   margin: 2px 2em;
 }
 .bio-filter {
@@ -122,6 +125,10 @@
   border: none;
   background: none;
 }
+.bio-filter  > .hint {
+  font-style: italic;
+  cursor: text;
+}
 .bio-filter  > .ui-icon {
   position: absolute;
   margin-top: -8px;
@@ -133,6 +140,10 @@
 .bio-filter  > .ui-icon-close {
   right: 0;
   cursor: pointer;
+  opacity: 0.6;
+}
+.bio-filter  > .ui-icon-close:hover {
+  opacity: 1.0;
 }
 .bio-panel  > ul {
   list-style-type: none;
