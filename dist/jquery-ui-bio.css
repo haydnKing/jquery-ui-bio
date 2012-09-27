@@ -101,3 +101,17 @@
   color: white;
   background-color: gray;
 }
+.bio-filter {
+  height: 1.2em;
+}
+.bio-panel {
+  padding-top: 7px;
+}
+.bio-panel  > ul {
+  list-style-type: none;
+}
+.bio-panel  > ul  > li {
+  padding: 0.2em 0;
+  text-align: center;
+  border: none;
+}
