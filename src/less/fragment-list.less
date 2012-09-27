@@ -1,15 +1,47 @@
+.bio-fragment-list > .ui-widget-header > .bio-filter {
+    margin: 2px 2em;
+}
+
 .bio-filter{
+    position: relative;
     height: 1.2em;
+    margin-top: 0.1em;
+    & > div{
+        position: absolute;
+        top: 0;
+        left: 16px;
+        right: 16px;
+        bottom: 0;
+        & > input{
+            height: 100%;
+            width: 100%;
+            border: none;
+            background: none;
+        }
+    }
+    & > .ui-icon{
+        position: absolute;
+        margin-top: -8px;
+        top: 50%;
+    }
+    & > .ui-icon-search{
+        left: 0;
+    }
+    & > .ui-icon-close{
+        right: 0;
+        cursor: pointer;
+    }
 }
 
 .bio-panel{
-    padding-top: 7px;
     & > ul{
         list-style-type: none;
+        background-image: none;
          & > li{
             padding: 0.2em 0;
             text-align: center;
             border: none;
+            background-image: none;
         }
     }
 }

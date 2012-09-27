@@ -43,9 +43,18 @@ $.widget("bio.fragmentSelect", {
             o = this.options,
             el = this.el = $(this.element[0]).addClass(baseClasses);
 
-        var filter = $('<div>').addClass('bio-filter ui-widget-header').appendTo(el);
-        this.input = $('<input type="text">').appendTo(filter);
-        $('<div>').addClass('ui-icon ui-icon-search').appendTo(filter);
+        var header = $('<div>').addClass('ui-widget-header').appendTo(el);
+        var filter = $('<div>')
+            .addClass('bio-filter ui-state-default ui-corner-all')
+            .appendTo(header);
+        this.input = $('<input type="text">')
+            .appendTo($('<div>').appendTo(filter));
+        $('<span>').addClass('ui-icon ui-icon-search').appendTo(filter);
+        $('<span>').addClass('ui-icon ui-icon-close').appendTo(filter)
+            .on({
+                'mouseenter': function(){$(this).addClass('ui-state-hover');},
+                'mouseleave': function(){$(this).removeClass('ui-state-hover');}
+            });
 
         var panel = $('<div>').addClass('bio-panel').appendTo(el);
 

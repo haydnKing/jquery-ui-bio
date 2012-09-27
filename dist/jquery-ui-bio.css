@@ -101,17 +101,46 @@
   color: white;
   background-color: gray;
 }
-.bio-filter {
-  height: 1.2em;
+.bio-fragment-list > .ui-widget-header > .bio-filter {
+  margin: 2px 2em;
 }
-.bio-panel {
-  padding-top: 7px;
+.bio-filter {
+  position: relative;
+  height: 1.2em;
+  margin-top: 0.1em;
+}
+.bio-filter  > div {
+  position: absolute;
+  top: 0;
+  left: 16px;
+  right: 16px;
+  bottom: 0;
+}
+.bio-filter  > div  > input {
+  height: 100%;
+  width: 100%;
+  border: none;
+  background: none;
+}
+.bio-filter  > .ui-icon {
+  position: absolute;
+  margin-top: -8px;
+  top: 50%;
+}
+.bio-filter  > .ui-icon-search {
+  left: 0;
+}
+.bio-filter  > .ui-icon-close {
+  right: 0;
+  cursor: pointer;
 }
 .bio-panel  > ul {
   list-style-type: none;
+  background-image: none;
 }
 .bio-panel  > ul  > li {
   padding: 0.2em 0;
   text-align: center;
   border: none;
+  background-image: none;
 }
