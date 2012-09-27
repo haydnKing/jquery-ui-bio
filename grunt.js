@@ -22,14 +22,18 @@ module.exports = function(grunt) {
         ' Licensed <%= _.pluck(pkg.licenses, "type").join(", ") %> */'
     },
     concat: {
-      dist: {
+      js: {
         src: ['<banner:meta.banner>', stripBanner(grunt.file.expandFiles('src/js/*.js'))],
         dest: 'dist/<%= pkg.name %>.js'
+      },
+      css: {
+        src: ['<banner:meta.banner>', 'src/less/*.less'],
+        dest: 'dist/<%= pkg.name %>.less'
       }
     },
     min: {
       dist: {
-        src: ['<banner:meta.banner>', '<config:concat.dist.dest>'],
+        src: ['<banner:meta.banner>', '<config:concat.js.dest>'],
         dest: 'dist/<%= pkg.name %>.min.js'
       }
     },
@@ -66,7 +70,7 @@ module.exports = function(grunt) {
     less: {
         development: {
             files: {
-                "dist/<%= pkg.name %>.css": "src/less/<%= pkg.name %>.less"
+                "dist/<%= pkg.name %>.css": "dist/<%= pkg.name %>.less"
             }
         },
         production: {

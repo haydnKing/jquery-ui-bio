@@ -23,6 +23,16 @@
 
 }(jQuery));
 
+//generate a decent color palette
+var next_color = (function() {
+    var last = Math.random() * 360;
+    var stride = 360 / 1.61803;
+    return function() {
+        last = Math.floor((last + stride)) % 360;
+        return 'hsl('+last+',40%,50%)';
+    };
+}());
+
 (function($, undefined) {
 
 $.widget("bio.tooltip", {

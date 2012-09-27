@@ -1,0 +1,174 @@
+/*! jQuery Ui Bio - v0.1.0 - 2012-09-27
+* https://github.com/Gibthon/jquery-ui-bio
+* Copyright (c) 2012 Haydn King; Licensed MIT, GPL */
+
+.arrow_box(@background, @border, @size, @border-width) { 
+    position: absolute; 
+    background: @background; 
+    border: @border-width solid @border; 
+ 
+    &:before, &:after { 
+        border: solid transparent; 
+        content: " "; 
+        height: 0; 
+        width: 0; 
+        position: absolute; 
+        pointer-events: none; 
+        border-color: rgba(0, 0, 0, 0); 
+    } 
+    &:after {
+        border-width: @size;
+    }
+    &:before {
+        border-width: @size + @border-width;
+    }
+}
+.arrow_top(@background, @border, @size, @border-width) {
+    .arrow_box(@background, @border, @size, @border-width);
+    &:before, &:after {
+        bottom: 100%;
+    }
+    &:after
+    { 
+        border-bottom-color: @background; 
+        left: 50%; 
+        margin-left: -@size; 
+    } 
+    &:before {
+        border-bottom-color: inherit; 
+        left: 50%; 
+        margin-left: -@size - @border-width; 
+    }
+}
+.arrow_bottom(@background, @border, @size, @border-width) {
+    .arrow_box(@background, @border, @size, @border-width);
+    &:before, &:after {
+        top: 100%;
+    }
+    &:after
+    { 
+        border-top-color: inherit; 
+        left: 50%; 
+        margin-left: -@size; 
+    } 
+    &:before {
+        border-top-color: @border; 
+        left: 50%; 
+        margin-left: -@size - @border-width; 
+    }
+}
+.arrow_left(@background, @border, @size, @border-width) {
+    .arrow_box(@background, @border, @size, @border-width);
+    &:before, &:after {
+        right: 100%;
+    }
+    &:after
+    { 
+        border-right-color: inherit; 
+        top: 50%; 
+        margin-top: -@size; 
+    } 
+    &:before {
+        border-right-color: @border; 
+        top: 50%; 
+        margin-top: -@size - @border-width; 
+    }
+}
+.arrow_right(@background, @border, @size, @border-width) {
+    .arrow_box(@background, @border, @size, @border-width);
+    &:before, &:after {
+        left: 100%;
+    }
+    &:after
+    { 
+        border-left-color: inherit; 
+        top: 50%; 
+        margin-top: -@size; 
+    } 
+    &:before {
+        border-left-color: @border; 
+        top: 50%; 
+        margin-top: -@size - @border-width; 
+    }
+}
+
+.bio-length:after {
+    content: " bp";
+}
+
+
+
+
+@def_color: hsl(0,40%,50%);
+@fragHeight: 1.5em;
+
+.bio-fragment
+{
+    position: relative;
+    display: inline-block;
+    min-width: 7em;
+    height: @fragHeight;
+    padding: 0 10px;
+    border: 0;
+    background-color: @def_color;
+    background-image: none;
+    border-color: @def_color;
+    cursor: pointer;
+    text-align: center;
+    font: 0.75em Verdana sans-serif;
+    font-size: (@fragHeight / 2);
+    line-height: 100%;
+
+    &:before, &:after{
+        content: ' ';
+        border-style: solid;
+        border-width: @fragHeight * 0.5;
+        position: absolute;
+        width: 0;
+        top: 0;
+        bottom: 0;
+    }
+    &:before
+    {
+        border-top-color: transparent;
+        border-bottom-color: transparent;
+        border-left-color: transparent;
+        border-right-color: inherit;
+        right: 100%;
+    }
+    &:after {
+        border-left-color: inherit;
+        border-right-color: transparent;
+        border-top-color: inherit;
+        border-bottom-color: inherit;
+        right: -@fragHeight / 2;
+    }
+
+    & > p{
+        margin-top: @fragHeight / 4;
+        padding: 0 (@fragHeight * 0.618);        
+        color: white;
+    }
+
+    & > div{
+        .arrow_top(white, @def_color, 7px, 1px);
+        top: @fragHeight + 0.5em;
+        left: -1em;
+        right: -1em;
+        padding: 0 0.5em;
+        border-color: inherit;
+        cursor: auto;
+        z-index: 100;
+    }
+    & > div > div {
+        padding: 0.5em 0;
+    }
+    & > div a
+    {
+        display: block;
+        &:hover {
+            color: white;
+            background-color: gray;
+        }
+    }
+}

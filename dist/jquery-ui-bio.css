@@ -1,3 +1,9 @@
+/*! jQuery Ui Bio - v0.1.0 - 2012-09-27
+* https://github.com/Gibthon/jquery-ui-bio
+* Copyright (c) 2012 Haydn King; Licensed MIT, GPL */
+.bio-length:after {
+  content: " bp";
+}
 .bio-fragment {
   position: relative;
   display: inline-block;
@@ -47,7 +53,7 @@
   position: absolute;
   background: #ffffff;
   border: 1px solid #b34d4d;
-  top: 2.2em;
+  top: 2em;
   left: -1em;
   right: -1em;
   padding: 0 0.5em;
@@ -95,67 +101,3 @@
   color: white;
   background-color: gray;
 }
-.bio-length:after {
-  content: " bp";
-}
-/*
-.JFS_panel
-{
-    padding: 1em;
-    border-left-width: 0;
-    border-right-width: 0;
-    border-top-width: 0;
-}
-
-.JFS_count
-{
-    padding: 0.0em 1.5em;
-    margin: 0;
-    font-style: italic;
-}
-
-.JFS_fragView
-{
-    overflow-y: scroll;
-    overflow-x: hidden;
-}
-
-#JFS_filter
-{
-    width: 100%;
-    margin: 0;
-    border-width: 0;
-}
-
-.JFS_filterHolder
-{
-    padding: 0em 1em;
-    position: relative;
-    background: none !important;
-}
-.JFS_filterHolder .ui-icon
-{
-    position: absolute;
-    right: 0.5em;
-    top: auto;
-}
-.JFS_filterHolder p
-{
-    position: absolute;
-    left: 0em;
-    top: 0em;
-    font-style:italic;
-    color:grey;
-}
-#JFS_loading
-{
-    margin: 1.5em 0;
-    color: grey;
-    font-style:italic;
-}
-.JFS_fragHolder
-{
-    position:relative;
-    margin: 0.5em;
-}
-*/
