@@ -1,4 +1,4 @@
-/*! jQuery Ui Bio - v0.1.0 - 2012-09-24
+/*! jQuery Ui Bio - v0.1.0 - 2012-09-27
 * https://github.com/Gibthon/jquery-ui-bio
 * Copyright (c) 2012 Haydn King; Licensed MIT, GPL */
 
@@ -116,6 +116,7 @@ $.widget("bio.tooltip", {
         
 }(jQuery));
 
+/*global next_color:false */
 (function($, undefined) {
 
 var baseClasses = 'bio-fragment ui-widget ui-state-default',
@@ -125,22 +126,34 @@ var baseClasses = 'bio-fragment ui-widget ui-state-default',
 
 $.widget("bio.fragment", $.ui.draggable, {
     options: {
-        name: 'Unnamed Fragment',
-        description: 'No Description',
-        length: 0,
+        name: null,
+        desc: null,
+        length: null,
         url: undefined,
         color: undefined,
         text: {
-            goto_page: 'Goto Page'
-        }
+            goto_page: 'Goto Page',
+            def_desc: 'No Description',
+            def_name: 'Unnamed Fragment'
+        },
+        helper: 'clone'
     },
     _create: function() {
         var o = this.options,
             self = this;
+
         var el = this.el = $(this.element[0])
             .addClass(baseClasses);
+
+        o.name = el.attr('name') || o.name || o.text.def_name;
+        o.desc = el.attr('desc') || o.desc || o.text.def_desc;
+        o.length = el.attr('length') || o.length || 0;
+        o.url = el.attr('href') || o.url;
+        o.color = o.color || next_color();
+
         this.name = $("<p>")
             .text(o.name)
+            .addClass('bio-name')
             .appendTo(el);
         this.info = $("<div>")
             .hide()
@@ -152,17 +165,20 @@ $.widget("bio.fragment", $.ui.draggable, {
             });
         this.refreshInfo();            
         
-        if(o.color != null) {
-            el.css({
-                'background-color':this.options.color,
-                'border-color':this.options.color
-            });
-        }
+        el.css({
+            'background-color': o.color,
+            'border-color': o.color
+        });
 
         if(o.helper === 'clone'){
             o.helper = function(){
                 return $('<div>')
                     .addClass(baseClasses)
+                    .css({
+                        'background-color': o.color,
+                        'border-color': o.color,
+                        'z-index': 100
+                    })
                     .append($("<p>").text(o.name));
             };
         }
@@ -173,14 +189,15 @@ $.widget("bio.fragment", $.ui.draggable, {
             self.info.tooltip('enable');
         });
         this.info.tooltip({
-            'mouseTarget': this.el
+            'mouseTarget': this.el,
+            openDelay: 500
         });
     },
     _init: function() {
     },
     option: function(name, value)
     {
-        var o = this.option;
+        var o = this.options;
 
         if(value == null) {
             return o[name] || this.$el.draggable(name);
@@ -191,7 +208,7 @@ $.widget("bio.fragment", $.ui.draggable, {
             case 'name':
                 this.name.text(value);
                 break;
-            case 'description':
+            case 'desc':
             case 'length':
             case 'url':
                 this.refreshInfo();
@@ -216,10 +233,10 @@ $.widget("bio.fragment", $.ui.draggable, {
         this.info.html('');
         $('<div><p class="bio-length">'+ o.length + '</p></div>')
             .appendTo(this.info);
-        $('<div><p>'+ o.description + '</p></div>')
+        $('<div><p class="bio-desc">'+ o.desc + '</p></div>')
             .appendTo(this.info);
         if(o.url != null){
-            $('<div><a href=' + o.url + '>'+o.text.goto_page+'</a></div>').
+            $('<div><a href=' + o.url + ' class="bio-url">'+o.text.goto_page+'</a></div>').
                 appendTo(this.info);
         }
     }

@@ -14,8 +14,9 @@
   font-size: 0.75em;
   line-height: 100%;
 }
-.before-after {
-  content: '';
+.bio-fragment:before,
+.bio-fragment:after {
+  content: ' ';
   border-style: solid;
   border-width: 0.75em;
   position: absolute;
@@ -24,13 +25,6 @@
   bottom: 0;
 }
 .bio-fragment:before {
-  content: '';
-  border-style: solid;
-  border-width: 0.75em;
-  position: absolute;
-  width: 0;
-  top: 0;
-  bottom: 0;
   border-top-color: transparent;
   border-bottom-color: transparent;
   border-left-color: transparent;
@@ -38,25 +32,18 @@
   right: 100%;
 }
 .bio-fragment:after {
-  content: '';
-  border-style: solid;
-  border-width: 0.75em;
-  position: absolute;
-  width: 0;
-  top: 0;
-  bottom: 0;
   border-left-color: inherit;
   border-right-color: transparent;
   border-top-color: inherit;
   border-bottom-color: inherit;
   right: -0.75em;
 }
-.bio-fragment > p {
+.bio-fragment  > p {
   margin-top: 0.375em;
   padding: 0 0.927em;
   color: white;
 }
-.bio-fragment > div {
+.bio-fragment  > div {
   position: absolute;
   background: #ffffff;
   border: 1px solid #b34d4d;
@@ -66,9 +53,10 @@
   padding: 0 0.5em;
   border-color: inherit;
   cursor: auto;
+  z-index: 100;
 }
-.bio-fragment > div:before,
-.bio-fragment > div:after {
+.bio-fragment  > div:before,
+.bio-fragment  > div:after {
   border: solid transparent;
   content: " ";
   height: 0;
@@ -77,33 +65,33 @@
   pointer-events: none;
   border-color: rgba(0, 0, 0, 0);
 }
-.bio-fragment > div:after {
+.bio-fragment  > div:after {
   border-width: 7px;
 }
-.bio-fragment > div:before {
+.bio-fragment  > div:before {
   border-width: 8px;
 }
-.bio-fragment > div:before,
-.bio-fragment > div:after {
+.bio-fragment  > div:before,
+.bio-fragment  > div:after {
   bottom: 100%;
 }
-.bio-fragment > div:after {
+.bio-fragment  > div:after {
   border-bottom-color: #ffffff;
   left: 50%;
   margin-left: -7px;
 }
-.bio-fragment > div:before {
-  border-bottom-color: #b34d4d;
+.bio-fragment  > div:before {
+  border-bottom-color: inherit;
   left: 50%;
   margin-left: -8px;
 }
-.bio-fragment > div > div {
+.bio-fragment  > div > div {
   padding: 0.5em 0;
 }
-.bio-fragment > div a {
+.bio-fragment  > div a {
   display: block;
 }
-.bio-fragment > div a:hover {
+.bio-fragment  > div a:hover {
   color: white;
   background-color: gray;
 }

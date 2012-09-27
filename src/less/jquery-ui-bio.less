@@ -36,7 +36,7 @@
         margin-left: -@size; 
     } 
     &:before {
-        border-bottom-color: @border; 
+        border-bottom-color: inherit; 
         left: 50%; 
         margin-left: -@size - @border-width; 
     }
@@ -48,7 +48,7 @@
     }
     &:after
     { 
-        border-top-color: @background; 
+        border-top-color: inherit; 
         left: 50%; 
         margin-left: -@size; 
     } 
@@ -65,7 +65,7 @@
     }
     &:after
     { 
-        border-right-color: @background; 
+        border-right-color: inherit; 
         top: 50%; 
         margin-top: -@size; 
     } 
@@ -82,7 +82,7 @@
     }
     &:after
     { 
-        border-left-color: @background; 
+        border-left-color: inherit; 
         top: 50%; 
         margin-top: -@size; 
     } 
@@ -109,56 +109,58 @@
     font: 0.75em Verdana sans-serif;
     font-size: (@height / 2);
     line-height: 100%;
-}
-.before-after{
-    content:'';
-    border-style: solid;
-    border-width: @height * 0.5;
-    position: absolute;
-    width: 0;
-    top: 0;
-    bottom: 0;
-}
-.bio-fragment:before
-{
-    .before-after;
-    border-top-color: transparent;
-    border-bottom-color: transparent;
-    border-left-color: transparent;
-    border-right-color: inherit;
-    right: 100%;
-}
-.bio-fragment:after {
-    .before-after;
-    border-left-color: inherit;
-    border-right-color: transparent;
-    border-top-color: inherit;
-    border-bottom-color: inherit;
-    right: -@height / 2;
-}
-.bio-fragment > p{
-    margin-top: @height / 4;
-    padding: 0 (@height * 0.618);        
-    color: white;
-}
-.bio-fragment > div{
-    .arrow_top(white, @def_color, 7px, 1px);
-    top: @height + @arrow + 0.2em;
-    left: -1em;
-    right: -1em;
-    padding: 0 0.5em;
-    border-color: inherit;
-    cursor: auto;
-}
-.bio-fragment > div > div {
-    padding: 0.5em 0;
-}
-.bio-fragment > div a
-{
-    display: block;
-    &:hover {
+
+    &:before, &:after{
+        content: ' ';
+        border-style: solid;
+        border-width: @height * 0.5;
+        position: absolute;
+        width: 0;
+        top: 0;
+        bottom: 0;
+    }
+    &:before
+    {
+        border-top-color: transparent;
+        border-bottom-color: transparent;
+        border-left-color: transparent;
+        border-right-color: inherit;
+        right: 100%;
+    }
+    &:after {
+        border-left-color: inherit;
+        border-right-color: transparent;
+        border-top-color: inherit;
+        border-bottom-color: inherit;
+        right: -@height / 2;
+    }
+
+    & > p{
+        margin-top: @height / 4;
+        padding: 0 (@height * 0.618);        
         color: white;
-        background-color: gray;
+    }
+
+    & > div{
+        .arrow_top(white, @def_color, 7px, 1px);
+        top: @height + @arrow + 0.2em;
+        left: -1em;
+        right: -1em;
+        padding: 0 0.5em;
+        border-color: inherit;
+        cursor: auto;
+        z-index: 100;
+    }
+    & > div > div {
+        padding: 0.5em 0;
+    }
+    & > div a
+    {
+        display: block;
+        &:hover {
+            color: white;
+            background-color: gray;
+        }
     }
 }
 .bio-length:after {
