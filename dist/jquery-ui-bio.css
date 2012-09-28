@@ -1,6 +1,44 @@
 /*! jQuery Ui Bio - v0.1.0 - 2012-09-28
 * https://github.com/Gibthon/jquery-ui-bio
 * Copyright (c) 2012 Haydn King; Licensed MIT, GPL */
+.bio-search {
+  position: relative;
+  height: 1.2em;
+  margin-top: 0.1em;
+}
+.bio-search  > div {
+  position: absolute;
+  top: 0;
+  left: 16px;
+  right: 16px;
+  bottom: 0;
+}
+.bio-search  > div  > input {
+  height: 100%;
+  width: 100%;
+  border: none;
+  background: none;
+}
+.bio-search  > .hint {
+  font-style: italic;
+  cursor: text;
+}
+.bio-search  > .ui-icon {
+  position: absolute;
+  margin-top: -8px;
+  top: 50%;
+}
+.bio-search  > .ui-icon-search {
+  left: 0;
+}
+.bio-search  > .ui-icon-close {
+  right: 0;
+  cursor: pointer;
+  opacity: 0.6;
+}
+.bio-search  > .ui-icon-close:hover {
+  opacity: 1.0;
+}
 .bio-length:after {
   content: " bp";
 }
@@ -124,42 +162,4 @@
 }
 .bio-fragment-select  > .bio-bottom {
   height: 0.7em;
-}
-.bio-filter {
-  position: relative;
-  height: 1.2em;
-  margin-top: 0.1em;
-}
-.bio-filter  > div {
-  position: absolute;
-  top: 0;
-  left: 16px;
-  right: 16px;
-  bottom: 0;
-}
-.bio-filter  > div  > input {
-  height: 100%;
-  width: 100%;
-  border: none;
-  background: none;
-}
-.bio-filter  > .hint {
-  font-style: italic;
-  cursor: text;
-}
-.bio-filter  > .ui-icon {
-  position: absolute;
-  margin-top: -8px;
-  top: 50%;
-}
-.bio-filter  > .ui-icon-search {
-  left: 0;
-}
-.bio-filter  > .ui-icon-close {
-  right: 0;
-  cursor: pointer;
-  opacity: 0.6;
-}
-.bio-filter  > .ui-icon-close:hover {
-  opacity: 1.0;
 }

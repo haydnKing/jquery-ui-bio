@@ -13,10 +13,8 @@ var baseClasses = 'bio-fragment-select ui-widget',
     bottomClasses='bio-bottom ui-widget ui-widget-header';
 
 var test_frag = function(f, filter){
-    var r = filter.test(f.fragment('option','name')) || 
+    return filter.test(f.fragment('option','name')) || 
         filter.test(f.fragment('option','desc'));
-    console.log('test_frag(f,' + filter + ') -> ' + r);
-    return r;
 };
 
 $.widget("bio.fragmentSelect", {
@@ -38,48 +36,15 @@ $.widget("bio.fragmentSelect", {
         this.timeout = null;
 
         var header  = this.header = $('<div>').addClass('ui-widget-header').appendTo(el);
-        var filter = $('<div>')
-            .addClass('bio-filter ui-state-default')
-            .appendTo(header);
-        this.input = $('<input type="text">')
-            .appendTo($('<div>').appendTo(filter))
-            .on({
-                'focus': function(){self.filter_hint.hide();},
-                'blur': function(){
-                    if(!$(this).val()){ 
-                        self.filter_hint.show();
-                        self.filter_clear.hide();
-                    }
-                },
-                'keyup': function(){
-                    var v = self.input.val();
-                    if(v){
-                        self.filter_clear.show();
-                    } else{
-                        self.filter_clear.hide();
-                    }
-                    if(self.timeout)
-                    {
-                        clearTimeout(self.timeout);
-                    }
-                    self.timeout = setTimeout(function() {
-                        self.timeout = null;
-                        self.filter(v);
-                    }, 500);
+        this.search = $('<div>')
+            .search({
+                text: {search: 'filter'},
+                change: function(){
+                    self.filter(self.search.search('value'));
                 }
-            });
-        this.filter_hint = $('<div>')
-            .addClass('hint')
-            .text(o.text.filter)
-            .appendTo(filter)
-            .on('click', function() {self.input.focus();});
-        $('<span>').addClass('ui-icon ui-icon-search').appendTo(filter);
-        this.filter_clear = $('<span>').addClass('ui-icon ui-icon-close')
-            .hide()
-            .appendTo(filter)
-            .on('click', function(){
-               
-            });
+            })
+            .appendTo(header);
+        
 
         var panel = this.panel = $('<div>').addClass(panelClasses).appendTo(el);
         var base = $('<div>').addClass(bottomClasses).appendTo(el);
@@ -113,12 +78,11 @@ $.widget("bio.fragmentSelect", {
 
         if(el.hasClass('ui-corner-all')){
             header.addClass('ui-corner-top');
-            filter.addClass('ui-corner-all');
+            this.search.addClass('ui-corner-all');
             base.addClass('ui-corner-bottom');
         }
     },
     filter: function(str){
-        console.log('str = '+str);
         var reg = new RegExp(str, 'i');
         this.el.find(':bio-fragment').each( function(){
             var f = $(this);

@@ -2,6 +2,45 @@
 * https://github.com/Gibthon/jquery-ui-bio
 * Copyright (c) 2012 Haydn King; Licensed MIT, GPL */
 
+.bio-search{
+    position: relative;
+    height: 1.2em;
+    margin-top: 0.1em;
+    & > div{
+        position: absolute;
+        top: 0;
+        left: 16px;
+        right: 16px;
+        bottom: 0;
+        & > input{
+            height: 100%;
+            width: 100%;
+            border: none;
+            background: none;
+        }
+    }
+    & > .hint{
+        font-style: italic;
+        cursor: text;
+    }
+    & > .ui-icon{
+        position: absolute;
+        margin-top: -8px;
+        top: 50%;
+    }
+    & > .ui-icon-search{
+        left: 0;
+    }
+    & > .ui-icon-close{
+        right: 0;
+        cursor: pointer;
+        opacity: 0.6;
+        &:hover{
+            opacity: 1.0;
+        }
+    }
+}
+
 .arrow_box(@background, @border, @size, @border-width) { 
     position: absolute; 
     background: @background; 
@@ -197,45 +236,4 @@
         height: 0.7em;
     }
 }
-
-.bio-filter{
-    position: relative;
-    height: 1.2em;
-    margin-top: 0.1em;
-    & > div{
-        position: absolute;
-        top: 0;
-        left: 16px;
-        right: 16px;
-        bottom: 0;
-        & > input{
-            height: 100%;
-            width: 100%;
-            border: none;
-            background: none;
-        }
-    }
-    & > .hint{
-        font-style: italic;
-        cursor: text;
-    }
-    & > .ui-icon{
-        position: absolute;
-        margin-top: -8px;
-        top: 50%;
-    }
-    & > .ui-icon-search{
-        left: 0;
-    }
-    & > .ui-icon-close{
-        right: 0;
-        cursor: pointer;
-        opacity: 0.6;
-        &:hover{
-            opacity: 1.0;
-        }
-    }
-}
-
-
 

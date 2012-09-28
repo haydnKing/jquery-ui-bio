@@ -56,48 +56,15 @@ $.widget("bio.fragmentSelect", {
         this.timeout = null;
 
         var header  = this.header = $('<div>').addClass('ui-widget-header').appendTo(el);
-        var filter = $('<div>')
-            .addClass('bio-filter ui-state-default')
-            .appendTo(header);
-        this.input = $('<input type="text">')
-            .appendTo($('<div>').appendTo(filter))
-            .on({
-                'focus': function(){self.filter_hint.hide();},
-                'blur': function(){
-                    if(!$(this).val()){ 
-                        self.filter_hint.show();
-                        self.filter_clear.hide();
-                    }
-                },
-                'keyup': function(){
-                    var v = self.input.val();
-                    if(v){
-                        self.filter_clear.show();
-                    } else{
-                        self.filter_clear.hide();
-                    }
-                    if(self.timeout)
-                    {
-                        clearTimeout(self.timeout);
-                    }
-                    self.timeout = setTimeout(function() {
-                        self.timeout = null;
-                        self.filter(v);
-                    }, 500);
+        this.search = $('<div>')
+            .search({
+                text: {search: 'filter'},
+                change: function(){
+                    self.filter(self.search.search('value'));
                 }
-            });
-        this.filter_hint = $('<div>')
-            .addClass('hint')
-            .text(o.text.filter)
-            .appendTo(filter)
-            .on('click', function() {self.input.focus();});
-        $('<span>').addClass('ui-icon ui-icon-search').appendTo(filter);
-        this.filter_clear = $('<span>').addClass('ui-icon ui-icon-close')
-            .hide()
-            .appendTo(filter)
-            .on('click', function(){
-               
-            });
+            })
+            .appendTo(header);
+        
 
         var panel = this.panel = $('<div>').addClass(panelClasses).appendTo(el);
         var base = $('<div>').addClass(bottomClasses).appendTo(el);
@@ -131,7 +98,7 @@ $.widget("bio.fragmentSelect", {
 
         if(el.hasClass('ui-corner-all')){
             header.addClass('ui-corner-top');
-            filter.addClass('ui-corner-all');
+            this.search.addClass('ui-corner-all');
             base.addClass('ui-corner-bottom');
         }
     },
@@ -153,6 +120,117 @@ $.widget("bio.fragmentSelect", {
     },
     _set_height: function(){
         this.panel.outerHeight(this.options.height - this.header.outerHeight());
+    }
+});
+
+}(jQuery));
+
+
+(function($, undefined) {
+
+var baseClasses    = 'bio-search ui-widget',
+    defaultClasses = 'ui-state-default',
+    hoverClasses   = 'ui-state-hover',
+    focusClasses   = 'ui-state-highlight';
+
+$.widget("bio.search", {
+    options: {
+        text: {
+            search: 'search'
+        },
+        // events
+        change: undefined 
+    },
+    _create: function() {
+        var self = this,
+            o = this.options,
+            el = this.el = $(this.element[0]).addClass(baseClasses);
+
+        this.timeout = null;
+
+        el.addClass(baseClasses).addClass(defaultClasses);
+        this.input = $('<input type="text">')
+            .appendTo($('<div>').appendTo(el));
+        this.search_hint = $('<div>')
+            .addClass('hint')
+            .text(o.text.search)
+            .appendTo(el);
+        $('<span>').addClass('ui-icon ui-icon-search').appendTo(el);
+        this.search_clear = $('<span>').addClass('ui-icon ui-icon-close')
+            .hide()
+            .appendTo(el);
+            
+    },
+    _init: function(){
+        var self = this,
+            o = this.options;
+        this.input.on({
+                'focus': function(){
+                    self.search_hint.hide();
+                    self.el
+                        .removeClass(defaultClasses)
+                        .removeClass(hoverClasses)
+                        .addClass(focusClasses);
+                },
+                'blur': function(){
+                    if(!$(this).val()){ 
+                        self.search_hint.show();
+                        self.search_clear.hide();
+                    }
+                    self.el
+                        .removeClass(focusClasses)
+                        .addClass(defaultClasses);
+                },
+                'keyup': function(){
+                    var v = self.input.val();
+                    if(v){
+                        self.search_clear.show();
+                    } else{
+                        self.search_clear.hide();
+                    }
+                    if(self.timeout)
+                    {
+                        clearTimeout(self.timeout);
+                    }
+                    self.timeout = setTimeout(function() {
+                        self.timeout = null;
+                        self._trigger('change', v);
+                    }, 500);
+                }
+            });
+        this.el.on({
+            'click': function() {
+                self.input.focus();
+            },
+            'mouseenter': function() {
+                if(self.el.hasClass(defaultClasses)){
+                    self.el
+                        .removeClass(defaultClasses)
+                        .addClass(hoverClasses);
+                }
+            },
+            'mouseleave': function() {
+                if(self.el.hasClass(hoverClasses)){
+                    self.el
+                        .removeClass(hoverClasses)
+                        .addClass(defaultClasses);
+                }
+            }
+                    
+        });
+        this.search_clear.on('click', function(){
+            self.input.val('');
+            self.search_clear.hide();
+            self._trigger('change');
+        });
+    },
+    value: function(v) {
+        if(v!=null){
+            this.input.val(v);
+            this._trigger('change');
+            return;
+        }
+        return this.input.val();
     }
 });
 
