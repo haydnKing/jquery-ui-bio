@@ -1,4 +1,4 @@
-/*! jQuery Ui Bio - v0.1.0 - 2012-09-27
+/*! jQuery Ui Bio - v0.1.0 - 2012-09-28
 * https://github.com/Gibthon/jquery-ui-bio
 * Copyright (c) 2012 Haydn King; Licensed MIT, GPL */
 .bio-length:after {
@@ -101,11 +101,29 @@
   color: white;
   background-color: gray;
 }
-.bio-fragment-list {
+.bio-fragment-select {
   background-image: none;
 }
-.bio-fragment-list  > .ui-widget-header > .bio-filter {
+.bio-fragment-select  > .ui-widget-header > .bio-filter {
   margin: 2px 2em;
+}
+.bio-fragment-select  > .bio-panel {
+  background-image: none;
+  border-top: none;
+  border-bottom: none;
+}
+.bio-fragment-select  > .bio-panel  > ul {
+  list-style-type: none;
+  background-image: none;
+}
+.bio-fragment-select  > .bio-panel  > ul  > li {
+  padding: 0.2em 0;
+  text-align: center;
+  border: none;
+  background-image: none;
+}
+.bio-fragment-select  > .bio-bottom {
+  height: 0.7em;
 }
 .bio-filter {
   position: relative;
@@ -144,14 +162,4 @@
 }
 .bio-filter  > .ui-icon-close:hover {
   opacity: 1.0;
-}
-.bio-panel  > ul {
-  list-style-type: none;
-  background-image: none;
-}
-.bio-panel  > ul  > li {
-  padding: 0.2em 0;
-  text-align: center;
-  border: none;
-  background-image: none;
 }

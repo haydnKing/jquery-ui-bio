@@ -1,4 +1,4 @@
-/*! jQuery Ui Bio - v0.1.0 - 2012-09-27
+/*! jQuery Ui Bio - v0.1.0 - 2012-09-28
 * https://github.com/Gibthon/jquery-ui-bio
 * Copyright (c) 2012 Haydn King; Licensed MIT, GPL */
 
@@ -173,10 +173,28 @@
     }
 }
 
-.bio-fragment-list {
+.bio-fragment-select {
     background-image: none;
     & > .ui-widget-header > .bio-filter {
         margin: 2px 2em;
+    }
+    & > .bio-panel{
+        background-image: none;
+        border-top: none;
+        border-bottom: none;
+        & > ul{
+            list-style-type: none;
+            background-image: none;
+             & > li{
+                padding: 0.2em 0;
+                text-align: center;
+                border: none;
+                background-image: none;
+            }
+        }
+    }
+    & > .bio-bottom{
+        height: 0.7em;
     }
 }
 
@@ -219,16 +237,5 @@
     }
 }
 
-.bio-panel{
-    & > ul{
-        list-style-type: none;
-        background-image: none;
-         & > li{
-            padding: 0.2em 0;
-            text-align: center;
-            border: none;
-            background-image: none;
-        }
-    }
-}
+
 

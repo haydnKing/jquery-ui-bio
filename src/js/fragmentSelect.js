@@ -8,7 +8,9 @@
 /*global next_color:false */
 (function($, undefined) {
 
-var baseClasses = 'bio-fragment-list ui-widget ui-state-default';
+var baseClasses = 'bio-fragment-select ui-widget',
+    panelClasses= 'bio-panel ui-widget ui-state-default',
+    bottomClasses='bio-bottom ui-widget ui-widget-header';
 
 var test_frag = function(f, filter){
     var r = filter.test(f.fragment('option','name')) || 
@@ -20,6 +22,7 @@ var test_frag = function(f, filter){
 $.widget("bio.fragmentSelect", {
     options: {
         text: {
+            title: 'Fragment Selector',
             filter: 'filter',
             loading: 'Loading fragments...',
             none_found: 'No fragments found'
@@ -36,7 +39,7 @@ $.widget("bio.fragmentSelect", {
 
         var header  = this.header = $('<div>').addClass('ui-widget-header').appendTo(el);
         var filter = $('<div>')
-            .addClass('bio-filter ui-state-default ui-corner-all')
+            .addClass('bio-filter ui-state-default')
             .appendTo(header);
         this.input = $('<input type="text">')
             .appendTo($('<div>').appendTo(filter))
@@ -78,7 +81,8 @@ $.widget("bio.fragmentSelect", {
                
             });
 
-        var panel = this.panel = $('<div>').addClass('bio-panel').appendTo(el);
+        var panel = this.panel = $('<div>').addClass(panelClasses).appendTo(el);
+        var base = $('<div>').addClass(bottomClasses).appendTo(el);
 
         //copy any initial fragments
         var list = el.find('ul');
@@ -106,6 +110,12 @@ $.widget("bio.fragmentSelect", {
         }, 'ul > li');
 
         self._set_height();
+
+        if(el.hasClass('ui-corner-all')){
+            header.addClass('ui-corner-top');
+            filter.addClass('ui-corner-all');
+            base.addClass('ui-corner-bottom');
+        }
     },
     filter: function(str){
         console.log('str = '+str);
