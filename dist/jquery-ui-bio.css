@@ -1,6 +1,63 @@
-/*! jQuery Ui Bio - v0.1.0 - 2012-09-28
+/*! jQuery Ui Bio - v0.1.0 - 2012-09-29
 * https://github.com/Gibthon/jquery-ui-bio
 * Copyright (c) 2012 Haydn King; Licensed MIT, GPL */
+.bio-help {
+  opacity: 0.6;
+  cursor: pointer;
+  position: relative;
+  height: 1em;
+  width: 0.5em;
+  z-index: 100;
+}
+.bio-help:before {
+  content: '?';
+}
+.bio-help:hover {
+  opacity: 1.0;
+}
+.bio-help  > .tip {
+  position: absolute;
+  background: #ffffff;
+  border: 1px solid inherit;
+  position: absolute;
+  top: 2em;
+  width: 20em;
+  left: 50%;
+  margin-left: -10em;
+}
+.bio-help  > .tip:before,
+.bio-help  > .tip:after {
+  border: solid transparent;
+  content: " ";
+  height: 0;
+  width: 0;
+  position: absolute;
+  pointer-events: none;
+  border-color: rgba(0, 0, 0, 0);
+}
+.bio-help  > .tip:after {
+  border-width: 10px;
+}
+.bio-help  > .tip:before {
+  border-width: 11px;
+}
+.bio-help  > .tip:before,
+.bio-help  > .tip:after {
+  bottom: 100%;
+}
+.bio-help  > .tip:after {
+  border-bottom-color: #ffffff;
+  left: 50%;
+  margin-left: -10px;
+}
+.bio-help  > .tip:before {
+  border-bottom-color: inherit;
+  left: 50%;
+  margin-left: -11px;
+}
+.bio-help  > .tip  > * {
+  margin: 1.5em 0.5em;
+}
 .bio-search {
   position: relative;
   height: 1.2em;
@@ -44,6 +101,12 @@
 .ui-icon-loading,
 .ui-state-default .ui-icon-loading {
   background-image: url('images/loading16.gif');
+}
+.ui-corner-inherit {
+  -moz-border-radius: inherit;
+  -webkit-border-radius: inherit;
+  -khtml-border-radius: inherit;
+  border-radius: inherit;
 }
 .bio-fragment {
   position: relative;
@@ -150,19 +213,11 @@
   text-align: center;
   padding: 0.25em;
 }
-.bio-fragment-select  > .ui-widget-header  > .help {
-  opacity: 0.6;
-  cursor: pointer;
+.bio-fragment-select  > .ui-widget-header  > .bio-help {
   position: absolute;
   right: 0.5em;
   top: 50%;
   margin-top: -0.5em;
-}
-.bio-fragment-select  > .ui-widget-header  > .help:after {
-  content: '?';
-}
-.bio-fragment-select  > .ui-widget-header  > .help:hover {
-  opacity: 1.0;
 }
 .bio-fragment-select  > .bio-panel {
   position: relative;

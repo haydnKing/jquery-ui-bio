@@ -1,4 +1,4 @@
-/*! jQuery Ui Bio - v0.1.0 - 2012-09-28
+/*! jQuery Ui Bio - v0.1.0 - 2012-09-29
 * https://github.com/Gibthon/jquery-ui-bio
 * Copyright (c) 2012 Haydn King; Licensed MIT, GPL */
 
@@ -40,6 +40,7 @@ $.widget("bio.fragmentSelect", {
     options: {
         text: {
             title: 'Fragment Selector',
+            helphtml: 'Drag and drop fragments to select them',
             filter: 'filter',
             loading: 'Loading fragments...',
             none_loaded: 'No fragments are loaded',
@@ -64,7 +65,9 @@ $.widget("bio.fragmentSelect", {
         var base = $('<div>').addClass(bottomClasses).appendTo(el);
         
         $('<span>').addClass('title').text(o.text.title).appendTo(header);
-        $('<span>').addClass('help').appendTo(header);
+        var h = $('<span>').appendTo(header).help({
+            helphtml: o.text.helphtml
+        });
 
         var searchbar = $('<div>').addClass('searchbar').appendTo(panel);
         
@@ -115,6 +118,7 @@ $.widget("bio.fragmentSelect", {
             header.addClass('ui-corner-top');
             this.search.addClass('ui-corner-all');
             base.addClass('ui-corner-bottom');
+            h.addClass('ui-corner-all');
         }
     },
     filter: function(str){
@@ -281,6 +285,41 @@ $.widget("bio.search", {
 
 }(jQuery));
 
+
+/*global next_color:false */
+(function($, undefined) {
+
+var iconStyle = 'bio-help ui-widget',
+    tooltipStyle = 'tip ui-widget-content ui-corner-inherit',
+    cornerStyle = 'ui-corner-all';
+
+$.widget("bio.help", {
+    options: {
+        helphtml: 'Some Help',
+        open: undefined,
+        close: undefined
+    },
+    _init: function() {
+        var self = this,
+            o = this.options,
+            el = this.el = $(this.element[0]).addClass(iconStyle),
+            tip = $('<div>').addClass(tooltipStyle).appendTo(el);
+        
+        if(el.hasClass('ui-corner-all')){
+            tip.addClass('ui-corner-all');
+        }
+
+        $('<p>').html(o.helphtml).appendTo(tip);
+        tip.tooltip({
+            mouseTarget: el
+        });
+
+    },
+    _create: function() {
+    }
+});
+
+}(jQuery));
 
 //generate a decent color palette
 var next_color = (function() {

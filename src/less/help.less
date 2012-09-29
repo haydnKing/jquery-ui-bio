@@ -1,0 +1,27 @@
+.bio-help {
+    opacity: 0.6;
+    cursor: pointer;
+    position: relative;
+    height: 1em;
+    width: 0.5em;
+    z-index: 100;
+
+    &:before {
+        content: '?';
+    }
+    &:hover {
+        opacity: 1.0;
+    }
+    & > .tip {
+        .arrow_top(white, inherit, 10px, 1px);
+        position: absolute;
+        top: 2em;
+        width: 20em;
+        left: 50%;
+        margin-left: -10em;
+        & > * {
+            margin: 1.5em 0.5em;
+        }
+    }
+}
+
