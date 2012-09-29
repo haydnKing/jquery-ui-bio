@@ -178,48 +178,16 @@
 {
     position: relative;
     display: inline-block;
-    min-width: 7em;
+    min-width: 10em;
     height: @fragHeight;
-    padding: 0 10px;
-    border: 0;
-    background-color: @def_color;
     background-image: none;
-    border-color: @def_color;
     cursor: pointer;
-    text-align: center;
     font: 0.75em Verdana sans-serif;
     font-size: (@fragHeight / 2);
     line-height: 100%;
 
-    &:before, &:after{
-        content: ' ';
-        border-style: solid;
-        border-width: @fragHeight * 0.5;
-        position: absolute;
-        width: 0;
-        top: 0;
-        bottom: 0;
-    }
-    &:before
-    {
-        border-top-color: transparent;
-        border-bottom-color: transparent;
-        border-left-color: transparent;
-        border-right-color: inherit;
-        right: 100%;
-    }
-    &:after {
-        border-left-color: inherit;
-        border-right-color: transparent;
-        border-top-color: inherit;
-        border-bottom-color: inherit;
-        right: -@fragHeight / 2;
-    }
-
-    & > p{
-        margin-top: @fragHeight / 4;
-        padding: 0 (@fragHeight * 0.618);        
-        color: white;
+    & > svg{
+        z-index: 0;
     }
 
     & > div{

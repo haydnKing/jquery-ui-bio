@@ -5,13 +5,28 @@
  * Copyright (c) 2012 Gibthon Developers
  * Licensed under the MIT, GPL licenses.
  */
-/*global next_color:false */
+/*global next_color:false Raphael:false */
 (function($, undefined) {
 
 var baseClasses = 'bio-fragment ui-widget',
     hoverClasses = 'ui-state-hover ui-state-active',
     disabledClasses = 'ui-state-disabled',
     infoClasses = 'ui-corner-all';
+
+var tail_len = 10;
+
+var makeLinearFrag = function(w, h, right) {
+    if(right == null){
+        right = true;
+    }
+    var h2 = h / 2;
+    var wa = w - h2;
+    var t = (right) ? h2 : -h2;
+    var x0= (right) ? 0  :  h2;
+    var s = 'M'+x0+',0 h'+wa+' l'+h2+','+h2+' l'+(-h2)+','+h2+
+            ' h'+(-wa)+' l'+h2+','+(-h2)+' z';
+    return s;
+};
 
 $.widget("bio.fragment", $.ui.draggable, {
     options: {
@@ -40,10 +55,6 @@ $.widget("bio.fragment", $.ui.draggable, {
         o.url = el.attr('href') || o.url;
         o.color = o.color || next_color();
 
-        this.name = $("<p>")
-            .text(o.name)
-            .addClass('bio-name')
-            .appendTo(el);
         this.info = $("<div>")
             .hide()
             .addClass(infoClasses)
@@ -55,20 +66,13 @@ $.widget("bio.fragment", $.ui.draggable, {
         this.refreshInfo();            
         
         el.css({
-            'background-color': o.color,
             'border-color': o.color
         });
 
         if(o.helper === 'clone'){
             o.helper = function(){
-                return $('<div>')
-                    .addClass(baseClasses)
-                    .css({
-                        'background-color': o.color,
-                        'border-color': o.color,
-                        'z-index': 100
-                    })
-                    .append($("<p>").text(o.name));
+                return $('<div>').addClass(baseClasses)
+                    .append(el.children('svg').clone());
             };
         }
 
@@ -81,6 +85,8 @@ $.widget("bio.fragment", $.ui.draggable, {
             'mouseTarget': this.el,
             openDelay: 500
         });
+
+        this._add_svg(el);
     },
     _init: function() {
     },
@@ -95,7 +101,7 @@ $.widget("bio.fragment", $.ui.draggable, {
         switch(name)
         {
             case 'name':
-                this.name.text(value);
+                this.name.attr('name', value);
                 break;
             case 'desc':
             case 'length':
@@ -127,6 +133,28 @@ $.widget("bio.fragment", $.ui.draggable, {
         if(o.url != null){
             $('<div><a href=' + o.url + ' class="bio-url">'+o.text.goto_page+'</a></div>').
                 appendTo(this.info);
+        }
+    },
+    _add_svg: function(el)
+    {
+        var w = el.width(),
+            h = el.height(),
+            hsl= this.options.color.match(/\d+/g),
+            paper = Raphael(this.element[0], w, h),
+            frag = paper.path(makeLinearFrag(w,h)).attr({
+                fill: Raphael.hsl(hsl[0], hsl[1], hsl[2]),
+                stroke: Raphael.hsl(hsl[0], hsl[1], Math.max(0, hsl[2]-10))
+            });
+        this.name = paper.text(w/2, h/2, this.options.name).attr({
+                fill: 'white',
+                font: 'inherit'
+            });
+        var w2 = (this.name.getBBox().width + h);
+        if(w2 > w){
+            frag.attr('path', makeLinearFrag(w2,h));
+            this.name.transform('t'+0.5*(w2-w)+',0');
+            this.el.width(w2);
+            paper.setSize(w2, h);
         }
     }
 }); 
