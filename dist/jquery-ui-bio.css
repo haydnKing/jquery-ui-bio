@@ -4,7 +4,6 @@
 .bio-search {
   position: relative;
   height: 1.2em;
-  margin-top: 0.1em;
 }
 .bio-search  > div {
   position: absolute;
@@ -41,6 +40,10 @@
 }
 .bio-length:after {
   content: " bp";
+}
+.ui-icon-loading,
+.ui-state-default .ui-icon-loading {
+  background-image: url('images/loading16.gif');
 }
 .bio-fragment {
   position: relative;
@@ -142,19 +145,67 @@
 .bio-fragment-select {
   background-image: none;
 }
-.bio-fragment-select  > .ui-widget-header > .bio-filter {
-  margin: 2px 2em;
+.bio-fragment-select  > .ui-widget-header {
+  position: relative;
+  text-align: center;
+  padding: 0.25em;
+}
+.bio-fragment-select  > .ui-widget-header  > .help {
+  opacity: 0.6;
+  cursor: pointer;
+  position: absolute;
+  right: 0.5em;
+  top: 50%;
+  margin-top: -0.5em;
+}
+.bio-fragment-select  > .ui-widget-header  > .help:after {
+  content: '?';
+}
+.bio-fragment-select  > .ui-widget-header  > .help:hover {
+  opacity: 1.0;
 }
 .bio-fragment-select  > .bio-panel {
+  position: relative;
   background-image: none;
   border-top: none;
   border-bottom: none;
 }
-.bio-fragment-select  > .bio-panel  > ul {
+.bio-fragment-select  > .bio-panel  > .list {
+  overflow-y: auto;
+}
+.bio-fragment-select  > .bio-panel  > .searchbar {
+  padding: 0.2em 1em;
+}
+.bio-fragment-select  > .bio-panel  > .statusbar {
+  position: relative;
+  height: 20px;
+  text-size: 12px;
+  overflow: hidden;
+}
+.bio-fragment-select  > .bio-panel  > .statusbar  > .ui-icon {
+  position: absolute;
+  top: 50%;
+  margin-top: -8px;
+  left: 6px;
+}
+.bio-fragment-select  > .bio-panel  > .statusbar  > p {
+  margin: 2px 25px;
+}
+.bio-fragment-select  > .bio-panel:first-child {
+  border-top: none;
+}
+.bio-fragment-select  > .bio-panel  > div {
+  background-image: none;
+  border-bottom: none;
+  border-left: none;
+  border-right: none;
+}
+.bio-fragment-select  > .bio-panel  > div  > ul {
+  margin-top: 0.2em;
   list-style-type: none;
   background-image: none;
 }
-.bio-fragment-select  > .bio-panel  > ul  > li {
+.bio-fragment-select  > .bio-panel  > div  > ul  > li {
   padding: 0.2em 0;
   text-align: center;
   border: none;

@@ -5,7 +5,6 @@
 .bio-search{
     position: relative;
     height: 1.2em;
-    margin-top: 0.1em;
     & > div{
         position: absolute;
         top: 0;
@@ -134,7 +133,9 @@
 .bio-length:after {
     content: " bp";
 }
-
+.ui-icon-loading, .ui-state-default .ui-icon-loading  {
+    background-image: url('images/loading16.gif');
+}
 
 
 
@@ -214,21 +215,69 @@
 
 .bio-fragment-select {
     background-image: none;
-    & > .ui-widget-header > .bio-filter {
-        margin: 2px 2em;
+    & > .ui-widget-header {
+        position: relative;
+        text-align: center;
+        padding: 0.25em;
+        & > .help {
+            opacity: 0.6;
+            cursor: pointer;
+            position: absolute;
+            right: 0.5em;
+            top: 50%;
+            margin-top: -0.5em;
+            &:after {
+                content: '?';
+            }
+            &:hover {
+                opacity: 1.0;
+            }
+        }
     }
     & > .bio-panel{
+        position: relative;
         background-image: none;
         border-top: none;
         border-bottom: none;
-        & > ul{
-            list-style-type: none;
+        & > .list {
+            overflow-y: auto;
+        }
+        & > .searchbar {
+            padding: 0.2em 1em;
+        }
+        & > .statusbar {
+            position: relative;
+            height: 20px;
+            text-size: 12px;
+            overflow: hidden;
+            & > .ui-icon {
+                position: absolute;
+                top: 50%;
+                margin-top: -8px;
+                left: 6px;
+            }
+            & > p {
+                margin: 2px 25px;
+            }
+        }
+        &:first-child {
+            border-top: none;
+        }
+        & > div{
             background-image: none;
-             & > li{
-                padding: 0.2em 0;
-                text-align: center;
-                border: none;
+            border-bottom: none;
+            border-left: none;
+            border-right: none;
+            & > ul{
+                margin-top: 0.2em;
+                list-style-type: none;
                 background-image: none;
+                 & > li{
+                    padding: 0.2em 0;
+                    text-align: center;
+                    border: none;
+                    background-image: none;
+                }
             }
         }
     }

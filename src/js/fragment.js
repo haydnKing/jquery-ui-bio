@@ -8,7 +8,7 @@
 /*global next_color:false */
 (function($, undefined) {
 
-var baseClasses = 'bio-fragment ui-widget ui-state-default',
+var baseClasses = 'bio-fragment ui-widget',
     hoverClasses = 'ui-state-hover ui-state-active',
     disabledClasses = 'ui-state-disabled',
     infoClasses = 'ui-corner-all';
