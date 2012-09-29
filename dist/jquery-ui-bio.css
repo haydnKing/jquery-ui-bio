@@ -230,10 +230,12 @@
   background-image: none;
 }
 .bio-fragment-select  > .bio-panel  > div  > ul  > li {
-  padding: 0.2em 0;
   text-align: center;
   border: none;
   background-image: none;
+}
+.bio-fragment-select  > .bio-panel  > div  > ul  > li  > * {
+  margin: 0.25em 0;
 }
 .bio-fragment-select  > .bio-bottom {
   height: 0.7em;

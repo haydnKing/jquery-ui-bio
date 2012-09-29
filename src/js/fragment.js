@@ -71,7 +71,7 @@ $.widget("bio.fragment", $.ui.draggable, {
 
         if(o.helper === 'clone'){
             o.helper = function(){
-                return $('<div>').addClass(baseClasses)
+                return $('<div>').addClass(baseClasses).css('z-index', 200)
                     .append(el.children('svg').clone());
             };
         }
