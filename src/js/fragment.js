@@ -35,6 +35,7 @@ $.widget("bio.fragment", $.ui.draggable, {
         length: null,
         url: undefined,
         color: undefined,
+        width: undefined, //7em
         text: {
             goto_page: 'Goto Page',
             def_desc: 'No Description',
@@ -54,6 +55,19 @@ $.widget("bio.fragment", $.ui.draggable, {
         o.length = el.attr('length') || o.length || 0;
         o.url = el.attr('href') || o.url;
         o.color = o.color || next_color();
+        o.width = o.width || el.width();
+        el.width(o.width);
+
+        var w = el.width(),
+            h = el.height();
+
+        this.paper = Raphael(this.element[0], w, h);
+        this.frag = this.paper.path('');
+        this.name = this.paper.text(w/2, h/2, this.options.name).attr({
+                fill: 'white',
+                font: 'inherit'
+            });
+
 
         this.info = $("<div>")
             .hide()
@@ -86,7 +100,8 @@ $.widget("bio.fragment", $.ui.draggable, {
             openDelay: 500
         });
 
-        this._add_svg(el);
+        this._redraw_frag();
+        this._set_color();
     },
     _init: function() {
     },
@@ -101,18 +116,21 @@ $.widget("bio.fragment", $.ui.draggable, {
         switch(name)
         {
             case 'name':
-                this.name.attr('name', value);
+                this._redraw_frag();
                 break;
             case 'desc':
             case 'length':
             case 'url':
                 this.refreshInfo();
                 break;
+            case 'width':
+                this._redraw_frag();
+                break;
             case 'color':
                 this.el.css({
-                    'background-color':this.options.color,
                     'border-color':this.options.color
                 });
+                this._set_color();
                 break;
             case 'draggable':
                 this.el.draggable( (value) ? 'enable' : 'disable');
@@ -135,28 +153,35 @@ $.widget("bio.fragment", $.ui.draggable, {
                 appendTo(this.info);
         }
     },
-    _add_svg: function(el)
+    _set_color: function() {
+        var hsl = this.options.color.match(/\d+/g);
+        this.frag.attr({
+            fill: Raphael.hsl(hsl[0], hsl[1], hsl[2]),
+            stroke: Raphael.hsl(hsl[0], hsl[1], Math.max(0, hsl[2]-10))
+        });
+    },
+    _redraw_frag: function()
     {
-        console.log('_add_svg: ' + el.width() + 'x' + el.height());
-        var w = el.width(),
-            h = el.height(),
-            hsl= this.options.color.match(/\d+/g),
-            paper = Raphael(this.element[0], w, h),
-            frag = paper.path(makeLinearFrag(w,h)).attr({
-                fill: Raphael.hsl(hsl[0], hsl[1], hsl[2]),
-                stroke: Raphael.hsl(hsl[0], hsl[1], Math.max(0, hsl[2]-10))
-            });
-        this.name = paper.text(w/2, h/2, this.options.name).attr({
-                fill: 'white',
-                font: 'inherit'
-            });
-        var w2 = (this.name.getBBox().width + h);
-        if(w2 > w){
-            console.log('expanding to ' + w2);
-            frag.attr('path', makeLinearFrag(w2,h));
-            this.name.transform('t'+0.5*(w2-w)+',0');
-            this.el.width(w2);
-            paper.setSize(w2, h);
+        var w = this.el.width(),
+            h = this.el.height();
+
+        console.log('_redraw_frag: ' + w + 'x' + h);
+
+        this.paper.setSize(w,h);
+        this.frag.attr({
+            'path': makeLinearFrag(w,h)
+        });
+
+        this.name.attr({
+            x: w/2, 
+            y: h/2, 
+            text: this.options.name
+        });
+
+        var l = this.options.name.length - 1;
+        while((this.name.getBBox().width + h) > w){
+            l -= 1;
+            this.name.attr({text: this.options.name.substr(0, l)+'...'});           
         }
     }
 }); 

@@ -80,15 +80,17 @@ $.widget("bio.fragmentSelect", {
         }
 
         if(o.src != null) {
-            ul.css('opacity',0);
             if(typeof(o.src) === 'string') {
+                //prepare for animations
+                this.list.css('overflow', 'hidden');
+                ul.css('margin-top', this.list.height() + 'px');
                 //interpret as an url to load from
                 this.setStatus(o.text.loading, 'ui-icon-loading');
                 $.ajax({
                     'url': o.src,
                     'dataType': 'json',
                     'success': function(data) {
-                        console.log('Got some data, length: ' + data.length);
+                        //copy into the DOM
                         for(var i = 0; i < data.length; i++) {
                             var f = data[i];
                             $('<li>').append($('<div>').attr({
@@ -98,14 +100,23 @@ $.widget("bio.fragmentSelect", {
                                 href: f.url
                             })).appendTo(ul);
                         }
-                        self.setStatus();
                         //and initialise them
                         ul.find('li').each(function() {
+                            var w = $(this).width();
+                            console.log('w = ' + w);
                             $(this).addClass('ui-state-default')
-                                .children().fragment({helper: o.defaultHelper});
+                                .children().fragment({
+                                    width: w,
+                                    helper: o.defaultHelper
+                                });
                         });
-                        ul.hide().css('opacity','').fadeIn('slow');
                         self.setStatus();
+                        ul.animate({
+                            'margin-top': '0px'
+                        }, 'fast', function() {
+                            self.list.css('overflow-y', 'auto');
+                        });
+
                     },
                     'error': function(jqXHR, textStatus, errorThrown) {
                         self.setStatus(String(errorThrown),'ui-icon-alert');
@@ -113,7 +124,6 @@ $.widget("bio.fragmentSelect", {
                 });
             }
             else {
-                ul.show();
                 this.setStatus();
             }
         }
