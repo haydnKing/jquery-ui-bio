@@ -25,6 +25,7 @@ $.widget("bio.fragmentSelect", {
             helphtml: 'Drag and drop fragments to select them',
             filter: 'filter',
             loading: 'Loading fragments...',
+            error: 'Error',
             none_loaded: 'No fragments are loaded',
             none_matching: 'No fragments match the filter',
             showing_all: 'Showing %total %fragment',
@@ -33,7 +34,8 @@ $.widget("bio.fragmentSelect", {
             fragments: 'fragments'
         },
         defaultHelper: 'clone',
-        height: 400
+        height: 400,
+        src: undefined
     },
     _create: function() {
         var self = this,
@@ -69,22 +71,57 @@ $.widget("bio.fragmentSelect", {
         this.status_text = $('<p>').appendTo(s);
 
         //copy any initial fragments
-        var list = el.find('ul');
-        if(list.length === 1){
-            list.detach().appendTo(this.list);
+        var ul = el.find('ul');
+        if(ul.length === 1){
+            ul.detach().appendTo(this.list);
         }
         else{
-            list = $('ul').appendTo(this.list);
+            ul = $('ul').appendTo(this.list);
         }
 
-        //and initialise them
-        list.find('li').each(function() {
-            $(this).addClass('ui-state-default')
-                .children().fragment({helper: o.defaultHelper});
-        });
+        if(o.src != null) {
+            ul.css('opacity',0);
+            if(typeof(o.src) === 'string') {
+                //interpret as an url to load from
+                this.setStatus(o.text.loading, 'ui-icon-loading');
+                $.ajax({
+                    'url': o.src,
+                    'dataType': 'json',
+                    'success': function(data) {
+                        console.log('Got some data, length: ' + data.length);
+                        for(var i = 0; i < data.length; i++) {
+                            var f = data[i];
+                            $('<li>').append($('<div>').attr({
+                                name: f.name,
+                                length: f.length,
+                                desc: f.desc,
+                                href: f.url
+                            })).appendTo(ul);
+                        }
+                        self.setStatus();
+                        //and initialise them
+                        ul.find('li').each(function() {
+                            $(this).addClass('ui-state-default')
+                                .children().fragment({helper: o.defaultHelper});
+                        });
+                        ul.hide().css('opacity','').fadeIn('slow');
+                        self.setStatus();
+                    },
+                    'error': function(jqXHR, textStatus, errorThrown) {
+                        self.setStatus(String(errorThrown),'ui-icon-alert');
+                    }
+                });
+            }
+            else {
+                ul.show();
+                this.setStatus();
+            }
+        }
+
+        
 
         //interaction clues
-        list.on({
+        ul.on({
             'mouseenter': function(){
                 $(this).addClass('ui-state-hover');
             },
@@ -93,7 +130,6 @@ $.widget("bio.fragmentSelect", {
             }
         }, 'ul > li');
 
-        this.setStatus();
         this._set_height();
 
         if(el.hasClass('ui-corner-all')){

@@ -24,9 +24,9 @@
         }
         & > .statusbar {
             position: relative;
-            height: 20px;
+            min-height: 20px;
             text-size: 12px;
-            overflow: hidden;
+            padding: 0.2em;
             & > .ui-icon {
                 position: absolute;
                 top: 50%;
@@ -34,7 +34,8 @@
                 left: 6px;
             }
             & > p {
-                margin: 2px 25px;
+                margin: 2px 35px;
+                text-indent: -10px;
             }
         }
         &:first-child {
@@ -53,8 +54,9 @@
                     text-align: center;
                     border: none;
                     background-image: none;
+                    padding: 0.2em 0.5em;
                     & > * {
-                        margin: 0.25em 0;
+                        height: 1.5em;
                     }
                 }
             }

@@ -137,6 +137,7 @@ $.widget("bio.fragment", $.ui.draggable, {
     },
     _add_svg: function(el)
     {
+        console.log('_add_svg: ' + el.width() + 'x' + el.height());
         var w = el.width(),
             h = el.height(),
             hsl= this.options.color.match(/\d+/g),
@@ -151,6 +152,7 @@ $.widget("bio.fragment", $.ui.draggable, {
             });
         var w2 = (this.name.getBBox().width + h);
         if(w2 > w){
+            console.log('expanding to ' + w2);
             frag.attr('path', makeLinearFrag(w2,h));
             this.name.transform('t'+0.5*(w2-w)+',0');
             this.el.width(w2);

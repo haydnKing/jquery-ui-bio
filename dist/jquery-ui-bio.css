@@ -110,7 +110,6 @@
 }
 .bio-fragment {
   position: relative;
-  display: inline-block;
   min-width: 10em;
   height: 1.5em;
   background-image: none;
@@ -202,9 +201,9 @@
 }
 .bio-fragment-select  > .bio-panel  > .statusbar {
   position: relative;
-  height: 20px;
+  min-height: 20px;
   text-size: 12px;
-  overflow: hidden;
+  padding: 0.2em;
 }
 .bio-fragment-select  > .bio-panel  > .statusbar  > .ui-icon {
   position: absolute;
@@ -213,7 +212,8 @@
   left: 6px;
 }
 .bio-fragment-select  > .bio-panel  > .statusbar  > p {
-  margin: 2px 25px;
+  margin: 2px 35px;
+  text-indent: -10px;
 }
 .bio-fragment-select  > .bio-panel:first-child {
   border-top: none;
@@ -233,9 +233,10 @@
   text-align: center;
   border: none;
   background-image: none;
+  padding: 0.2em 0.5em;
 }
 .bio-fragment-select  > .bio-panel  > div  > ul  > li  > * {
-  margin: 0.25em 0;
+  height: 1.5em;
 }
 .bio-fragment-select  > .bio-bottom {
   height: 0.7em;
