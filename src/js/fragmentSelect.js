@@ -69,20 +69,6 @@ $.widget("bio.fragmentSelect", {
             .appendTo(searchbar);
         
         this.list = $('<div>').addClass('list ui-state-default')
-            /*.droppable({
-                accept: '.bio-fragment',
-                over: function(ev, ui) {
-                    $(ui.draggable).on('drag', function(ev, ui) {
-                        var dy = $(ui.draggable).offset().top;
-                        var dh = $(ui.draggable).height();
-                        var hh = ui.offset.top;
-                        if(hh
-                    });
-                },
-                out: function(ev, ui) {
-                    $(ui.draggable).off('drag');
-                }
-            })*/
             .appendTo(panel);
         var s = $('<div>').addClass('ui-state-default statusbar')
             .appendTo(panel);
@@ -97,6 +83,24 @@ $.widget("bio.fragmentSelect", {
         else{
             ul = $('<ul>').appendTo(this.list);
         }
+
+        ul.sortable({
+            connectWith: '.bio-panel ul',
+            start: function(ev, ui) {
+                $(this).find(':bio-fragment').fragment('disable');
+            },
+            stop: function(ev, ui) {
+                $(this).find(':bio-fragment').fragment('enable');
+            },
+            receive: function(ev, ui) {
+                var n = $(ui.item).find(':bio-fragment').fragment('option', 'name');
+                self.setStatus('Added fragment "'+n+'"');
+            },  
+            remove: function(ev, ui) {
+                var n = $(ui.item).find(':bio-fragment').fragment('option', 'name');
+                self.setStatus('Removed fragment "'+n+'"');
+            }
+        });
 
         if(o.src != null) {
             if(typeof(o.src) === 'string') {
@@ -122,10 +126,8 @@ $.widget("bio.fragmentSelect", {
                         //and initialise them
                         ul.find('li').each(function() {
                             var w = $(this).width();
-                            $(this).addClass('ui-state-default')
-                                .children().fragment({
-                                    width: w,
-                                    helper: o.defaultHelper
+                            $(this).children().fragment({
+                                    width: w
                                 });
                         });
                         self.setStatus();
@@ -145,16 +147,6 @@ $.widget("bio.fragmentSelect", {
                 this.setStatus();
             }
         }
-
-        //interaction clues
-        ul.on({
-            'mouseenter': function(){
-                $(this).addClass('ui-state-hover');
-            },
-            'mouseleave dragstop': function(){
-                $(this).removeClass('ui-state-hover');
-            }
-        }, 'ul > li');
 
         this._set_height();
 

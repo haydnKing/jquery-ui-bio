@@ -28,7 +28,7 @@ var makeLinearFrag = function(w, h, right) {
     return s;
 };
 
-$.widget("bio.fragment", $.ui.draggable, {
+$.widget("bio.fragment", {
     options: {
         name: null,
         desc: null,
@@ -91,13 +91,6 @@ $.widget("bio.fragment", $.ui.draggable, {
             };
         }
 
-        el.draggable(o).on('dragstart', function(){
-            self.info.tooltip('disable');
-            self.ghost(true);
-        }).on('dragstop', function(){
-            self.info.tooltip('enable');
-            self.ghost(false);
-        });
         this.info.tooltip({
             'mouseTarget': this.el,
             openDelay: 500
@@ -113,7 +106,7 @@ $.widget("bio.fragment", $.ui.draggable, {
         var o = this.options;
 
         if(value == null) {
-            return o[name] || this.$el.draggable(name);
+            return o[name];
         }
         o[name] = value;
         switch(name)
@@ -135,11 +128,6 @@ $.widget("bio.fragment", $.ui.draggable, {
                 });
                 this._set_color();
                 break;
-            case 'draggable':
-                this.el.draggable( (value) ? 'enable' : 'disable');
-                break;
-            default:
-                this.el.draggable(name, value);
         }
         return this;
     },
@@ -155,6 +143,12 @@ $.widget("bio.fragment", $.ui.draggable, {
             $('<div><a href=' + o.url + ' class="bio-url">'+o.text.goto_page+'</a></div>').
                 appendTo(this.info);
         }
+    },
+    disable: function() {
+        this.info.tooltip('disable');
+    },
+    enable: function() {
+        this.info.tooltip('enable');
     },
     ghost: function(g) {
         if(g == null) {g = true;}
