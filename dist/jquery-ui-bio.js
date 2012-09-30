@@ -38,9 +38,11 @@ var test_frag = function(f, filter){
 
 $.widget("bio.fragmentSelect", {
     options: {
+        title: undefined,
+        help: undefined,
         text: {
-            title: 'Fragment Selector',
-            helphtml: 'Drag and drop fragments to select them',
+            defaultTitle: 'Fragment Selector',
+            defaultHelp: 'Drag and drop fragments to select them',
             filter: 'filter',
             loading: 'Loading fragments...',
             error: 'Error',
@@ -60,15 +62,17 @@ $.widget("bio.fragmentSelect", {
             o = this.options,
             el = this.el = $(this.element[0]).addClass(baseClasses);
 
+        o.title = o.title || o.text.defaultTitle;
+        o.help = o.help || o.text.defaultHelp;
         this.timeout = null;
 
         var header = this.header = $('<div>').addClass('ui-widget-header').appendTo(el);
         var panel = this.panel = $('<div>').addClass(panelClasses).appendTo(el);
         var base = $('<div>').addClass(bottomClasses).appendTo(el);
         
-        $('<span>').addClass('title').text(o.text.title).appendTo(header);
+        $('<span>').addClass('title').text(o.title).appendTo(header);
         var h = $('<span>').appendTo(header).help({
-            helphtml: o.text.helphtml
+            helphtml: o.help
         });
 
         var searchbar = $('<div>').addClass('searchbar').appendTo(panel);
@@ -82,7 +86,22 @@ $.widget("bio.fragmentSelect", {
             })
             .appendTo(searchbar);
         
-        this.list = $('<div>').addClass('list ui-state-default').appendTo(panel);
+        this.list = $('<div>').addClass('list ui-state-default')
+            /*.droppable({
+                accept: '.bio-fragment',
+                over: function(ev, ui) {
+                    $(ui.draggable).on('drag', function(ev, ui) {
+                        var dy = $(ui.draggable).offset().top;
+                        var dh = $(ui.draggable).height();
+                        var hh = ui.offset.top;
+                        if(hh
+                    });
+                },
+                out: function(ev, ui) {
+                    $(ui.draggable).off('drag');
+                }
+            })*/
+            .appendTo(panel);
         var s = $('<div>').addClass('ui-state-default statusbar')
             .appendTo(panel);
         this.status_icon = $('<span>').addClass('ui-icon').appendTo(s);
@@ -94,7 +113,7 @@ $.widget("bio.fragmentSelect", {
             ul.detach().appendTo(this.list);
         }
         else{
-            ul = $('ul').appendTo(this.list);
+            ul = $('<ul>').appendTo(this.list);
         }
 
         if(o.src != null) {
@@ -121,7 +140,6 @@ $.widget("bio.fragmentSelect", {
                         //and initialise them
                         ul.find('li').each(function() {
                             var w = $(this).width();
-                            console.log('w = ' + w);
                             $(this).addClass('ui-state-default')
                                 .children().fragment({
                                     width: w,
@@ -145,8 +163,6 @@ $.widget("bio.fragmentSelect", {
                 this.setStatus();
             }
         }
-
-        
 
         //interaction clues
         ul.on({
@@ -549,6 +565,7 @@ $.widget("bio.fragment", $.ui.draggable, {
         });
 
         if(o.helper === 'clone'){
+            o.revert = true;
             o.helper = function(){
                 return $('<div>').addClass(baseClasses).css('z-index', 200)
                     .append(el.children('svg').clone());
@@ -557,8 +574,10 @@ $.widget("bio.fragment", $.ui.draggable, {
 
         el.draggable(o).on('dragstart', function(){
             self.info.tooltip('disable');
+            self.ghost(true);
         }).on('dragstop', function(){
             self.info.tooltip('enable');
+            self.ghost(false);
         });
         this.info.tooltip({
             'mouseTarget': this.el,
@@ -618,6 +637,22 @@ $.widget("bio.fragment", $.ui.draggable, {
                 appendTo(this.info);
         }
     },
+    ghost: function(g) {
+        if(g == null) {g = true;}
+        if(!g) {
+            this.name.attr('opacity', 1.0);
+            this._set_color();
+            this.frag.attr('stroke-dasharray', '');
+        }
+        else {
+            this.name.attr('opacity', 0.0);
+            this.frag.attr({
+                'fill': null,
+                'stroke': '#555555',
+                'stroke-dasharray': '-'
+            });
+        }
+    },
     _set_color: function() {
         var hsl = this.options.color.match(/\d+/g);
         this.frag.attr({
@@ -629,8 +664,6 @@ $.widget("bio.fragment", $.ui.draggable, {
     {
         var w = this.el.width(),
             h = this.el.height();
-
-        console.log('_redraw_frag: ' + w + 'x' + h);
 
         this.paper.setSize(w,h);
         this.frag.attr({

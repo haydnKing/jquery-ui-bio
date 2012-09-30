@@ -25,30 +25,35 @@
     }
     #list_pad{
         margin: 50px auto;
+        width: 1000px;
+    }
+    #list_pad > div {
+        float: left;
         width: 300px;
+        margin: 0 100px;
     }
 </style>
 
 <script type="text/javascript">
 $(window).ready( function(){
-    $('#fragment_sel').fragmentSelect({
+    $('#fragment_sel_1').fragmentSelect({
         height: 500,
-        src: 'fragmentList1.json'
+        src: 'fragmentList1.json',
+        title: 'Project 1',
+    });
+    $('#fragment_sel_2').fragmentSelect({
+        height: 500,
+        src: 'fragmentList2.json',
+        title: 'Project 2',
     });
 });
 </script>
 </head>
 <body>
 <div id='list_pad'>
-    <div id='fragment_sel' class='ui-corner-all'>
-        <ul>
-            <li><div name='Fragment 1' desc='some text'></div></li>
-            <li><div name='Fragment 2' desc='description'></div></li>
-            <li><div name='Fragment 3' desc='yet more description'></div></li>
-            <li><div name='Fragment 4' desc='blarg'></div></li>
-            <li><div name='Fragment 5' desc='another fragment'></div></li>
-        </ul>
-    </div>
+    <div id='fragment_sel_1' class='ui-corner-all'></div>
+    <div id='fragment_sel_2' class='ui-corner-all'></div>
+    <div style='clear:both;'></div>
 </div>
 </body>
 </html>

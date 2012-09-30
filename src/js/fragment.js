@@ -84,6 +84,7 @@ $.widget("bio.fragment", $.ui.draggable, {
         });
 
         if(o.helper === 'clone'){
+            o.revert = true;
             o.helper = function(){
                 return $('<div>').addClass(baseClasses).css('z-index', 200)
                     .append(el.children('svg').clone());
@@ -92,8 +93,10 @@ $.widget("bio.fragment", $.ui.draggable, {
 
         el.draggable(o).on('dragstart', function(){
             self.info.tooltip('disable');
+            self.ghost(true);
         }).on('dragstop', function(){
             self.info.tooltip('enable');
+            self.ghost(false);
         });
         this.info.tooltip({
             'mouseTarget': this.el,
@@ -153,6 +156,22 @@ $.widget("bio.fragment", $.ui.draggable, {
                 appendTo(this.info);
         }
     },
+    ghost: function(g) {
+        if(g == null) {g = true;}
+        if(!g) {
+            this.name.attr('opacity', 1.0);
+            this._set_color();
+            this.frag.attr('stroke-dasharray', '');
+        }
+        else {
+            this.name.attr('opacity', 0.0);
+            this.frag.attr({
+                'fill': null,
+                'stroke': '#555555',
+                'stroke-dasharray': '-'
+            });
+        }
+    },
     _set_color: function() {
         var hsl = this.options.color.match(/\d+/g);
         this.frag.attr({
@@ -164,8 +183,6 @@ $.widget("bio.fragment", $.ui.draggable, {
     {
         var w = this.el.width(),
             h = this.el.height();
-
-        console.log('_redraw_frag: ' + w + 'x' + h);
 
         this.paper.setSize(w,h);
         this.frag.attr({
