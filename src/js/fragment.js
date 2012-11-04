@@ -126,7 +126,7 @@ $.widget("bio.fragment", {
                 this.el.css({
                     'border-color':this.options.color
                 });
-                this._set_color();
+                this._anim_color();
                 break;
         }
         return this;
@@ -172,6 +172,14 @@ $.widget("bio.fragment", {
             fill: Raphael.hsl(hsl[0], hsl[1], hsl[2]),
             stroke: Raphael.hsl(hsl[0], hsl[1], Math.max(0, hsl[2]-10))
         });
+    },
+    _anim_color: function() {
+        var hsl = this.options.color.match(/\d+/g);
+        var a = Raphael.animation({
+            fill: Raphael.hsl(hsl[0], hsl[1], hsl[2]),
+            stroke: Raphael.hsl(hsl[0], hsl[1], Math.max(0, hsl[2]-10))
+        }, 1000);
+        this.frag.animate(a.delay(100));
     },
     _redraw_frag: function()
     {

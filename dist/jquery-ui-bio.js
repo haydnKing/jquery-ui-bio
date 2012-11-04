@@ -29,7 +29,7 @@
 var baseClasses   = 'bio-fragment-select ui-widget',
     panelClasses  = 'bio-panel ui-widget-content ui-state-default',
     bottomClasses = 'bio-bottom ui-widget ui-widget-header',
-    defaultIcon   = 'ui-icon-carat-1-e';
+    defaultIcon   = 'ui-icon-circle-triangle-e';
 
 var test_frag = function(f, filter){
     return filter.test(f.fragment('option','name')) || 
@@ -55,7 +55,8 @@ $.widget("bio.fragmentSelect", {
         },
         defaultHelper: 'clone',
         height: 400,
-        src: undefined
+        src: undefined,
+        color: null
     },
     _create: function() {
         var self = this,
@@ -64,7 +65,9 @@ $.widget("bio.fragmentSelect", {
 
         o.title = o.title || o.text.defaultTitle;
         o.help = o.help || o.text.defaultHelp;
+        o.color = o.color || next_color();
         this.timeout = null;
+
 
         var header = this.header = $('<div>').addClass('ui-widget-header').appendTo(el);
         var panel = this.panel = $('<div>').addClass(panelClasses).appendTo(el);
@@ -94,7 +97,7 @@ $.widget("bio.fragmentSelect", {
         this.status_text = $('<p>').appendTo(s);
 
         //copy any initial fragments
-        var ul = el.find('ul');
+        var ul = this.ul = el.find('ul');
         if(ul.length === 1){
             ul.detach().appendTo(this.list);
         }
@@ -103,6 +106,7 @@ $.widget("bio.fragmentSelect", {
         }
 
         ul.sortable({
+            placeholder: 'ui-widget-content',
             connectWith: '.bio-panel ul',
             start: function(ev, ui) {
                 $(this).find(':bio-fragment').fragment('disable');
@@ -111,12 +115,15 @@ $.widget("bio.fragmentSelect", {
                 $(this).find(':bio-fragment').fragment('enable');
             },
             receive: function(ev, ui) {
-                var n = $(ui.item).find(':bio-fragment').fragment('option', 'name');
-                self.setStatus('Added fragment "'+n+'"');
+                var f = ui.item.find(':bio-fragment');
+                f.fragment('option', 'color', o.color);
+                self.setStatus('Added fragment "'+f.fragment('option','name')+'"',
+                              'ui-icon-circle-plus');
             },  
             remove: function(ev, ui) {
-                var n = $(ui.item).find(':bio-fragment').fragment('option', 'name');
-                self.setStatus('Removed fragment "'+n+'"');
+                var f = ui.item.find(':bio-fragment');
+                self.setStatus('Removed fragment "'+f.fragment('option','name')+'"',
+                              'ui-icon-circle-minus');
             }
         });
 
@@ -145,6 +152,7 @@ $.widget("bio.fragmentSelect", {
                         ul.find('li').each(function() {
                             var w = $(this).width();
                             $(this).children().fragment({
+                                    color: o.color,
                                     width: w
                                 });
                         });
@@ -215,7 +223,8 @@ $.widget("bio.fragmentSelect", {
         this.panel.siblings().add(this.list.siblings()).each(function() {
             others += $(this).outerHeight();
         });
-        this.list.outerHeight(this.options.height - others);
+        var h = this.options.height - others;
+        this.list.outerHeight(h).find('ul').outerHeight(h-5);
     },
     _get_text: function(str, filter, total){
         var t = this.options.text;
@@ -599,7 +608,7 @@ $.widget("bio.fragment", {
                 this.el.css({
                     'border-color':this.options.color
                 });
-                this._set_color();
+                this._anim_color();
                 break;
         }
         return this;
@@ -645,6 +654,14 @@ $.widget("bio.fragment", {
             fill: Raphael.hsl(hsl[0], hsl[1], hsl[2]),
             stroke: Raphael.hsl(hsl[0], hsl[1], Math.max(0, hsl[2]-10))
         });
+    },
+    _anim_color: function() {
+        var hsl = this.options.color.match(/\d+/g);
+        var a = Raphael.animation({
+            fill: Raphael.hsl(hsl[0], hsl[1], hsl[2]),
+            stroke: Raphael.hsl(hsl[0], hsl[1], Math.max(0, hsl[2]-10))
+        }, 1000);
+        this.frag.animate(a.delay(100));
     },
     _redraw_frag: function()
     {

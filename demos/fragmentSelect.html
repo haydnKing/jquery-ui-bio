@@ -36,15 +36,18 @@
 
 <script type="text/javascript">
 $(window).ready( function(){
+    var help = "Click and Drag fragments between projects";
     $('#fragment_sel_1').fragmentSelect({
         height: 500,
         src: 'fragmentList1.json',
         title: 'Project 1',
+        help: help
     });
     $('#fragment_sel_2').fragmentSelect({
         height: 500,
         src: 'fragmentList2.json',
         title: 'Project 2',
+        help: help
     });
 });
 </script>
