@@ -1,0 +1,14 @@
+(function() {
+    names = [
+        {#names}
+            "{.}",
+        {/names}
+    ];
+    for(var i=0; i < names.length; i++)
+    {
+        document.write('<script type="text/javascript" src="/static/' +
+                       names[i] + '"></script>');
+    }
+    document.write('<link rel="stylesheet" type="text/css" '+
+                   'href="/static/dist/jquery-ui-bio.css" />');
+}());

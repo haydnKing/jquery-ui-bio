@@ -9,9 +9,9 @@
     uitheme = 'http://code.jquery.com/ui/' + jqversion[1] + '/themes/base/jquery-ui.css';
   } else {
     // No version was specified, load the local version.
-    path = '../libs/jquery/jquery.js';
-    uipath = '../libs/jquery/jquery-ui.js';
-    uitheme = '../libs/jquery/jquery-ui.css';
+    path = '/static/libs/jquery/jquery.js';
+    uipath = '/static/libs/jquery/jquery-ui.js';
+    uitheme = '/static/libs/jquery/jquery-ui.css';
   }
   // This is the only time I'll ever use document.write, I promise!
   document.write('<script src="' + path + '"></script>');

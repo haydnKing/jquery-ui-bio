@@ -9,7 +9,7 @@ function stripBanner( files ) {
 module.exports = function(grunt) {
     /*Load grunt-contrib-less*/
     grunt.loadNpmTasks('grunt-contrib-less');
-
+    grunt.loadNpmTasks('grunt-templater');
 
   // Project configuration.
   grunt.initConfig({
@@ -45,7 +45,7 @@ module.exports = function(grunt) {
     },
     watch: {
       files: ['grunt.js', 'src/**/*.*', 'test/**/*.js'],
-      tasks: 'lint qunit concat less:development'
+      tasks: 'lint qunit concat template less:development'
     },
     jshint: {
       options: {
@@ -80,10 +80,19 @@ module.exports = function(grunt) {
                 "dist/<%= pkg.name %>.min.css": "src/less/<%= pkg.name %>.less"
             }
         }
+    },
+    template: {
+        dev: {
+            src: 'libs/jquery-ui-bio-loader.dust',
+            dest: 'libs/jquery-ui-bio-loader.js',
+            variables: {
+                names: grunt.file.expandFiles('src/js/*.js')
+            }
+        }
     }
   });
 
   // Default task.
-  grunt.registerTask('default', 'lint qunit concat min less');
+  grunt.registerTask('default', 'lint qunit concat min less template');
 
 };
