@@ -78,6 +78,7 @@ STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 #    'django.contrib.staticfiles.finders.DefaultStorageFinder',
+		'dajaxice.finders.DajaxiceFinder',
 )
 
 # Make this unique, and don't share it with anybody.
@@ -87,8 +88,17 @@ SECRET_KEY = 'pcqx1(yo$#ob&amp;6h!r-az$l(_xjr5!q3o_h8$i8cm!#yagg!gta'
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader',
     'django.template.loaders.app_directories.Loader',
-#     'django.template.loaders.eggs.Loader',
+    'django.template.loaders.eggs.Loader',
 )
+
+TEMPLATE_PROCESSORS = ("django.contrib.auth.context_processors.auth",
+		"django.core.context_processors.debug",
+		"django.core.context_processors.i18n",
+		"django.core.context_processors.media",
+		"django.core.context_processors.static",
+		"django.core.context_processors.tz",
+		"django.core.context_processors.request",
+		"django.contrib.messages.context_processors.messages")
 
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
@@ -119,6 +129,7 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     #'django.contrib.messages',
     'django.contrib.staticfiles',
+		'dajaxice',
 		'ui_bio_demos',
     # Uncomment the next line to enable the admin:
     # 'django.contrib.admin',

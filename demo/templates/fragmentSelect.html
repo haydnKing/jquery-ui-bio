@@ -1,14 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>jQuery FragmentSelect Demo</title>
+{% extends "base.html" %}
 
-<script type="text/javascript" src="/static/libs/jquery-loader.js"></script>
-<script type="text/javascript" src="/static/libs/raphael/raphael.js"></script>
+{% block title %}jQuery FragmentSelect Demo{% endblock %}
 
-<script type="text/javascript" src="/static/libs/jquery-ui-bio-loader.js"></script>
-
+{% block style %}
 <style type='text/css'>
     * {
         margin: 0;
@@ -27,30 +21,38 @@
         margin: 0 100px;
     }
 </style>
+{% endblock %}
 
+{% block script %}
 <script type="text/javascript">
+
+var fetch = function(cb, num, ecb){
+    Dajaxice.ui_bio_demos.fragmentSelect(cb, {'num': num,}, 
+        {'error_callback': ecb});
+}
+
 $(window).ready( function(){
     var help = "Click and Drag fragments between projects";
     $('#fragment_sel_1').fragmentSelect({
         height: 500,
-        src: 'fragmentList1.json',
+        src: function(cb, ecb) {fetch(cb,1,ecb);},
         title: 'Project 1',
         help: help
     });
     $('#fragment_sel_2').fragmentSelect({
         height: 500,
-        src: 'fragmentList2.json',
+        src: function(cb, ecb) {fetch(cb,2,ecb);},
         title: 'Project 2',
         help: help
     });
 });
 </script>
-</head>
-<body>
+{% endblock %}
+
+{% block body %}
 <div id='list_pad'>
     <div id='fragment_sel_1' class='ui-corner-all'></div>
     <div id='fragment_sel_2' class='ui-corner-all'></div>
     <div style='clear:both;'></div>
 </div>
-</body>
-</html>
+{% endblock %}

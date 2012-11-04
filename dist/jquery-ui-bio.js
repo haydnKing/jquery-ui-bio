@@ -51,11 +51,12 @@ $.widget("bio.fragmentSelect", {
             showing_all: 'Showing %total %fragment',
             showing_filter: 'Showing %filter of %total %fragment',
             fragment: 'fragment',
-            fragments: 'fragments'
+            fragments: 'fragments',
+            cberror: 'An error occurred'
         },
         defaultHelper: 'clone',
         height: 400,
-        src: undefined,
+        src: undefined, //string URL or f(cb, error_cb)
         color: null
     },
     _create: function() {
@@ -127,6 +128,35 @@ $.widget("bio.fragmentSelect", {
             }
         });
 
+        var success = function(data) {
+            //copy into the DOM
+            for(var i = 0; i < data.length; i++) {
+                var f = data[i];
+                $('<li>').append($('<div>').attr({
+                    name: f.name,
+                    length: f.length,
+                    desc: f.desc,
+                    href: f.url
+                })).appendTo(ul);
+            }
+            //and initialise them
+            ul.find('li').each(function() {
+                var w = $(this).width();
+                $(this).children().fragment({
+                        color: o.color,
+                        width: w
+                    });
+            });
+            self.setStatus();
+            ul.animate({
+                'margin-top': '0px'
+            }, 'fast', function() {
+                self.list.css('overflow-y', 'auto');
+            });
+
+        };
+
+
         if(o.src != null) {
             if(typeof(o.src) === 'string') {
                 //prepare for animations
@@ -137,40 +167,24 @@ $.widget("bio.fragmentSelect", {
                 $.ajax({
                     'url': o.src,
                     'dataType': 'json',
-                    'success': function(data) {
-                        //copy into the DOM
-                        for(var i = 0; i < data.length; i++) {
-                            var f = data[i];
-                            $('<li>').append($('<div>').attr({
-                                name: f.name,
-                                length: f.length,
-                                desc: f.desc,
-                                href: f.url
-                            })).appendTo(ul);
-                        }
-                        //and initialise them
-                        ul.find('li').each(function() {
-                            var w = $(this).width();
-                            $(this).children().fragment({
-                                    color: o.color,
-                                    width: w
-                                });
-                        });
-                        self.setStatus();
-                        ul.animate({
-                            'margin-top': '0px'
-                        }, 'fast', function() {
-                            self.list.css('overflow-y', 'auto');
-                        });
-
-                    },
+                    'success': success,
                     'error': function(jqXHR, textStatus, errorThrown) {
                         self.setStatus(String(errorThrown),'ui-icon-alert');
                     }
                 });
             }
+            else if($.isFunction(o.src)){
+                try{
+                    o.src(success, function(){
+                        self.setStatus(o.text.cberror, 'ui-icon-alert');
+                    });
+                }
+                catch(e){
+                    self.setStatus(e.message, 'ui-icon-alert');
+                }
+            }
             else {
-                this.setStatus();
+                throw("options.src must be a string URL or a function");
             }
         }
 
