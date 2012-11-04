@@ -2,255 +2,237 @@
 * https://github.com/Gibthon/jquery-ui-bio
 * Copyright (c) 2012 Haydn King; Licensed MIT, GPL */
 
-(function($) {
+(function($, undefined) {
 
-  // Collection method.
-  $.fn.awesome = function() {
-    return this.each(function() {
-      $(this).html('awesome');
-    });
-  };
+$.widget("bio.tooltip", {
+    options: {
+        mouseTarget: 'this', //'this', a jQuery selector or an object
+        openDelay: 250,
+        closeDelay: 250,
+        openAnim: 0,
+        closeAnim: 200
+    },
+    _create: function() {
+        var el = this.el = $(this.element[0]).hide();
+        var o = this.options,
+            self = this;
 
-  // Static method.
-  $.awesome = function() {
-    return 'awesome';
-  };
+        if(typeof o.mouseTarget === "string"){
+            if(o.mouseTarget === "this"){
+                o.mouseTarget = el;
+            }
+            else{
+                o.mouseTarget = el.find(o.mouseTarget);
+            }
+        }
 
-  // Custom selector.
-  $.expr[':'].awesome = function(elem) {
-    return elem.textContent.indexOf('awesome') >= 0;
-  };
+        this.timeout = null;
+        this._is_open = false;
+        this._enabled = true;
+
+        o.mouseTarget.mouseenter(function(){self._on_enter();})
+          .mouseleave(function(){self._on_leave();});
+    },
+    close: function(){
+        this._clear_timeout();
+        this.el.fadeOut(this.options.closeAnim);
+        this._is_open = false;
+        this._trigger('close');
+    },
+    open: function(){
+        this._clear_timeout();
+        this.el.fadeIn(this.options.openAnim);
+        this._is_open = true;
+        this._trigger('open');
+    },
+    disable: function(){
+        this.close();
+        this._enabled = false;
+    },
+    enable: function(){
+        this._enabled = true;
+    },
+    _on_enter: function(){
+        if(!this._enabled) {return;}
+
+        var self = this,
+            o = this.options;
+
+        //don't close
+        this._clear_timeout();
+
+        //if we're closed, open
+        if(!this._is_open){
+            this.timeout = setTimeout(function() {
+                self.open();
+            }, o.openDelay);
+        }
+    },
+    _on_leave: function(){
+        if(!this._enabled) {return;}
+
+        var self = this,
+            o = this.options;
+
+        //don't open
+        this._clear_timeout();
+
+        //close if we're open
+        if(this._is_open){
+            this.timeout = setTimeout(function() {
+                self.close();
+            }, o.closeDelay);
+        }
+    },
+    _clear_timeout: function()
+    {
+        if(this.timeout != null){
+            clearTimeout(this.timeout);
+            this.timeout = null;
+        }
+    }
+});
+        
+}(jQuery));
+
+/*global next_color:false */
+(function($, undefined) {
+
+var iconStyle = 'bio-help ui-widget',
+    tooltipStyle = 'tip ui-widget-content ui-corner-inherit',
+    cornerStyle = 'ui-corner-all';
+
+$.widget("bio.help", {
+    options: {
+        helphtml: 'Some Help',
+        open: undefined,
+        close: undefined
+    },
+    _init: function() {
+        var self = this,
+            o = this.options,
+            el = this.el = $(this.element[0]).addClass(iconStyle),
+            tip = $('<div>').addClass(tooltipStyle).appendTo(el);
+        
+        if(el.hasClass('ui-corner-all')){
+            tip.addClass('ui-corner-all');
+        }
+
+        this.help = $('<p>').html(o.helphtml).appendTo(tip);
+        tip.tooltip({
+            mouseTarget: el
+        });
+
+    },
+    _create: function() {
+    },
+    setHelp: function(help){
+        this.options.helphtml(help);
+        this.help.html(help);
+    }
+});
 
 }(jQuery));
 
 /*global next_color:false */
 (function($, undefined) {
 
-var baseClasses   = 'bio-fragment-select ui-widget',
-    panelClasses  = 'bio-panel ui-widget-content ui-state-default',
-    bottomClasses = 'bio-bottom ui-widget ui-widget-header',
+var panelClasses  = 'bio-panel ui-widget-content ui-state-default',
+    footerClasses = 'bio-footer ui-widget ui-widget-header',
     defaultIcon   = 'ui-icon-circle-triangle-e';
 
-var test_frag = function(f, filter){
-    return filter.test(f.fragment('option','name')) || 
-        filter.test(f.fragment('option','desc'));
-};
-
-$.widget("bio.fragmentSelect", {
+$.widget("bio.panel", {
     options: {
         title: undefined,
         help: undefined,
+        baseClasses: 'ui-widget',
         text: {
-            defaultTitle: 'Fragment Selector',
-            defaultHelp: 'Drag and drop fragments to select them',
-            filter: 'filter',
-            loading: 'Loading fragments...',
-            error: 'Error',
-            none_loaded: 'No fragments are loaded',
-            none_matching: 'No fragments match the filter',
-            showing_all: 'Showing %total %fragment',
-            showing_filter: 'Showing %filter of %total %fragment',
-            fragment: 'fragment',
-            fragments: 'fragments',
-            cberror: 'An error occurred'
+            defaultTitle: 'Bio Panel',
+            defaultHelp: '',
+            defaultStatus: 'Ready'
         },
-        defaultHelper: 'clone',
         height: 400,
-        src: undefined, //string URL or f(cb, error_cb)
-        color: null
+        showStatus: true
     },
     _create: function() {
+        console.log('bio.panel._create');
         var self = this,
             o = this.options,
-            el = this.el = $(this.element[0]).addClass(baseClasses);
+            el = this.el = $(this.element[0]).addClass(o.baseClasses);
 
         o.title = o.title || o.text.defaultTitle;
         o.help = o.help || o.text.defaultHelp;
         o.color = o.color || next_color();
-        this.timeout = null;
 
 
-        var header = this.header = $('<div>').addClass('ui-widget-header').appendTo(el);
+        var head = this.head = $('<div>').addClass('ui-widget-header').appendTo(el);
         var panel = this.panel = $('<div>').addClass(panelClasses).appendTo(el);
-        var base = $('<div>').addClass(bottomClasses).appendTo(el);
+        var foot = this.foot = $('<div>').addClass(footerClasses).appendTo(el);
         
-        $('<span>').addClass('title').text(o.title).appendTo(header);
-        var h = $('<span>').appendTo(header).help({
+        this.title = $('<span>').addClass('title').text(o.title).appendTo(head);
+        var h = this.help = $('<span>').appendTo(head).help({
             helphtml: o.help
         });
 
-        var searchbar = $('<div>').addClass('searchbar').appendTo(panel);
-        
-        this.search = $('<div>')
-            .search({
-                text: {search: 'filter'},
-                change: function(){
-                    self.filter(self.search.search('value'));
-                }
-            })
-            .appendTo(searchbar);
-        
-        this.list = $('<div>').addClass('list ui-state-default')
-            .appendTo(panel);
-        var s = $('<div>').addClass('ui-state-default statusbar')
+        var s = this.status_bar = $('<div>').addClass('ui-state-default statusbar')
             .appendTo(panel);
         this.status_icon = $('<span>').addClass('ui-icon').appendTo(s);
         this.status_text = $('<p>').appendTo(s);
-
-        //copy any initial fragments
-        var ul = this.ul = el.find('ul');
-        if(ul.length === 1){
-            ul.detach().appendTo(this.list);
-        }
-        else{
-            ul = $('<ul>').appendTo(this.list);
-        }
-
-        ul.sortable({
-            placeholder: 'ui-widget-content',
-            connectWith: '.bio-panel ul',
-            start: function(ev, ui) {
-                $(this).find(':bio-fragment').fragment('disable');
-            },
-            stop: function(ev, ui) {
-                $(this).find(':bio-fragment').fragment('enable');
-            },
-            receive: function(ev, ui) {
-                var f = ui.item.find(':bio-fragment');
-                f.fragment('option', 'color', o.color);
-                self.setStatus('Added fragment "'+f.fragment('option','name')+'"',
-                              'ui-icon-circle-plus');
-            },  
-            remove: function(ev, ui) {
-                var f = ui.item.find(':bio-fragment');
-                self.setStatus('Removed fragment "'+f.fragment('option','name')+'"',
-                              'ui-icon-circle-minus');
-            }
-        });
-
-        var success = function(data) {
-            //copy into the DOM
-            for(var i = 0; i < data.length; i++) {
-                var f = data[i];
-                $('<li>').append($('<div>').attr({
-                    name: f.name,
-                    length: f.length,
-                    desc: f.desc,
-                    href: f.url
-                })).appendTo(ul);
-            }
-            //and initialise them
-            ul.find('li').each(function() {
-                var w = $(this).width();
-                $(this).children().fragment({
-                        color: o.color,
-                        width: w
-                    });
-            });
-            self.setStatus();
-            ul.animate({
-                'margin-top': '0px'
-            }, 'fast', function() {
-                self.list.css('overflow-y', 'auto');
-            });
-
-        };
-
-
-        if(o.src != null) {
-            if(typeof(o.src) === 'string') {
-                //prepare for animations
-                this.list.css('overflow', 'hidden');
-                ul.css('margin-top', this.list.height() + 'px');
-                //interpret as an url to load from
-                this.setStatus(o.text.loading, 'ui-icon-loading');
-                $.ajax({
-                    'url': o.src,
-                    'dataType': 'json',
-                    'success': success,
-                    'error': function(jqXHR, textStatus, errorThrown) {
-                        self.setStatus(String(errorThrown),'ui-icon-alert');
-                    }
-                });
-            }
-            else if($.isFunction(o.src)){
-                try{
-                    o.src(success, function(){
-                        self.setStatus(o.text.cberror, 'ui-icon-alert');
-                    });
-                }
-                catch(e){
-                    self.setStatus(e.message, 'ui-icon-alert');
-                }
-            }
-            else {
-                throw("options.src must be a string URL or a function");
-            }
+        if(!o.showStatus){
+            s.hide();
         }
 
         this._set_height();
 
         if(el.hasClass('ui-corner-all')){
-            header.addClass('ui-corner-top');
-            this.search.addClass('ui-corner-all');
-            base.addClass('ui-corner-bottom');
+            head.addClass('ui-corner-top');
+            foot.addClass('ui-corner-bottom');
             h.addClass('ui-corner-all');
         }
     },
-    filter: function(str){
-        var reg = new RegExp(str, 'i');
-        this.el.find(':bio-fragment').each( function(){
-            var f = $(this);
-            if(test_frag(f, reg)){
-                f.parent().show();
-            }
-            else{
-                f.parent().hide();
-            }
-        });
-        this.setStatus();
-    },
-    showAll: function(){
-        this.el.find(':bio-fragment').show();
+    option: function(key, value) {
+        if(value == null){
+            return this.options[key];
+        }
+        switch(key){
+            case 'title':
+                this.head.find('span').text(value);
+                break;
+            case 'help':
+                this.help('setHelp', value);
+                break;
+            case 'height':
+                this._set_height(value);
+                break;
+        }
+        this.options[key] = value;
     },
     setStatus: function(text, icon) {
-        var tot = this.list.find(':bio-fragment').length;
-        var fil = this.list.find(':bio-fragment:visible').length;
-        if(text == null){
-            var t = this.options.text;
-            if(tot === 0 && fil === 0) {
-                text = t.none_loaded;
-                icon = 'ui-icon-alert';
-            }
-            else if(tot > 0 && fil === 0) {
-                text = t.none_matching;
-                icon = 'ui-icon-alert';
-            }
-            else if(tot === fil) {text = t.showing_all;}
-            else {text = t.showing_filter;}
-        }
         this.status_icon.attr('class', 'ui-icon ' + (icon || defaultIcon));
-        this.status_text.text( this._get_text(text, fil, tot));
+        this.status_text.text(text || this.options.text.defaultStatus);
     },
     _set_height: function(){
         var others = 0;
-        this.panel.siblings().add(this.list.siblings()).each(function() {
+        this.panel.siblings().each(function() {
             others += $(this).outerHeight();
         });
         var h = this.options.height - others;
-        this.list.outerHeight(h).find('ul').outerHeight(h-5);
-    },
-    _get_text: function(str, filter, total){
-        var t = this.options.text;
-        return str
-            .replace('%filter', filter)
-            .replace('%total', total)
-            .replace('%fragment', (total === 1)? t.fragment : t.fragments);
+        this.panel.outerHeight(h);
     }
 });
 
 }(jQuery));
 
+
+//generate a decent color palette
+var next_color = (function() {
+    var last = Math.random() * 360;
+    var stride = 360 / 1.61803;
+    return function() {
+        last = Math.floor((last + stride)) % 360;
+        return 'hsl('+last+',40%,50%)';
+    };
+}());
 
 (function($, undefined) {
 
@@ -362,144 +344,6 @@ $.widget("bio.search", {
 
 }(jQuery));
 
-
-/*global next_color:false */
-(function($, undefined) {
-
-var iconStyle = 'bio-help ui-widget',
-    tooltipStyle = 'tip ui-widget-content ui-corner-inherit',
-    cornerStyle = 'ui-corner-all';
-
-$.widget("bio.help", {
-    options: {
-        helphtml: 'Some Help',
-        open: undefined,
-        close: undefined
-    },
-    _init: function() {
-        var self = this,
-            o = this.options,
-            el = this.el = $(this.element[0]).addClass(iconStyle),
-            tip = $('<div>').addClass(tooltipStyle).appendTo(el);
-        
-        if(el.hasClass('ui-corner-all')){
-            tip.addClass('ui-corner-all');
-        }
-
-        $('<p>').html(o.helphtml).appendTo(tip);
-        tip.tooltip({
-            mouseTarget: el
-        });
-
-    },
-    _create: function() {
-    }
-});
-
-}(jQuery));
-
-//generate a decent color palette
-var next_color = (function() {
-    var last = Math.random() * 360;
-    var stride = 360 / 1.61803;
-    return function() {
-        last = Math.floor((last + stride)) % 360;
-        return 'hsl('+last+',40%,50%)';
-    };
-}());
-
-(function($, undefined) {
-
-$.widget("bio.tooltip", {
-    options: {
-        mouseTarget: 'this', //'this', a jQuery selector or an object
-        openDelay: 250,
-        closeDelay: 250,
-        openAnim: 0,
-        closeAnim: 200
-    },
-    _create: function() {
-        var el = this.el = $(this.element[0]).hide();
-        var o = this.options,
-            self = this;
-
-        if(typeof o.mouseTarget === "string"){
-            if(o.mouseTarget === "this"){
-                o.mouseTarget = el;
-            }
-            else{
-                o.mouseTarget = el.find(o.mouseTarget);
-            }
-        }
-
-        this.timeout = null;
-        this._is_open = false;
-        this._enabled = true;
-
-        o.mouseTarget.mouseenter(function(){self._on_enter();})
-          .mouseleave(function(){self._on_leave();});
-    },
-    close: function(){
-        this._clear_timeout();
-        this.el.fadeOut(this.options.closeAnim);
-        this._is_open = false;
-        this._trigger('close');
-    },
-    open: function(){
-        this._clear_timeout();
-        this.el.fadeIn(this.options.openAnim);
-        this._is_open = true;
-        this._trigger('open');
-    },
-    disable: function(){
-        this.close();
-        this._enabled = false;
-    },
-    enable: function(){
-        this._enabled = true;
-    },
-    _on_enter: function(){
-        if(!this._enabled) {return;}
-
-        var self = this,
-            o = this.options;
-
-        //don't close
-        this._clear_timeout();
-
-        //if we're closed, open
-        if(!this._is_open){
-            this.timeout = setTimeout(function() {
-                self.open();
-            }, o.openDelay);
-        }
-    },
-    _on_leave: function(){
-        if(!this._enabled) {return;}
-
-        var self = this,
-            o = this.options;
-
-        //don't open
-        this._clear_timeout();
-
-        //close if we're open
-        if(this._is_open){
-            this.timeout = setTimeout(function() {
-                self.close();
-            }, o.closeDelay);
-        }
-    },
-    _clear_timeout: function()
-    {
-        if(this.timeout != null){
-            clearTimeout(this.timeout);
-            this.timeout = null;
-        }
-    }
-});
-        
-}(jQuery));
 
 /*global next_color:false Raphael:false */
 (function($, undefined) {
@@ -702,3 +546,204 @@ $.widget("bio.fragment", {
 }); 
 
 }(jQuery));
+
+/*global next_color:false */
+(function($, undefined) {
+
+var baseClasses   = 'bio-fragment-select ui-widget',
+    panelClasses  = 'bio-panel ui-widget-content ui-state-default',
+    bottomClasses = 'bio-bottom ui-widget ui-widget-header',
+    defaultIcon   = 'ui-icon-circle-triangle-e';
+
+var test_frag = function(f, filter){
+    return filter.test(f.fragment('option','name')) || 
+        filter.test(f.fragment('option','desc'));
+};
+
+$.widget("bio.fragmentSelect", $.bio.panel, {
+    options: {
+        title: undefined,
+        help: undefined,
+        text: {
+            defaultTitle: 'Fragment Selector',
+            defaultHelp: 'Drag and drop fragments to select them',
+            filter: 'filter',
+            loading: 'Loading fragments...',
+            error: 'Error',
+            none_loaded: 'No fragments are loaded',
+            none_matching: 'No fragments match the filter',
+            showing_all: 'Showing %total %fragment',
+            showing_filter: 'Showing %filter of %total %fragment',
+            fragment: 'fragment',
+            fragments: 'fragments',
+            cberror: 'An error occurred'
+        },
+        defaultHelper: 'clone',
+        height: 400,
+        src: undefined, //string URL or f(cb, error_cb)
+        color: null
+    },
+    _create: function() {
+        this._super();
+        console.log('bio.fragmentSelect._create');
+        var self = this,
+            o = this.options,
+            el = this.el = $(this.element[0]).addClass(baseClasses);
+
+        this.timeout = null;
+
+        var searchbar = $('<div>').addClass('searchbar').appendTo(this.panel);
+        
+        this.search = $('<div>')
+            .search({
+                text: {search: 'filter'},
+                change: function(){
+                    self.filter(self.search.search('value'));
+                }
+            })
+            .appendTo(searchbar);
+        
+        this.list = $('<div>').addClass('list ui-state-default')
+            .appendTo(this.panel);
+
+        //copy any initial fragments
+        var ul = this.ul = el.find('ul');
+        if(ul.length === 1){
+            ul.detach().appendTo(this.list);
+        }
+        else{
+            ul = $('<ul>').appendTo(this.list);
+        }
+
+        ul.sortable({
+            placeholder: 'ui-widget-content',
+            connectWith: '.bio-panel ul',
+            start: function(ev, ui) {
+                $(this).find(':bio-fragment').fragment('disable');
+            },
+            stop: function(ev, ui) {
+                $(this).find(':bio-fragment').fragment('enable');
+            },
+            receive: function(ev, ui) {
+                var f = ui.item.find(':bio-fragment');
+                f.fragment('option', 'color', o.color);
+                self.setStatus('Added fragment "'+f.fragment('option','name')+'"',
+                              'ui-icon-circle-plus');
+            },  
+            remove: function(ev, ui) {
+                var f = ui.item.find(':bio-fragment');
+                self.setStatus('Removed fragment "'+f.fragment('option','name')+'"',
+                              'ui-icon-circle-minus');
+            }
+        });
+
+        var success = function(data) {
+            //copy into the DOM
+            for(var i = 0; i < data.length; i++) {
+                var f = data[i];
+                $('<li>').append($('<div>').attr({
+                    name: f.name,
+                    length: f.length,
+                    desc: f.desc,
+                    href: f.url
+                })).appendTo(ul);
+            }
+            //and initialise them
+            ul.find('li').each(function() {
+                var w = $(this).width();
+                $(this).children().fragment({
+                        color: o.color,
+                        width: w
+                    });
+            });
+            self.setStatus();
+            ul.animate({
+                'margin-top': '0px'
+            }, 'fast', function() {
+                self.list.css('overflow-y', 'auto');
+            });
+
+        };
+
+
+        if(o.src != null) {
+            if(typeof(o.src) === 'string') {
+                //prepare for animations
+                this.list.css('overflow', 'hidden');
+                ul.css('margin-top', this.list.height() + 'px');
+                //interpret as an url to load from
+                this.setStatus(o.text.loading, 'ui-icon-loading');
+                $.ajax({
+                    'url': o.src,
+                    'dataType': 'json',
+                    'success': success,
+                    'error': function(jqXHR, textStatus, errorThrown) {
+                        self.setStatus(String(errorThrown),'ui-icon-alert');
+                    }
+                });
+            }
+            else if($.isFunction(o.src)){
+                try{
+                    o.src(success, function(){
+                        self.setStatus(o.text.cberror, 'ui-icon-alert');
+                    });
+                }
+                catch(e){
+                    self.setStatus(e.message, 'ui-icon-alert');
+                }
+            }
+            else {
+                throw("options.src must be a string URL or a function");
+            }
+        }
+
+        if(el.hasClass('ui-corner-all')){
+            this.search.addClass('ui-corner-all');
+        }
+    },
+    filter: function(str){
+        var reg = new RegExp(str, 'i');
+        this.el.find(':bio-fragment').each( function(){
+            var f = $(this);
+            if(test_frag(f, reg)){
+                f.parent().show();
+            }
+            else{
+                f.parent().hide();
+            }
+        });
+        this.setStatus();
+    },
+    showAll: function(){
+        this.el.find(':bio-fragment').show();
+    },
+    setStatus: function(text, icon) {
+        var tot = this.list.find(':bio-fragment').length;
+        var fil = this.list.find(':bio-fragment:visible').length;
+        if(text == null){
+            var t = this.options.text;
+            if(tot === 0 && fil === 0) {
+                text = t.none_loaded;
+                icon = 'ui-icon-alert';
+            }
+            else if(tot > 0 && fil === 0) {
+                text = t.none_matching;
+                icon = 'ui-icon-alert';
+            }
+            else if(tot === fil) {text = t.showing_all;}
+            else {text = t.showing_filter;}
+        }
+        this.status_icon.attr('class', 'ui-icon ' + (icon || defaultIcon));
+        this.status_text.text( this._get_text(text, fil, tot));
+    },
+    _get_text: function(str, filter, total){
+        var t = this.options.text;
+        return str
+            .replace('%filter', filter)
+            .replace('%total', total)
+            .replace('%fragment', (total === 1)? t.fragment : t.fragments);
+    }
+});
+
+}(jQuery));
+

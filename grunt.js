@@ -5,6 +5,15 @@ function stripBanner( files ) {
     });
 }
 
+var src_files = [   'src/js/tooltip.js',
+                    'src/js/help.js',
+                    'src/js/panel.js',
+                    'src/js/color.js',
+                    'src/js/search.js',
+                    'src/js/fragment.js',
+                    'src/js/fragmentSelect.js'
+];
+
 /*global module:false*/
 module.exports = function(grunt) {
     /*Load grunt-contrib-less*/
@@ -23,7 +32,7 @@ module.exports = function(grunt) {
     },
     concat: {
       js: {
-        src: ['<banner:meta.banner>', stripBanner(grunt.file.expandFiles('src/js/*.js'))],
+        src: ['<banner:meta.banner>', stripBanner(src_files)],
         dest: 'dist/<%= pkg.name %>.js'
       },
       css: {
@@ -86,7 +95,7 @@ module.exports = function(grunt) {
             src: 'libs/jquery-ui-bio-loader.dust',
             dest: 'libs/jquery-ui-bio-loader.js',
             variables: {
-                names: grunt.file.expandFiles('src/js/*.js')
+                names: src_files
             }
         }
     }

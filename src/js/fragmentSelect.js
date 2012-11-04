@@ -18,7 +18,7 @@ var test_frag = function(f, filter){
         filter.test(f.fragment('option','desc'));
 };
 
-$.widget("bio.fragmentSelect", {
+$.widget("bio.fragmentSelect", $.bio.panel, {
     options: {
         title: undefined,
         help: undefined,
@@ -42,26 +42,15 @@ $.widget("bio.fragmentSelect", {
         color: null
     },
     _create: function() {
+        this._super();
+        console.log('bio.fragmentSelect._create');
         var self = this,
             o = this.options,
             el = this.el = $(this.element[0]).addClass(baseClasses);
 
-        o.title = o.title || o.text.defaultTitle;
-        o.help = o.help || o.text.defaultHelp;
-        o.color = o.color || next_color();
         this.timeout = null;
 
-
-        var header = this.header = $('<div>').addClass('ui-widget-header').appendTo(el);
-        var panel = this.panel = $('<div>').addClass(panelClasses).appendTo(el);
-        var base = $('<div>').addClass(bottomClasses).appendTo(el);
-        
-        $('<span>').addClass('title').text(o.title).appendTo(header);
-        var h = $('<span>').appendTo(header).help({
-            helphtml: o.help
-        });
-
-        var searchbar = $('<div>').addClass('searchbar').appendTo(panel);
+        var searchbar = $('<div>').addClass('searchbar').appendTo(this.panel);
         
         this.search = $('<div>')
             .search({
@@ -73,11 +62,7 @@ $.widget("bio.fragmentSelect", {
             .appendTo(searchbar);
         
         this.list = $('<div>').addClass('list ui-state-default')
-            .appendTo(panel);
-        var s = $('<div>').addClass('ui-state-default statusbar')
-            .appendTo(panel);
-        this.status_icon = $('<span>').addClass('ui-icon').appendTo(s);
-        this.status_text = $('<p>').appendTo(s);
+            .appendTo(this.panel);
 
         //copy any initial fragments
         var ul = this.ul = el.find('ul');
@@ -170,13 +155,8 @@ $.widget("bio.fragmentSelect", {
             }
         }
 
-        this._set_height();
-
         if(el.hasClass('ui-corner-all')){
-            header.addClass('ui-corner-top');
             this.search.addClass('ui-corner-all');
-            base.addClass('ui-corner-bottom');
-            h.addClass('ui-corner-all');
         }
     },
     filter: function(str){
@@ -213,14 +193,6 @@ $.widget("bio.fragmentSelect", {
         }
         this.status_icon.attr('class', 'ui-icon ' + (icon || defaultIcon));
         this.status_text.text( this._get_text(text, fil, tot));
-    },
-    _set_height: function(){
-        var others = 0;
-        this.panel.siblings().add(this.list.siblings()).each(function() {
-            others += $(this).outerHeight();
-        });
-        var h = this.options.height - others;
-        this.list.outerHeight(h).find('ul').outerHeight(h-5);
     },
     _get_text: function(str, filter, total){
         var t = this.options.text;
