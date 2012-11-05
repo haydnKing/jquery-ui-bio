@@ -11,7 +11,8 @@ var src_files = [   'src/js/tooltip.js',
                     'src/js/color.js',
                     'src/js/search.js',
                     'src/js/fragment.js',
-                    'src/js/fragmentSelect.js'
+                    'src/js/fragmentSelect.js',
+                    'src/js/sequenceView.js'
 ];
 
 /*global module:false*/

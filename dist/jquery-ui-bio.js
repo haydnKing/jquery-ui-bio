@@ -157,7 +157,6 @@ $.widget("bio.panel", {
         showStatus: true
     },
     _create: function() {
-        console.log('bio.panel._create');
         var self = this,
             o = this.options,
             el = this.el = $(this.element[0]).addClass(baseClasses);
@@ -586,7 +585,6 @@ $.widget("bio.fragmentSelect", $.bio.panel, {
     },
     _create: function() {
         this._super();
-        console.log('bio.fragmentSelect._create');
         var self = this,
             o = this.options,
             el = this.el = $(this.element[0]).addClass(baseClasses);
@@ -751,6 +749,33 @@ $.widget("bio.fragmentSelect", $.bio.panel, {
         });
         var h = this.options.height - others;
         this.list.outerHeight(h).find('ul').outerHeight(h-5);
+    }
+});
+
+}(jQuery));
+
+
+/*global next_color:false */
+(function($, undefined) {
+
+var baseClasses = 'bio-sequence-view ui-widget';
+
+$.widget("bio.sequenceView", $.bio.panel, {
+    options: {
+        title: undefined,
+        help: undefined,
+        text: {
+            defaultTitle: 'Fragment View',
+            defaultHelp: 'Drag to scroll around in the fragment'
+        },
+        height: 400
+    },
+    _create: function() {
+        this._super();
+        var self = this,
+            o = this.options,
+            el = this.el = $(this.element[0]).addClass(baseClasses);
+
     }
 });
 

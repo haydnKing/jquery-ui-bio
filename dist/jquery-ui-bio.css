@@ -137,6 +137,32 @@
 .bio-panel  > .bio-footer {
   height: 0.7em;
 }
+.bio-fragment-select > .bio-panel-content  > .list {
+  overflow-y: auto;
+}
+.bio-fragment-select > .bio-panel-content  > .searchbar {
+  padding: 0.2em 1em;
+}
+.bio-fragment-select > .bio-panel-content  > div {
+  background-image: none;
+  border-bottom: none;
+  border-left: none;
+  border-right: none;
+}
+.bio-fragment-select > .bio-panel-content  > div  > ul {
+  list-style-type: none;
+  background-image: none;
+}
+.bio-fragment-select > .bio-panel-content  > div  > ul  > li {
+  text-align: center;
+  margin: 0.3em 1em;
+  padding: 0.2em;
+  height: 1.5em;
+}
+.bio-fragment-select > .bio-panel-content  > div  > ul  > .ui-widget-content {
+  background: none;
+  border-style: dotted;
+}
 .bio-length:after {
   content: " bp";
 }
@@ -215,30 +241,4 @@
 .bio-fragment  > div a:hover {
   color: white;
   background-color: gray;
-}
-.bio-fragment-select > .bio-panel-content  > .list {
-  overflow-y: auto;
-}
-.bio-fragment-select > .bio-panel-content  > .searchbar {
-  padding: 0.2em 1em;
-}
-.bio-fragment-select > .bio-panel-content  > div {
-  background-image: none;
-  border-bottom: none;
-  border-left: none;
-  border-right: none;
-}
-.bio-fragment-select > .bio-panel-content  > div  > ul {
-  list-style-type: none;
-  background-image: none;
-}
-.bio-fragment-select > .bio-panel-content  > div  > ul  > li {
-  text-align: center;
-  margin: 0.3em 1em;
-  padding: 0.2em;
-  height: 1.5em;
-}
-.bio-fragment-select > .bio-panel-content  > div  > ul  > .ui-widget-content {
-  background: none;
-  border-style: dotted;
 }
