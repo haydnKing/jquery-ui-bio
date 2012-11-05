@@ -43,7 +43,6 @@ $.widget("bio.fragmentSelect", $.bio.panel, {
     },
     _create: function() {
         this._super();
-        console.log('bio.fragmentSelect._create');
         var self = this,
             o = this.options,
             el = this.el = $(this.element[0]).addClass(baseClasses);
@@ -200,6 +199,14 @@ $.widget("bio.fragmentSelect", $.bio.panel, {
             .replace('%filter', filter)
             .replace('%total', total)
             .replace('%fragment', (total === 1)? t.fragment : t.fragments);
+    },
+    _set_height: function(){
+        var others = 0;
+        this.panel.siblings().add(this.list.siblings()).each(function() {
+            others += $(this).outerHeight();
+        });
+        var h = this.options.height - others;
+        this.list.outerHeight(h).find('ul').outerHeight(h-5);
     }
 });
 

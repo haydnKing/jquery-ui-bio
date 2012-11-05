@@ -1,4 +1,4 @@
-/*! jQuery Ui Bio - v0.1.0 - 2012-11-04
+/*! jQuery Ui Bio - v0.1.0 - 2012-11-05
 * https://github.com/Gibthon/jquery-ui-bio
 * Copyright (c) 2012 Haydn King; Licensed MIT, GPL */
 .bio-help {
@@ -95,6 +95,48 @@
 .bio-search  > .ui-icon-close:hover {
   opacity: 1.0;
 }
+.bio-panel {
+  background-image: none;
+}
+.bio-panel  > .ui-widget-header {
+  position: relative;
+  text-align: center;
+  padding: 0.25em;
+}
+.bio-panel  > .ui-widget-header  > .bio-help {
+  position: absolute;
+  right: 0.5em;
+  top: 50%;
+  margin-top: -0.5em;
+}
+.bio-panel  > .bio-panel-content {
+  position: relative;
+  background-image: none;
+  border-top: none;
+  border-bottom: none;
+}
+.bio-panel  > .bio-panel-content:first-child {
+  border-top: none;
+}
+.bio-panel  > .statusbar {
+  position: relative;
+  min-height: 20px;
+  text-size: 12px;
+  padding: 0.2em;
+}
+.bio-panel  > .statusbar  > .ui-icon {
+  position: absolute;
+  top: 50%;
+  margin-top: -8px;
+  left: 6px;
+}
+.bio-panel  > .statusbar  > p {
+  margin: 2px 35px;
+  text-indent: -10px;
+}
+.bio-panel  > .bio-footer {
+  height: 0.7em;
+}
 .bio-length:after {
   content: " bp";
 }
@@ -174,71 +216,29 @@
   color: white;
   background-color: gray;
 }
-.bio-fragment-select {
-  background-image: none;
-}
-.bio-fragment-select  > .ui-widget-header {
-  position: relative;
-  text-align: center;
-  padding: 0.25em;
-}
-.bio-fragment-select  > .ui-widget-header  > .bio-help {
-  position: absolute;
-  right: 0.5em;
-  top: 50%;
-  margin-top: -0.5em;
-}
-.bio-fragment-select  > .bio-panel {
-  position: relative;
-  background-image: none;
-  border-top: none;
-  border-bottom: none;
-}
-.bio-fragment-select  > .bio-panel  > .list {
+.bio-fragment-select > .bio-panel-content  > .list {
   overflow-y: auto;
 }
-.bio-fragment-select  > .bio-panel  > .searchbar {
+.bio-fragment-select > .bio-panel-content  > .searchbar {
   padding: 0.2em 1em;
 }
-.bio-fragment-select  > .bio-panel  > .statusbar {
-  position: relative;
-  min-height: 20px;
-  text-size: 12px;
-  padding: 0.2em;
-}
-.bio-fragment-select  > .bio-panel  > .statusbar  > .ui-icon {
-  position: absolute;
-  top: 50%;
-  margin-top: -8px;
-  left: 6px;
-}
-.bio-fragment-select  > .bio-panel  > .statusbar  > p {
-  margin: 2px 35px;
-  text-indent: -10px;
-}
-.bio-fragment-select  > .bio-panel:first-child {
-  border-top: none;
-}
-.bio-fragment-select  > .bio-panel  > div {
+.bio-fragment-select > .bio-panel-content  > div {
   background-image: none;
   border-bottom: none;
   border-left: none;
   border-right: none;
 }
-.bio-fragment-select  > .bio-panel  > div  > ul {
+.bio-fragment-select > .bio-panel-content  > div  > ul {
   list-style-type: none;
   background-image: none;
 }
-.bio-fragment-select  > .bio-panel  > div  > ul  > li {
+.bio-fragment-select > .bio-panel-content  > div  > ul  > li {
   text-align: center;
   margin: 0.3em 1em;
   padding: 0.2em;
   height: 1.5em;
 }
-.bio-fragment-select  > .bio-panel  > div  > ul  > .ui-widget-content {
+.bio-fragment-select > .bio-panel-content  > div  > ul  > .ui-widget-content {
   background: none;
   border-style: dotted;
-}
-.bio-fragment-select  > .bio-footer {
-  height: 0.7em;
 }

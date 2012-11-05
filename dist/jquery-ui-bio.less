@@ -1,4 +1,4 @@
-/*! jQuery Ui Bio - v0.1.0 - 2012-11-04
+/*! jQuery Ui Bio - v0.1.0 - 2012-11-05
 * https://github.com/Gibthon/jquery-ui-bio
 * Copyright (c) 2012 Haydn King; Licensed MIT, GPL */
 
@@ -67,6 +67,50 @@
         }
     }
 }
+
+.bio-panel {
+    background-image: none;
+    & > .ui-widget-header {
+        position: relative;
+        text-align: center;
+        padding: 0.25em;
+        & > .bio-help {
+            position: absolute;
+            right: 0.5em;
+            top: 50%;
+            margin-top: -0.5em;
+        }
+    }
+    & > .bio-panel-content {
+        position: relative;
+        background-image: none;
+        border-top: none;
+        border-bottom: none;
+        &:first-child {
+            border-top: none;
+        }
+    }
+    & > .statusbar {
+        position: relative;
+        min-height: 20px;
+        text-size: 12px;
+        padding: 0.2em;
+        & > .ui-icon {
+            position: absolute;
+            top: 50%;
+            margin-top: -8px;
+            left: 6px;
+        }
+        & > p {
+            margin: 2px 35px;
+            text-indent: -10px;
+        }
+    }
+    & > .bio-footer {
+        height: 0.7em;
+    }
+}
+
 
 .arrow_box(@background, @border, @size, @border-width) { 
     position: absolute; 
@@ -213,72 +257,32 @@
     }
 }
 
-.bio-fragment-select {
-    background-image: none;
-    & > .ui-widget-header {
-        position: relative;
-        text-align: center;
-        padding: 0.25em;
-        & > .bio-help {
-            position: absolute;
-            right: 0.5em;
-            top: 50%;
-            margin-top: -0.5em;
-        }
+.bio-fragment-select  > .bio-panel-content {
+    & > .list {
+        overflow-y: auto;
     }
-    & > .bio-panel{
-        position: relative;
+    & > .searchbar {
+        padding: 0.2em 1em;
+    }
+    & > div{
         background-image: none;
-        border-top: none;
         border-bottom: none;
-        & > .list {
-            overflow-y: auto;
-        }
-        & > .searchbar {
-            padding: 0.2em 1em;
-        }
-        & > .statusbar {
-            position: relative;
-            min-height: 20px;
-            text-size: 12px;
-            padding: 0.2em;
-            & > .ui-icon {
-                position: absolute;
-                top: 50%;
-                margin-top: -8px;
-                left: 6px;
-            }
-            & > p {
-                margin: 2px 35px;
-                text-indent: -10px;
-            }
-        }
-        &:first-child {
-            border-top: none;
-        }
-        & > div{
+        border-left: none;
+        border-right: none;
+        & > ul{
+            list-style-type: none;
             background-image: none;
-            border-bottom: none;
-            border-left: none;
-            border-right: none;
-            & > ul{
-                list-style-type: none;
-                background-image: none;
-                 & > li{
-                    text-align: center;
-                    margin: 0.3em 1em;
-                    padding: 0.2em;
-                    height: 1.5em;
-                }
-                & > .ui-widget-content {
-                    background: none;
-                    border-style: dotted;
-                }
+             & > li{
+                text-align: center;
+                margin: 0.3em 1em;
+                padding: 0.2em;
+                height: 1.5em;
+            }
+            & > .ui-widget-content {
+                background: none;
+                border-style: dotted;
             }
         }
-    }
-    & > .bio-footer{
-        height: 0.7em;
     }
 }
 

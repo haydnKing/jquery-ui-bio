@@ -1,0 +1,43 @@
+.bio-panel {
+    background-image: none;
+    & > .ui-widget-header {
+        position: relative;
+        text-align: center;
+        padding: 0.25em;
+        & > .bio-help {
+            position: absolute;
+            right: 0.5em;
+            top: 50%;
+            margin-top: -0.5em;
+        }
+    }
+    & > .bio-panel-content {
+        position: relative;
+        background-image: none;
+        border-top: none;
+        border-bottom: none;
+        &:first-child {
+            border-top: none;
+        }
+    }
+    & > .statusbar {
+        position: relative;
+        min-height: 20px;
+        text-size: 12px;
+        padding: 0.2em;
+        & > .ui-icon {
+            position: absolute;
+            top: 50%;
+            margin-top: -8px;
+            left: 6px;
+        }
+        & > p {
+            margin: 2px 35px;
+            text-indent: -10px;
+        }
+    }
+    & > .bio-footer {
+        height: 0.7em;
+    }
+}
+

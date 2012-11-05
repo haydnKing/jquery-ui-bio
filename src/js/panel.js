@@ -8,7 +8,10 @@
 /*global next_color:false */
 (function($, undefined) {
 
-var panelClasses  = 'bio-panel ui-widget-content ui-state-default',
+var baseClasses = 'ui-widget bio-panel',
+    headerClasses = 'ui-widget-header',
+    panelClasses  = 'bio-panel-content ui-widget-content ui-state-default',
+    statusClasses = 'ui-state-default statusbar',
     footerClasses = 'bio-footer ui-widget ui-widget-header',
     defaultIcon   = 'ui-icon-circle-triangle-e';
 
@@ -16,7 +19,6 @@ $.widget("bio.panel", {
     options: {
         title: undefined,
         help: undefined,
-        baseClasses: 'ui-widget',
         text: {
             defaultTitle: 'Bio Panel',
             defaultHelp: '',
@@ -26,18 +28,17 @@ $.widget("bio.panel", {
         showStatus: true
     },
     _create: function() {
-        console.log('bio.panel._create');
         var self = this,
             o = this.options,
-            el = this.el = $(this.element[0]).addClass(o.baseClasses);
+            el = this.el = $(this.element[0]).addClass(baseClasses);
 
         o.title = o.title || o.text.defaultTitle;
         o.help = o.help || o.text.defaultHelp;
         o.color = o.color || next_color();
 
-
-        var head = this.head = $('<div>').addClass('ui-widget-header').appendTo(el);
+        var head = this.head = $('<div>').addClass(headerClasses).appendTo(el);
         var panel = this.panel = $('<div>').addClass(panelClasses).appendTo(el);
+        var s = this.status_bar = $('<div>').addClass(statusClasses).appendTo(el);
         var foot = this.foot = $('<div>').addClass(footerClasses).appendTo(el);
         
         this.title = $('<span>').addClass('title').text(o.title).appendTo(head);
@@ -45,21 +46,20 @@ $.widget("bio.panel", {
             helphtml: o.help
         });
 
-        var s = this.status_bar = $('<div>').addClass('ui-state-default statusbar')
-            .appendTo(panel);
         this.status_icon = $('<span>').addClass('ui-icon').appendTo(s);
         this.status_text = $('<p>').appendTo(s);
         if(!o.showStatus){
             s.hide();
         }
 
-        this._set_height();
-
         if(el.hasClass('ui-corner-all')){
             head.addClass('ui-corner-top');
             foot.addClass('ui-corner-bottom');
             h.addClass('ui-corner-all');
         }
+    },
+    _init: function(){
+        this._set_height();
     },
     option: function(key, value) {
         if(value == null){
