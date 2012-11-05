@@ -47,6 +47,8 @@ $.widget("bio.fragmentSelect", $.bio.panel, {
             o = this.options,
             el = this.el = $(this.element[0]).addClass(baseClasses);
 
+        this.stretch_factors = {'ul': 1};
+
         this.timeout = null;
 
         var searchbar = $('<div>').addClass('searchbar').appendTo(this.panel);
@@ -69,7 +71,7 @@ $.widget("bio.fragmentSelect", $.bio.panel, {
             ul.detach().appendTo(this.list);
         }
         else{
-            ul = $('<ul>').appendTo(this.list);
+            ul = this.ul = $('<ul>').appendTo(this.list);
         }
 
         ul.sortable({
@@ -199,14 +201,6 @@ $.widget("bio.fragmentSelect", $.bio.panel, {
             .replace('%filter', filter)
             .replace('%total', total)
             .replace('%fragment', (total === 1)? t.fragment : t.fragments);
-    },
-    _set_height: function(){
-        var others = 0;
-        this.panel.siblings().add(this.list.siblings()).each(function() {
-            others += $(this).outerHeight();
-        });
-        var h = this.options.height - others;
-        this.list.outerHeight(h).find('ul').outerHeight(h-5);
     }
 });
 

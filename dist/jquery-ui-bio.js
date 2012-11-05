@@ -170,6 +170,9 @@ $.widget("bio.panel", {
         var s = this.status_bar = $('<div>').addClass(statusClasses).appendTo(el);
         var foot = this.foot = $('<div>').addClass(footerClasses).appendTo(el);
         
+        //define how items should scale with height
+        this.stretch_factors = {'panel': 1};
+
         this.title = $('<span>').addClass('title').text(o.title).appendTo(head);
         var h = this.help = $('<span>').appendTo(head).help({
             helphtml: o.help
@@ -212,12 +215,20 @@ $.widget("bio.panel", {
         this.status_text.text(text || this.options.text.defaultStatus);
     },
     _set_height: function(){
-        var others = 0;
-        this.panel.siblings().each(function() {
-            others += $(this).outerHeight();
-        });
-        var h = this.options.height - others;
-        this.panel.outerHeight(h);
+        var stretch = 0, total = 0;
+        for(var i in this.stretch_factors)
+        {
+            total += this.stretch_factors[i];
+            stretch += this[i].outerHeight();
+        }
+        var fixed = this.el.outerHeight() - stretch;
+        stretch = Math.max(0, this.options.height - fixed);
+        console.log('Stretch = ' + stretch);
+        for(i in this.stretch_factors)
+        {
+            console.log('this['+i+'].outerHeight('+(stretch * this.stretch_factors[i] / total)+');');
+            this[i].outerHeight(stretch * this.stretch_factors[i] / total);
+        }
     }
 });
 
@@ -589,6 +600,8 @@ $.widget("bio.fragmentSelect", $.bio.panel, {
             o = this.options,
             el = this.el = $(this.element[0]).addClass(baseClasses);
 
+        this.stretch_factors = {'ul': 1};
+
         this.timeout = null;
 
         var searchbar = $('<div>').addClass('searchbar').appendTo(this.panel);
@@ -611,7 +624,7 @@ $.widget("bio.fragmentSelect", $.bio.panel, {
             ul.detach().appendTo(this.list);
         }
         else{
-            ul = $('<ul>').appendTo(this.list);
+            ul = this.ul = $('<ul>').appendTo(this.list);
         }
 
         ul.sortable({
@@ -741,14 +754,6 @@ $.widget("bio.fragmentSelect", $.bio.panel, {
             .replace('%filter', filter)
             .replace('%total', total)
             .replace('%fragment', (total === 1)? t.fragment : t.fragments);
-    },
-    _set_height: function(){
-        var others = 0;
-        this.panel.siblings().add(this.list.siblings()).each(function() {
-            others += $(this).outerHeight();
-        });
-        var h = this.options.height - others;
-        this.list.outerHeight(h).find('ul').outerHeight(h-5);
     }
 });
 
