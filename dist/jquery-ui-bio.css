@@ -58,6 +58,61 @@
 .bio-help  > .tip  > * {
   margin: 1.5em 0.5em;
 }
+.bio-sequence-view > .bio-panel-content  > .bio-overview {
+  border-color: inherit;
+  border-style: inherit;
+  border-width: 1px 0;
+  position: relative;
+}
+.bio-sequence-view > .bio-panel-content  > .bio-overview  > .bio-view {
+  border-color: inherit;
+  border-style: inherit;
+  border-width: 1px;
+  position: absolute;
+  top: -0.5em;
+  bottom: -0.5em;
+  left: 20%;
+  right: 60%;
+}
+.bio-sequence-view > .bio-panel-content  > .bio-zoomview {
+  border-color: inherit;
+  border-style: inherit;
+  border-width: 1px 0 0 0;
+  position: relative;
+}
+.bio-sequence-view > .bio-panel-content  > .bio-zoomview  > .bio-slidearrow {
+  position: absolute;
+  width: 32px;
+  top: 0;
+  bottom: 0;
+  background-image: none;
+  border: none;
+  cursor: pointer;
+}
+.bio-sequence-view > .bio-panel-content  > .bio-zoomview  > .bio-slidearrow  > .ui-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-top: -8px;
+  margin-left: -8px;
+}
+.bio-sequence-view > .bio-panel-content  > .bio-zoomview  > .bio-slideleft {
+  left: 0;
+}
+.bio-sequence-view > .bio-panel-content  > .bio-zoomview  > .bio-slideright {
+  right: 0;
+}
+.bio-meta {
+  padding: 0.5em 1em;
+}
+.bio-meta  > .bio-name {
+  font-weight: bold;
+  font-size: 1.1em;
+}
+.bio-meta  > .bio-desc {
+  margin-left: 1em;
+  font-style: italic;
+}
 .bio-search {
   position: relative;
   height: 1.2em;
@@ -112,11 +167,11 @@
 .bio-panel  > .bio-panel-content {
   position: relative;
   background-image: none;
-  border-top: none;
-  border-bottom: none;
+  border-top-width: 0;
+  border-bottom-width: 0;
 }
 .bio-panel  > .bio-panel-content:first-child {
-  border-top: none;
+  border-top-width: 0;
 }
 .bio-panel  > .statusbar {
   position: relative;
