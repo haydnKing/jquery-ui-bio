@@ -16,7 +16,7 @@
         background-image: none;
         border-top-width: 0;
         border-bottom-width: 0;
-        &:first-child {
+        & > *:first-child {
             border-top-width: 0;
         }
     }
@@ -26,6 +26,10 @@
         text-size: 12px;
         padding: 0.2em;
         border-bottom: none;
+        margin: 0;
+        -webkit-border-radius: 0px;
+        -moz-border-radius: 0px;
+        border-radius: 0px;
         & > .ui-icon {
             position: absolute;
             top: 50%;

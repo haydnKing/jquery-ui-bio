@@ -138,10 +138,11 @@ $.widget("bio.help", {
 (function($, undefined) {
 
 var baseClasses = 'ui-widget bio-panel',
-    headerClasses = 'ui-widget-header',
-    panelClasses  = 'bio-panel-content ui-widget-content ui-state-default',
-    statusClasses = 'ui-state-default statusbar',
-    footerClasses = 'bio-footer ui-widget ui-widget-header',
+    headerClasses = 'ui-widget-header ui-state-default',
+    panelClasses  = 'bio-panel-content ui-state-default',
+    panelItemClasses = 'ui-widget-content ui-state-default',
+    statusClasses = 'ui-state-default ui-widget-content statusbar',
+    footerClasses = 'bio-footer ui-widget-header ui-state-default',
     defaultIcon   = 'ui-icon-circle-triangle-e';
 
 $.widget("bio.panel", {
@@ -229,6 +230,11 @@ $.widget("bio.panel", {
             console.log('this['+i+'].outerHeight('+(stretch * this.stretch_factors[i] / total)+');');
             this[i].outerHeight(stretch * this.stretch_factors[i] / total);
         }
+    },
+    _add_to_panel: function($item){
+        $item.addClass(panelItemClasses);
+        this.panel.append($item);
+        return $item;
     }
 });
 
@@ -558,8 +564,6 @@ $.widget("bio.fragment", {
 (function($, undefined) {
 
 var baseClasses   = 'bio-fragment-select ui-widget',
-    panelClasses  = 'bio-panel ui-widget-content ui-state-default',
-    bottomClasses = 'bio-bottom ui-widget ui-widget-header',
     defaultIcon   = 'ui-icon-circle-triangle-e';
 
 var test_frag = function(f, filter){
@@ -600,7 +604,7 @@ $.widget("bio.fragmentSelect", $.bio.panel, {
 
         this.timeout = null;
 
-        var searchbar = $('<div>').addClass('searchbar').appendTo(this.panel);
+        var searchbar = self._add_to_panel($('<div>').addClass('searchbar'));
         
         this.search = $('<div>')
             .search({
@@ -611,8 +615,7 @@ $.widget("bio.fragmentSelect", $.bio.panel, {
             })
             .appendTo(searchbar);
         
-        this.list = $('<div>').addClass('list ui-state-default')
-            .appendTo(this.panel);
+        this.list = self._add_to_panel($('<div>').addClass('list'));
 
         //copy any initial fragments
         var ul = this.ul = el.find('ul');
