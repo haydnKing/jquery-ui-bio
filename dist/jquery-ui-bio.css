@@ -1,4 +1,4 @@
-/*! jQuery Ui Bio - v0.1.0 - 2012-11-05
+/*! jQuery Ui Bio - v0.1.0 - 2012-11-09
 * https://github.com/Gibthon/jquery-ui-bio
 * Copyright (c) 2012 Haydn King; Licensed MIT, GPL */
 .bio-help {
@@ -115,7 +115,7 @@
 }
 .bio-search {
   position: relative;
-  height: 1.2em;
+  height: 1.3em;
 }
 .bio-search  > div {
   position: absolute;
@@ -129,6 +129,9 @@
   width: 100%;
   border: none;
   background: none;
+  position: absolute;
+  padding: 0 16px;
+  margin: 0 -16px;
 }
 .bio-search  > .hint {
   font-style: italic;

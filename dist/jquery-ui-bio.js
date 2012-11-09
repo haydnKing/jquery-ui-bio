@@ -1,4 +1,4 @@
-/*! jQuery Ui Bio - v0.1.0 - 2012-11-05
+/*! jQuery Ui Bio - v0.1.0 - 2012-11-09
 * https://github.com/Gibthon/jquery-ui-bio
 * Copyright (c) 2012 Haydn King; Licensed MIT, GPL */
 
@@ -250,7 +250,7 @@ var next_color = (function() {
 var baseClasses    = 'bio-search ui-widget',
     defaultClasses = 'ui-state-default',
     hoverClasses   = 'ui-state-hover',
-    focusClasses   = 'ui-state-highlight';
+    focusClasses   = 'ui-state-focus';
 
 $.widget("bio.search", {
     options: {
@@ -287,7 +287,6 @@ $.widget("bio.search", {
                 'focus': function(){
                     self.search_hint.hide();
                     self.el
-                        .removeClass(defaultClasses)
                         .removeClass(hoverClasses)
                         .addClass(focusClasses);
                 },
@@ -297,8 +296,7 @@ $.widget("bio.search", {
                         self.search_clear.hide();
                     }
                     self.el
-                        .removeClass(focusClasses)
-                        .addClass(defaultClasses);
+                        .removeClass(focusClasses);
                 },
                 'keyup': function(){
                     var v = self.input.val();
@@ -324,15 +322,13 @@ $.widget("bio.search", {
             'mouseenter': function() {
                 if(self.el.hasClass(defaultClasses)){
                     self.el
-                        .removeClass(defaultClasses)
                         .addClass(hoverClasses);
                 }
             },
             'mouseleave': function() {
                 if(self.el.hasClass(hoverClasses)){
                     self.el
-                        .removeClass(hoverClasses)
-                        .addClass(defaultClasses);
+                        .removeClass(hoverClasses);
                 }
             }
                     
