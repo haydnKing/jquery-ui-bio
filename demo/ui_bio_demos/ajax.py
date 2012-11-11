@@ -1,6 +1,7 @@
 from django.utils import simplejson
 from dajaxice.decorators import dajaxice_register
-from django.http import HttpResponseNotFound
+import dajaxice.views
+from django.http import HttpResponseNotFound, HttpResponse
 
 _fragment_sets = [[
         {"name": "Fragment A", "Length": 15, 
@@ -79,6 +80,19 @@ _fragment_sets = [[
 ]
 
 
+
+#monkey-patch dajaxice response to include content length
+dispatch = dajaxice.views.DajaxiceRequest.dispatch
+
+def monkey(self, request, name=None):
+	ret = dispatch(self, request, name)
+	if isinstance(ret, HttpResponse):
+		ret['Content-Length'] = len(ret.content)
+	return ret
+
+dajaxice.views.DajaxiceRequest.dispatch = monkey
+
+
 @dajaxice_register
 def fragmentSelect(request, **kwargs):
 	num = kwargs.get('num')
@@ -86,4 +100,41 @@ def fragmentSelect(request, **kwargs):
 		return simplejson.dumps(_fragment_sets[num-1])
 	else:
 		return HttpResponseNotFound()
-		
+	
+import os.path
+from Bio import SeqIO
+from Bio.SeqRecord import SeqRecord
+from Bio.SeqFeature import SeqFeature, FeatureLocation
+
+def get_test_data():
+	path = os.path.join(os.path.dirname(__file__),"data/EColi.gb")
+	gen = SeqIO.parse(path, 'genbank')
+	return gen.next()
+
+@dajaxice_register
+def getMetadata(request, **kwargs):
+	"""Return metadata and features on EColi"""
+	coli = get_test_data()
+	ret = {		'name': coli.name,
+						'description': coli.description,
+						'length': len(coli.seq),
+						'alphabet': str(coli.seq.alphabet)[0:-2],
+						'features': [],
+					}
+	for f in coli.features:
+		feat = {'start': int(f.location.start),
+						'end': int(f.location.end),
+						'strand': f.strand,
+						'ref': f.ref,
+						'ref_db': f.ref_db,
+						'type': f.type,
+						'id': f.id,
+						'qualifiers': {},
+						}
+		for key,value in f.qualifiers.iteritems():
+			feat['qualifiers'][key] = value
+		ret['features'].append(feat)
+	
+	return simplejson.dumps(ret)
+	
+

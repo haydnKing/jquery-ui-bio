@@ -1,4 +1,4 @@
-/*! jQuery Ui Bio - v0.1.0 - 2012-11-09
+/*! jQuery Ui Bio - v0.1.0 - 2012-11-11
 * https://github.com/Gibthon/jquery-ui-bio
 * Copyright (c) 2012 Haydn King; Licensed MIT, GPL */
 .bio-help {
@@ -101,6 +101,13 @@
 }
 .bio-sequence-view > .bio-panel-content  > .bio-zoomview  > .bio-slideright {
   right: 0;
+}
+.bio-sequence-view > .bio-panel-content  > .bio-zoomview  > .ui-progressbar {
+  position: absolute;
+  top: 50%;
+  margin-top: -1em;
+  left: 64px;
+  right: 64px;
 }
 .bio-meta {
   padding: 0.5em 1em;

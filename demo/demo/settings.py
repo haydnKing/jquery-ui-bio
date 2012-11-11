@@ -165,3 +165,6 @@ LOGGING = {
         },
     }
 }
+
+
+DAJAXICE_XMLHTTPREQUEST_JS_IMPORT = False
