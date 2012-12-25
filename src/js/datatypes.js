@@ -43,7 +43,7 @@ this.bio = this.bio || {};
         {
             if( this.contains(rhs[i].start) ||
                 this.contains(rhs[i].end) ||
-                rhs.contains(rhs[i].start) )
+                rhs[i].contains(this.start) )
             {
                 return true;
             }

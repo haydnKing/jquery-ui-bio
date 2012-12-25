@@ -33,31 +33,36 @@
         start: 57,
         end: 150,
         strand: 1,
-        e_strand: 1
+        e_strand: 1,
+        e_overlap: true
     },
     {
         start: 4,
         end: 65,
         strand: -172,
-        e_strand: -1
+        e_strand: -1,
+        e_overlap: true
     },
     {
         start: 47,
         end: 101,
         strand: 0,
-        e_strand: 1
+        e_strand: 1,
+        e_overlap: true
     },
     {
         start: 55,
         end: 60,
         strand: 1,
-        e_strand: 1
+        e_strand: 1,
+        e_overlap: true
     },
     {
         start: 105,
         end: 170,
         strand: 5,
-        e_strand: 1
+        e_strand: 1,
+        e_overlap: false
     }];
 
     var rev = {
@@ -83,6 +88,22 @@
         equal(this.load[i].strand, fl_json[i].e_strand, 
               "Strand "+i+" is different");
     }
+  });
+
+  test('overlaps', fl_json.length-1, function(){
+
+    for(var i = 1; i < fl_json.length; i++)
+    {
+        equal(this.load[0].overlaps(this.load[i]), fl_json[i].e_overlap, 
+              "Overlap "+i);
+    }
+  });
+
+  test('reverse order', 3, function(){
+      var a = bio.loadFeatureLocation(rev);
+      equal(a[0].start, rev.end);
+      equal(a[0].end, rev.start);
+      equal(a[0].strand, rev.e_strand);
   });
 
 }());
