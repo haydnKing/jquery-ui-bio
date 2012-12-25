@@ -117,9 +117,13 @@ this.bio = this.bio || {};
         {
             l = [l];
         }
+        if(i == null)
+        {
+            i = -1;
+        }
         this.location = l || [];
         this.type = t || "NoneType";
-        this.id = i || -1;
+        this.id = i;
         this.qualifiers = q || {};
     };
 
@@ -162,12 +166,15 @@ this.bio = this.bio || {};
 
     bio.loadSeqFeature = function(json)
     {
-        var loc = [];
-        for(var i = 0; i < json.location.length; i++)
+        var ret = [];
+        for(var i = 0; i < json.length; i++)
         {
-            loc.push(bio.loadSeqLocation(json.location[i]));
+            ret.push(new SeqFeature(bio.loadFeatureLocation(json[i].location),
+                                    json[i].type, 
+                                    json[i].id, 
+                                    json[i].qualifiers));
         }
-        return new SeqFeature(loc, json.type, json.id, json.qualifiers);
+        return ret;
     };
 
 }());

@@ -72,6 +72,48 @@
         e_strand: 1
     };
 
+    var sf_json = [{
+        type: 'one',
+        id: 0,
+        qualifiers: {},
+        location: [fl_json[0]]
+    },
+    {
+        type: 'two',
+        id: 1,
+        qualifiers: {one: 1, two: '2'},
+        location: [fl_json[1]]
+    },
+    {
+        type: 'three',
+        id: 1,
+        qualifiers: {one: 1, two: '2'},
+        location: [fl_json[5]]
+    }];
+
+    var equal_fl = function(actual, expected, msg)
+    {
+        msg = msg || "";
+        equal(actual.start, expected.start, msg + " start");
+        equal(actual.end, expected.end, msg + " end");
+        equal(actual.strand, expected.e_strand, msg + " strand");
+    };
+
+    var equal_sf = function(actual, expected, msg)
+    {
+        msg = msg || "";
+        equal(actual.type, expected.type, msg + " type");
+        equal(actual.id, expected.id, msg + " id");
+        equal(actual.qualifiers, expected.qualifiers, msg + " qualifiers");
+        equal(actual.location.length, expected.location.length, msg + " loc_length");
+        for(var i = 0; i < actual.location.length; i++)
+        {
+            equal_fl(actual.location[0], expected.location[0], 
+                    msg + " location("+i+")");
+        }
+    };
+
+
   module('bio.FeatureLocation', {
     setup: function() {
         this.load = bio.loadFeatureLocation(fl_json);
@@ -83,10 +125,7 @@
 
     for(var i = 0; i < fl_json.length; i++)
     {
-        equal(this.load[i].start, fl_json[i].start, "Start "+i+" is different");
-        equal(this.load[i].end, fl_json[i].end, "End "+i+" is different");
-        equal(this.load[i].strand, fl_json[i].e_strand, 
-              "Strand "+i+" is different");
+       equal_fl(this.load[i], fl_json[i], "fl("+i+")"); 
     }
   });
 
@@ -105,5 +144,22 @@
       equal(a[0].end, rev.start);
       equal(a[0].strand, rev.e_strand);
   });
+
+
+  module('bio.SeqFeature', {
+    setup: function() {
+        this.load = bio.loadSeqFeature(sf_json);
+    }
+  });
+
+  test('load from json', undefined, function(){
+    equal(this.load.length, sf_json.length, "Loaded length is different");
+
+    for(var i = 0; i < sf_json.length; i++)
+    {
+        equal_sf(this.load[i], sf_json[i], "SF("+i+")");
+    }
+  });
+
 
 }());
