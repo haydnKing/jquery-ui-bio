@@ -82,13 +82,15 @@
         type: 'two',
         id: 1,
         qualifiers: {one: 1, two: '2'},
-        location: [fl_json[1]]
+        location: [fl_json[5], fl_json[1]],
+        e_overlap: true
     },
     {
         type: 'three',
         id: 1,
         qualifiers: {one: 1, two: '2'},
-        location: [fl_json[5]]
+        location: [fl_json[5]],
+        e_overlap: false
     }];
 
     var equal_fl = function(actual, expected, msg)
@@ -108,7 +110,7 @@
         equal(actual.location.length, expected.location.length, msg + " loc_length");
         for(var i = 0; i < actual.location.length; i++)
         {
-            equal_fl(actual.location[0], expected.location[0], 
+            equal_fl(actual.location[i], expected.location[i], 
                     msg + " location("+i+")");
         }
     };
@@ -159,6 +161,14 @@
     {
         equal_sf(this.load[i], sf_json[i], "SF("+i+")");
     }
+  });
+
+  test('overlap', sf_json.length - 1, function(){
+
+      for(var i = 1; i < sf_json.length; i++)
+      {
+          equal(this.load[0].overlaps(this.load[i]), sf_json[i].e_overlap);
+      }
   });
 
 
