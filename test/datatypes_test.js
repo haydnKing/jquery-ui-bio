@@ -76,20 +76,20 @@
         type: 'one',
         id: 0,
         qualifiers: {},
-        location: [fl_json[0]]
+        location: fl_json[0]
     },
     {
         type: 'two',
         id: 1,
         qualifiers: {one: 1, two: '2'},
-        location: [fl_json[5], fl_json[1]],
+        location: fl_json[3],
         e_overlap: true
     },
     {
         type: 'three',
         id: 1,
         qualifiers: {one: 1, two: '2'},
-        location: [fl_json[5]],
+        location: fl_json[5],
         e_overlap: false
     }];
 
@@ -101,19 +101,17 @@
         equal(actual.strand, expected.e_strand, msg + " strand");
     };
 
+    var tests_fl = 3;
+
     var equal_sf = function(actual, expected, msg)
     {
         msg = msg || "";
         equal(actual.type, expected.type, msg + " type");
         equal(actual.id, expected.id, msg + " id");
         equal(actual.qualifiers, expected.qualifiers, msg + " qualifiers");
-        equal(actual.location.length, expected.location.length, msg + " loc_length");
-        for(var i = 0; i < actual.location.length; i++)
-        {
-            equal_fl(actual.location[i], expected.location[i], 
-                    msg + " location("+i+")");
-        }
+        equal_fl(actual.location, expected.location, " location");
     };
+    var tests_sf = 3 + tests_fl;
 
 
   module('bio.FeatureLocation', {
@@ -122,7 +120,7 @@
     }
   });
 
-  test('load from json', 1 + 3*fl_json.length, function(){
+  test('load from json', 1 + tests_fl*fl_json.length, function(){
     equal(this.load.length, fl_json.length, "Loaded length is different");
 
     for(var i = 0; i < fl_json.length; i++)
@@ -154,7 +152,7 @@
     }
   });
 
-  test('load from json', undefined, function(){
+  test('load from json', sf_json.length * tests_sf, function(){
     equal(this.load.length, sf_json.length, "Loaded length is different");
 
     for(var i = 0; i < sf_json.length; i++)
