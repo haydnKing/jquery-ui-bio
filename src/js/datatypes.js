@@ -59,7 +59,7 @@ this.bio = this.bio || {};
     fl.length = function()
     {
         return this.end - this.start;
-    }
+    };
 
 
     bio.FeatureLocation = FeatureLocation;
@@ -117,7 +117,7 @@ this.bio = this.bio || {};
             ret += this.location[i].length();
         }
         return ret;
-    }
+    };
 
     bio.SeqFeature = SeqFeature;
 
@@ -164,7 +164,7 @@ this.bio = this.bio || {};
     var FeatureStore = function(features, tile_size)
     {
         this.init(features, tile_size);
-    }
+    };
     var fs = FeatureStore.prototype;
 
     //Default values
@@ -178,6 +178,10 @@ this.bio = this.bio || {};
      */
     fs.tile_size = 1024;
     /*
+     * length: end of all the features
+     */
+    fs.length = 0;
+    /*
      * types: array of all different feature types
      */
     fs.types = [];
@@ -190,6 +194,11 @@ this.bio = this.bio || {};
      * stacks: the maximum stacking height for each type in each direction
      */
     fs.stacks = {};
+    /*
+     * tiles: an array of dictionary objects, keys are types, values are arrays
+     * of features
+     */
+    fs.tiles = [];
 
     /*
      * Public Functions ------------------------------------------------------
@@ -198,7 +207,7 @@ this.bio = this.bio || {};
     //getters & setters
     fs.getTypes = function()
     {
-        return this.types
+        return this.types;
     };
     fs.getFeatures = function()
     {
@@ -207,7 +216,7 @@ this.bio = this.bio || {};
     fs.getFeaturesByType = function(type)
     {
         return this.by_type[type.toLowerCase()];
-    }
+    };
     fs.pos2tile = function(pos)
     {
         return Math.floor(pos/this.tile_size);
@@ -227,7 +236,7 @@ this.bio = this.bio || {};
         this.features = f || [];
         if(s != null)
         {
-            this.tile_size = parseInt(s);
+            this.tile_size = parseInt(s,10);
         }
 
         this._calc_types();
@@ -249,6 +258,10 @@ this.bio = this.bio || {};
                 this.types.push(t);
             }
             this.by_type[t].push(f);
+            if(f.end > this.length)
+            {
+                this.length = f.end;
+            }
         }
     };
 
@@ -259,6 +272,12 @@ this.bio = this.bio || {};
         {
             feats = this.getFeaturesByType(this.types[type]);
 
+            /*
+             *
+             * This gets easy if features are all on the same strand
+             *
+             *
+             */
         }
     };
 
@@ -299,7 +318,38 @@ this.bio = this.bio || {};
     };
 
     fs._calc_tiles = function()
-    {};
+    {
+        var f;
+
+        var make_tile = function()
+        {
+            var t = {};
+            for(var i = 0; i < this.types; i++)
+            {
+                t[this.types[i]] = [];
+            }
+            return t;
+        };
+
+        for(var i = 0; i < this.length / this.tile_size; i++)
+        {
+            this.tiles.push(make_tile());
+        }
+
+        for(i = 0; i < this.features.length; i++)
+        {
+            f = this.features[i];
+            
+            /*
+             * Again, easy of features only exist in one place...
+             *
+             *
+             */
+        }
+
+
+        
+    };
 
 
 
