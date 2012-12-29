@@ -76,15 +76,11 @@ this.bio = this.bio || {};
 
     sf.init = function(l,t,i,q)
     {
-        if(!Array.isArray(l))
-        {
-            l = [l];
-        }
         if(i == null)
         {
             i = -1;
         }
-        this.location = l || [];
+        this.location = l;
         this.type = t || "NoneType";
         this.id = i;
         this.qualifiers = q || {};
@@ -98,12 +94,9 @@ this.bio = this.bio || {};
         }
         for(var i = 0; i < rhs.length; i++)
         {
-            for(var j = 0; j < this.location.length; j++)
+            if(this.location.overlaps(rhs[i].location))
             {
-                if(this.location[j].overlaps(rhs[i].location))
-                {
-                    return true;
-                }
+                return true;
             }
         }
         return false;
@@ -111,12 +104,7 @@ this.bio = this.bio || {};
 
     sf.length = function()
     {
-        var ret, i;
-        for(i = 0; i < this.location.length; i++)
-        {
-            ret += this.location[i].length();
-        }
-        return ret;
+        return this.location.length();
     };
 
     bio.SeqFeature = SeqFeature;
@@ -139,10 +127,15 @@ this.bio = this.bio || {};
 
     bio.loadSeqFeature = function(json)
     {
+        if(!Array.isArray(json))
+        {
+            json = [json];
+        }
         var ret = [];
         for(var i = 0; i < json.length; i++)
         {
-            ret.push(new SeqFeature(bio.loadFeatureLocation(json[i].location),
+            ret.push(new SeqFeature(bio.loadFeatureLocation(
+                                                        json[i].location)[0],
                                     json[i].type, 
                                     json[i].id, 
                                     json[i].qualifiers));

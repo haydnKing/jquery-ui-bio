@@ -152,7 +152,7 @@
     }
   });
 
-  test('load from json', sf_json.length * tests_sf, function(){
+  test('load from json', 1 + sf_json.length * tests_sf, function(){
     equal(this.load.length, sf_json.length, "Loaded length is different");
 
     for(var i = 0; i < sf_json.length; i++)

@@ -1,4 +1,4 @@
-/*! jQuery Ui Bio - v0.1.0 - 2012-12-26
+/*! jQuery Ui Bio - v0.1.0 - 2012-12-29
 * https://github.com/Gibthon/jquery-ui-bio
 * Copyright (c) 2012 Haydn King; Licensed MIT, GPL */
 
@@ -98,6 +98,11 @@ this.bio = this.bio || {};
         return (this.start <= pos) && (this.end > pos);
     };
 
+    fl.length = function()
+    {
+        return this.end - this.start;
+    };
+
 
     bio.FeatureLocation = FeatureLocation;
      
@@ -113,15 +118,11 @@ this.bio = this.bio || {};
 
     sf.init = function(l,t,i,q)
     {
-        if(!Array.isArray(l))
-        {
-            l = [l];
-        }
         if(i == null)
         {
             i = -1;
         }
-        this.location = l || [];
+        this.location = l;
         this.type = t || "NoneType";
         this.id = i;
         this.qualifiers = q || {};
@@ -135,15 +136,17 @@ this.bio = this.bio || {};
         }
         for(var i = 0; i < rhs.length; i++)
         {
-            for(var j = 0; j < this.location.length; j++)
+            if(this.location.overlaps(rhs[i].location))
             {
-                if(this.location[j].overlaps(rhs[i].location))
-                {
-                    return true;
-                }
+                return true;
             }
         }
         return false;
+    };
+
+    sf.length = function()
+    {
+        return this.location.length();
     };
 
     bio.SeqFeature = SeqFeature;
@@ -166,16 +169,225 @@ this.bio = this.bio || {};
 
     bio.loadSeqFeature = function(json)
     {
+        if(!Array.isArray(json))
+        {
+            json = [json];
+        }
         var ret = [];
         for(var i = 0; i < json.length; i++)
         {
-            ret.push(new SeqFeature(bio.loadFeatureLocation(json[i].location),
+            ret.push(new SeqFeature(bio.loadFeatureLocation(
+                                                        json[i].location)[0],
                                     json[i].type, 
                                     json[i].id, 
                                     json[i].qualifiers));
         }
         return ret;
     };
+
+    /*
+     * FeatureStore
+     *  Store all the features belonging to a fragment in a quick-to-access
+     *  mannar. Can return all features at a position / in a range.
+     */
+    /*
+     * Args:
+     *      features: an Array of SeqFeatures
+     *      tile_size: size of tiles to use internally, optional
+     */
+
+    var FeatureStore = function(features, tile_size)
+    {
+        this.init(features, tile_size);
+    };
+    var fs = FeatureStore.prototype;
+
+    //Default values
+
+    /*
+     * features: flat Array of all features
+     */
+    fs.features = [];
+    /*
+     * tile_size: size (in bp) of internal tiles
+     */
+    fs.tile_size = 1024;
+    /*
+     * length: end of all the features
+     */
+    fs.length = 0;
+    /*
+     * types: array of all different feature types
+     */
+    fs.types = [];
+    /*
+     * by_type: dictionary object where keys are types and values are Arrays of
+     * that type
+     */
+    fs.by_type = {};
+    /*
+     * stacks: the maximum stacking height for each type in each direction
+     */
+    fs.stacks = {};
+    /*
+     * tiles: an array of dictionary objects, keys are types, values are arrays
+     * of features
+     */
+    fs.tiles = [];
+
+    /*
+     * Public Functions ------------------------------------------------------
+     */
+
+    //getters & setters
+    fs.getTypes = function()
+    {
+        return this.types;
+    };
+    fs.getFeatures = function()
+    {
+        return this.features;
+    };
+    fs.getFeaturesByType = function(type)
+    {
+        return this.by_type[type.toLowerCase()];
+    };
+    fs.pos2tile = function(pos)
+    {
+        return Math.floor(pos/this.tile_size);
+    };
+    fs.tile2pos = function(i)
+    {
+        return [this.tile_size * i, this.tile_size * (i+1)];
+    };
+
+
+    /*
+     * Private Functions -----------------------------------------------------
+     */
+
+    fs.init = function(f,s)
+    {
+        this.features = f || [];
+        if(s != null)
+        {
+            this.tile_size = parseInt(s,10);
+        }
+
+        this._calc_types();
+        this._calc_tracks();
+        this._calc_tiles();
+    };
+
+    fs._calc_types = function()
+    {
+        var i,f,t;
+        this.by_type = {};
+        for(i = 0; i < this.features.length; i++)
+        {
+            f = this.features[i];
+            t = f.type.toLowerCase();
+            if(!this.by_type.hasOwnProperty(t))
+            {
+                this.by_type[t] = [];
+                this.types.push(t);
+            }
+            this.by_type[t].push(f);
+            if(f.end > this.length)
+            {
+                this.length = f.end;
+            }
+        }
+    };
+
+    fs._calc_tracks = function()
+    {
+        var type, feats, fwd, rev;
+        for(type=0; type < this.types.length; type++)
+        {
+            feats = this.getFeaturesByType(this.types[type]);
+
+            /*
+             *
+             * This gets easy if features are all on the same strand
+             *
+             *
+             */
+        }
+    };
+
+    fs._set_tracks = function(features)
+    {
+        var track = 0, i, f, stack=[[]], ok;
+
+        //sort so biggest are first
+        features.sort(function(a,b){
+            return b.length() - a.length();
+        });
+
+        for(i = 0; i < features.length; i++)
+        {
+            f = features[i];
+            ok = true;
+            for(track = 0; track < stack.length; track++)
+            {
+                if(f.overlaps(stack[track]))
+                {
+                    ok = false;
+                    break;
+                }
+            }
+            if(ok)
+            {
+                stack[track].push(f);
+                f.track = track;
+            }
+            else
+            {
+                f.track = stack.length;
+                stack.push([f]);
+            }
+        }
+        
+        return stack.length;    
+    };
+
+    fs._calc_tiles = function()
+    {
+        var f;
+
+        var make_tile = function()
+        {
+            var t = {};
+            for(var i = 0; i < this.types; i++)
+            {
+                t[this.types[i]] = [];
+            }
+            return t;
+        };
+
+        for(var i = 0; i < this.length / this.tile_size; i++)
+        {
+            this.tiles.push(make_tile());
+        }
+
+        for(i = 0; i < this.features.length; i++)
+        {
+            f = this.features[i];
+            
+            /*
+             * Again, easy of features only exist in one place...
+             *
+             *
+             */
+        }
+
+
+        
+    };
+
+
+
 
 }());
 
