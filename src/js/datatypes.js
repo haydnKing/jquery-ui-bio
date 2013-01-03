@@ -11,8 +11,9 @@ this.bio = this.bio || {};
 
 (function() {
 
-    /**
+    /**#######################################################################
      * FeatureLocation
+     * #######################################################################
      */
     var FeatureLocation = function(start, end, strand)
     {
@@ -65,8 +66,9 @@ this.bio = this.bio || {};
     bio.FeatureLocation = FeatureLocation;
      
 
-    /**
+    /*########################################################################
      * SeqFeature: Represent a sequence feature
+     * #######################################################################
      */
     var SeqFeature = function(location, type, id, qualifiers)
     {
@@ -74,18 +76,28 @@ this.bio = this.bio || {};
     };
     var sf = SeqFeature.prototype;
 
-    sf.init = function(l,t,i,q)
+    //Default values
+
+    sf.location = null;
+    sf.type = "NoneType";
+    sf.id = -1;
+    sf.qualifiers = {};
+
+    /*
+     * public functions
+     */
+
+    //Accessors
+    sf.strand = function(){
+        return this.location.strand;
+    };
+    
+    sf.length = function()
     {
-        if(i == null)
-        {
-            i = -1;
-        }
-        this.location = l;
-        this.type = t || "NoneType";
-        this.id = i;
-        this.qualifiers = q || {};
+        return this.location.length();
     };
 
+    //Functions
     sf.overlaps = function(rhs)
     {
         if(!Array.isArray(rhs))
@@ -102,11 +114,28 @@ this.bio = this.bio || {};
         return false;
     };
 
-    sf.length = function()
-    {
-        return this.location.length();
+    sf.toString = function(){
+        return "[seqFeature (id="+this.id+", type="+this.type+"]";
     };
 
+    /*
+     * Private functions
+     */
+    sf.init = function(l,t,i,q)
+    {
+        if(i == null)
+        {
+            i = -1;
+        }
+        this.location = l;
+        this.type = t || "NoneType";
+        this.id = i;
+        this.qualifiers = q || {};
+    };
+
+   
+
+    //Export to namespace
     bio.SeqFeature = SeqFeature;
 
     bio.loadFeatureLocation = function(json)
@@ -143,8 +172,9 @@ this.bio = this.bio || {};
         return ret;
     };
 
-    /*
+    /* #######################################################################
      * FeatureStore
+     * #######################################################################
      *  Store all the features belonging to a fragment in a quick-to-access
      *  mannar. Can return all features at a position / in a range.
      */
@@ -154,9 +184,9 @@ this.bio = this.bio || {};
      *      tile_size: size of tiles to use internally, optional
      */
 
-    var FeatureStore = function(features, tile_size)
+    var FeatureStore = function(features, length, tile_size)
     {
-        this.init(features, tile_size);
+        this.init(features, length, tile_size);
     };
     var fs = FeatureStore.prototype;
 
@@ -224,13 +254,14 @@ this.bio = this.bio || {};
      * Private Functions -----------------------------------------------------
      */
 
-    fs.init = function(f,s)
+    fs.init = function(f,l,s)
     {
         this.features = f || [];
         if(s != null)
         {
             this.tile_size = parseInt(s,10);
         }
+        this.length = l;
 
         this._calc_types();
         this._calc_tracks();
@@ -241,6 +272,7 @@ this.bio = this.bio || {};
     {
         var i,f,t;
         this.by_type = {};
+        this.types = [];
         for(i = 0; i < this.features.length; i++)
         {
             f = this.features[i];
@@ -251,31 +283,46 @@ this.bio = this.bio || {};
                 this.types.push(t);
             }
             this.by_type[t].push(f);
-            if(f.end > this.length)
-            {
-                this.length = f.end;
-            }
         }
     };
 
     fs._calc_tracks = function()
     {
         var type, feats, fwd, rev;
+        this.stacks = {'fwd':{}, 'rev':{}};
         for(type=0; type < this.types.length; type++)
         {
             feats = this.getFeaturesByType(this.types[type]);
+            fwd = [];
+            rev = [];
 
-            /*
-             *
-             * This gets easy if features are all on the same strand
-             *
-             *
-             */
+            //split feats into fwd and reverse features
+            for(var f = 0; f < feats.length; f++)
+            {
+                if(feats[f].strand() >= 0)
+                {
+                    fwd.push(feats[f]);
+                }
+                else
+                {
+                    rev.push(feats[f]);
+                }
+            }
+            
+            //set the tracks for each
+            this.stacks.fwd[this.types[type]] = this._set_tracks(fwd);
+            this.stacks.rev[this.types[type]] = this._set_tracks(rev);
         }
     };
 
     fs._set_tracks = function(features)
     {
+        //do nothing if features are empty
+        if(features.length === 0)
+        {
+            return 0;
+        }
+
         var track = 0, i, f, stack=[[]], ok;
 
         //sort so biggest are first
@@ -286,12 +333,12 @@ this.bio = this.bio || {};
         for(i = 0; i < features.length; i++)
         {
             f = features[i];
-            ok = true;
+            ok = false;
             for(track = 0; track < stack.length; track++)
             {
-                if(f.overlaps(stack[track]))
+                if(!f.overlaps(stack[track]))
                 {
-                    ok = false;
+                    ok = true;
                     break;
                 }
             }
@@ -312,39 +359,37 @@ this.bio = this.bio || {};
 
     fs._calc_tiles = function()
     {
-        var f;
+        var f,i,j,t,first,last;
 
-        var make_tile = function()
+        //make enough blank tiles
+        this.tiles = [];
+        for(i = 0; i < this.length / this.tile_size; i++)
         {
-            var t = {};
-            for(var i = 0; i < this.types; i++)
+            t = {};
+            for(j = 0; j < this.types.length; j++)
             {
-                t[this.types[i]] = [];
+                t[this.types[j]] = [];
             }
-            return t;
-        };
-
-        for(var i = 0; i < this.length / this.tile_size; i++)
-        {
-            this.tiles.push(make_tile());
+            this.tiles.push(t);
         }
 
         for(i = 0; i < this.features.length; i++)
         {
             f = this.features[i];
-            
-            /*
-             * Again, easy of features only exist in one place...
-             *
-             *
-             */
+           
+            //find the positions of the first and last tiles for the feature
+            first = this.pos2tile(f.location.start);
+            last = this.pos2tile(f.location.end-1);
+
+            //add the feature to each tile in [first, last]
+            for(t = first; t <= last; t++)
+            {
+                this.tiles[t][f.type].push(f);
+            }
         }
-
-
-        
     };
 
-
-
+    //Export to namespace
+    bio.FeatureStore = FeatureStore;
 
 }());

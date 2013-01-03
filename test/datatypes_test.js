@@ -113,61 +113,198 @@
     };
     var tests_sf = 3 + tests_fl;
 
+    /*
+     * #####################################################
+     * FeaureLocation
+     * #####################################################
+     */
 
-  module('bio.FeatureLocation', {
-    setup: function() {
-        this.load = bio.loadFeatureLocation(fl_json);
-    }
-  });
+    module('bio.FeatureLocation', {
+        setup: function() {
+            this.load = bio.loadFeatureLocation(fl_json);
+        }
+    });
 
-  test('load from json', 1 + tests_fl*fl_json.length, function(){
-    equal(this.load.length, fl_json.length, "Loaded length is different");
+    test('load from json', 1 + tests_fl*fl_json.length, function(){
+        equal(this.load.length, fl_json.length, "Loaded length is different");
 
-    for(var i = 0; i < fl_json.length; i++)
-    {
-       equal_fl(this.load[i], fl_json[i], "fl("+i+")"); 
-    }
-  });
+        for(var i = 0; i < fl_json.length; i++)
+        {
+            equal_fl(this.load[i], fl_json[i], "fl("+i+")"); 
+        }
+    });
 
-  test('overlaps', fl_json.length-1, function(){
+    test('overlaps', fl_json.length-1, function(){
 
-    for(var i = 1; i < fl_json.length; i++)
-    {
-        equal(this.load[0].overlaps(this.load[i]), fl_json[i].e_overlap, 
-              "Overlap "+i);
-    }
-  });
+        for(var i = 1; i < fl_json.length; i++)
+        {
+            equal(this.load[0].overlaps(this.load[i]), fl_json[i].e_overlap, 
+                  "Overlap "+i);
+        }
+    });
 
-  test('reverse order', 3, function(){
-      var a = bio.loadFeatureLocation(rev);
-      equal(a[0].start, rev.end);
-      equal(a[0].end, rev.start);
-      equal(a[0].strand, rev.e_strand);
-  });
+    test('reverse order', 3, function(){
+        var a = bio.loadFeatureLocation(rev);
+        equal(a[0].start, rev.end);
+        equal(a[0].end, rev.start);
+        equal(a[0].strand, rev.e_strand);
+    });
 
+    /*
+     * #####################################################
+     * SeqFeature
+     * #####################################################
+     */
 
-  module('bio.SeqFeature', {
-    setup: function() {
-        this.load = bio.loadSeqFeature(sf_json);
-    }
-  });
+    module('bio.SeqFeature', {
+        setup: function() {
+            this.load = bio.loadSeqFeature(sf_json);
+        }
+    });
 
-  test('load from json', 1 + sf_json.length * tests_sf, function(){
-    equal(this.load.length, sf_json.length, "Loaded length is different");
+    test('load from json', 1 + sf_json.length * tests_sf, function(){
+        equal(this.load.length, sf_json.length, "Loaded length is different");
 
-    for(var i = 0; i < sf_json.length; i++)
-    {
-        equal_sf(this.load[i], sf_json[i], "SF("+i+")");
-    }
-  });
+        for(var i = 0; i < sf_json.length; i++)
+        {
+            equal_sf(this.load[i], sf_json[i], "SF("+i+")");
+        }
+    });
 
-  test('overlap', sf_json.length - 1, function(){
+    test('overlap', sf_json.length - 1, function(){
 
-      for(var i = 1; i < sf_json.length; i++)
-      {
-          equal(this.load[0].overlaps(this.load[i]), sf_json[i].e_overlap);
-      }
-  });
+        for(var i = 1; i < sf_json.length; i++)
+        {
+            equal(this.load[0].overlaps(this.load[i]), sf_json[i].e_overlap);
+        }
+    });
 
+    /*
+     * #####################################################
+     * FeaureStore
+     * #####################################################
+     */
+    
+    module('bio.FeatureStore', {
+        setup: function() {
+            this.json = [{
+                type: 'one',
+                id: 0,
+                qualifiers: {},
+                location: {
+                    start: 50,
+                    end: 100,
+                    strand: 100
+                }
+            },
+            {
+                type: 'one',
+                id: 1,
+                qualifiers: {one: 1, two: '2'},
+                location: {
+                    start: 47,
+                    end: 101,
+                    strand: 0
+                }
+            },
+            {
+                type: 'one',
+                id: 2,
+                qualifiers: {one: 1, two: '2'},
+                location:  {
+                    start: 105,
+                    end: 170,
+                    strand: 5
+                }
+            },
+            {
+                type: 'two',
+                id: 3,
+                qualifiers: {one: 1, two: '2'},
+                location: {
+                    start: 47,
+                    end: 101,
+                    strand: 0
+                }
+            },
+            {
+                type: 'three',
+                id: 4,
+                qualifiers: {one: 1, two: '2'},
+                location:  {
+                    start: 105,
+                    end: 170,
+                    strand: -5
+                }
+            }];
+
+            this.fs = new bio.FeatureStore(bio.loadSeqFeature(this.json), 
+                                           200, 50);
+        }
+    });
+
+    test('types', 1, function(){
+        deepEqual(this.fs.types, ['one','two','three']);
+    });
+
+    test('getFeaturesByType', 3, function(){
+        equal(this.fs.getFeaturesByType('one').length, 3);
+        equal(this.fs.getFeaturesByType('two').length, 1);
+        equal(this.fs.getFeaturesByType('three').length, 1);
+    });
+
+    test('tiles', undefined, function(){
+        var i,j,k;
+        equal(this.fs.tiles.length, 4);
+
+        var data = [{'one':[1],'two':[3],'three':[]},
+                    {'one':[0,1],'two':[3],'three':[]},
+                    {'one':[1,2],'two':[3],'three':[4]},
+                    {'one':[2],'two':[],'three':[4]}
+        ];
+
+        var types = ['one', 'two', 'three'];
+
+        for(i = 0; i < 4; i++)
+        {
+            for(j = 0; j < types.length; j++)
+            {
+                var t = types[j];
+                var ids = [];
+                for(k = 0; k < this.fs.tiles[i][t].length; k++)
+                {
+                    ids.push(this.fs.tiles[i][t][k].id);
+                }
+                ids.sort();
+
+                var msg = 'Tile '+i+', type="'+t+'" expected \n\t['+
+                            data[i][t]+'] got \n\t['+ids+']';
+
+                equal(ids.length, data[i][t].length, msg);
+                if(ids.length === data[i][t].length){
+                    for(k = 0; k < data[i][t].length; k++){
+                        equal(ids[k], data[i][t][k], msg);
+                    }
+                }
+            }
+        }
+    });
+
+    test('tracks', 5, function(){
+        equal(this.fs.features[0].track, 1);
+        equal(this.fs.features[1].track, 0);
+        equal(this.fs.features[2].track, 0);
+        equal(this.fs.features[3].track, 0);
+        equal(this.fs.features[4].track, 0);
+    });
+
+    test('stack', 6, function(){
+        equal(this.fs.stacks.fwd.one, 2);
+        equal(this.fs.stacks.fwd.two, 1);
+        equal(this.fs.stacks.fwd.three, 0);
+        equal(this.fs.stacks.rev.one, 0);
+        equal(this.fs.stacks.rev.two, 0);
+        equal(this.fs.stacks.rev.three, 1);
+    });
 
 }());
