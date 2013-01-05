@@ -1,9 +1,64 @@
-/*! jQuery Ui Bio - v0.1.0 - 2013-01-03
+/*! jQuery Ui Bio - v0.1.0 - 2013-01-05
 * https://github.com/Gibthon/jquery-ui-bio
 * Copyright (c) 2013 Haydn King; Licensed MIT, GPL */
+.bio-sequence-view > .bio-panel-content > .bio-overview {
+  border-color: inherit;
+  border-style: inherit;
+  border-width: 1px 0;
+  position: relative;
+}
+.bio-sequence-view > .bio-panel-content > .bio-overview > .bio-view {
+  border-color: inherit;
+  border-style: inherit;
+  border-width: 1px;
+  position: absolute;
+  top: -0.5em;
+  bottom: -0.5em;
+  left: 20%;
+  right: 60%;
+}
+.bio-sequence-view > .bio-panel-content > .bio-zoomview {
+  border-color: inherit;
+  border-style: inherit;
+  border-width: 1px 0 0 0;
+  position: relative;
+}
+.bio-sequence-view > .bio-panel-content > .bio-zoomview > .bio-slidearrow {
+  position: absolute;
+  width: 32px;
+  top: 0;
+  bottom: 0;
+  background-image: none;
+  border: none;
+  cursor: pointer;
+}
+.bio-sequence-view > .bio-panel-content > .bio-zoomview > .bio-slidearrow > .ui-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-top: -8px;
+  margin-left: -8px;
+}
+.bio-sequence-view > .bio-panel-content > .bio-zoomview > .bio-slideleft {
+  left: 0;
+}
+.bio-sequence-view > .bio-panel-content > .bio-zoomview > .bio-slideright {
+  right: 0;
+}
+.bio-meta {
+  padding: 0.5em 1em;
+}
+.bio-meta > .bio-name {
+  font-weight: bold;
+  font-size: 1.1em;
+}
+.bio-meta > .bio-desc {
+  margin-left: 1em;
+  font-style: italic;
+}
 .bio-search {
   position: relative;
-  height: 1.2em;
+  height: 1.3em;
 }
 .bio-search > div {
   position: absolute;
@@ -17,6 +72,9 @@
   width: 100%;
   border: none;
   background: none;
+  position: absolute;
+  padding: 0 16px;
+  margin: 0 -16px;
 }
 .bio-search > .hint {
   font-style: italic;
@@ -38,122 +96,27 @@
 .bio-search > .ui-icon-close:hover {
   opacity: 1.0;
 }
-.bio-fragment-select {
-  background-image: none;
-}
-.bio-fragment-select > .ui-widget-header {
-  position: relative;
-  text-align: center;
-  padding: 0.25em;
-}
-.bio-fragment-select > .ui-widget-header > .bio-help {
-  position: absolute;
-  right: 0.5em;
-  top: 50%;
-  margin-top: -0.5em;
-}
-.bio-fragment-select > .bio-panel {
-  position: relative;
-  background-image: none;
-  border-top: none;
-  border-bottom: none;
-}
-.bio-fragment-select > .bio-panel > .list {
-  overflow-y: auto;
-}
-.bio-fragment-select > .bio-panel > .searchbar {
-  padding: 0.2em 1em;
-}
-.bio-fragment-select > .bio-panel > .statusbar {
-  position: relative;
-  height: 20px;
-  text-size: 12px;
-  overflow: hidden;
-}
-.bio-fragment-select > .bio-panel > .statusbar > .ui-icon {
-  position: absolute;
-  top: 50%;
-  margin-top: -8px;
-  left: 6px;
-}
-.bio-fragment-select > .bio-panel > .statusbar > p {
-  margin: 2px 25px;
-}
-.bio-fragment-select > .bio-panel:first-child {
-  border-top: none;
-}
-.bio-fragment-select > .bio-panel > div {
-  background-image: none;
-  border-bottom: none;
-  border-left: none;
-  border-right: none;
-}
-.bio-fragment-select > .bio-panel > div > ul {
-  margin-top: 0.2em;
-  list-style-type: none;
-  background-image: none;
-}
-.bio-fragment-select > .bio-panel > div > ul > li {
-  padding: 0.2em 0;
-  text-align: center;
-  border: none;
-  background-image: none;
-}
-.bio-fragment-select > .bio-bottom {
-  height: 0.7em;
-}
 .bio-fragment {
   position: relative;
   display: inline-block;
-  min-width: 7em;
   height: 1.5em;
-  padding: 0 10px;
-  border: 0;
-  background-color: #b34d4d;
   background-image: none;
-  border-color: #b34d4d;
   cursor: pointer;
-  text-align: center;
   font: 0.75em Verdana sans-serif;
   font-size: 0.75em;
   line-height: 100%;
+  width: 10em;
 }
-.bio-fragment:before,
-.bio-fragment:after {
-  content: ' ';
-  border-style: solid;
-  border-width: 0.75em;
-  position: absolute;
-  width: 0;
-  top: 0;
-  bottom: 0;
-}
-.bio-fragment:before {
-  border-top-color: transparent;
-  border-bottom-color: transparent;
-  border-left-color: transparent;
-  border-right-color: inherit;
-  right: 100%;
-}
-.bio-fragment:after {
-  border-left-color: inherit;
-  border-right-color: transparent;
-  border-top-color: inherit;
-  border-bottom-color: inherit;
-  right: -0.75em;
-}
-.bio-fragment > p {
-  margin-top: 0.375em;
-  padding: 0 0.927em;
-  color: white;
+.bio-fragment > svg {
+  z-index: 0;
 }
 .bio-fragment > div {
   position: absolute;
   background: #ffffff;
   border: 1px solid #b34d4d;
   top: 2em;
-  left: -1em;
-  right: -1em;
+  left: 0;
+  right: 0;
   padding: 0 0.5em;
   border-color: inherit;
   cursor: auto;
@@ -267,4 +230,77 @@
 }
 .bio-help > .tip > * {
   margin: 1.5em 0.5em;
+}
+.bio-panel {
+  background-image: none;
+}
+.bio-panel > .ui-widget-header {
+  position: relative;
+  text-align: center;
+  padding: 0.25em;
+}
+.bio-panel > .ui-widget-header > .bio-help {
+  position: absolute;
+  right: 0.5em;
+  top: 50%;
+  margin-top: -0.5em;
+}
+.bio-panel > .bio-panel-content {
+  position: relative;
+  background-image: none;
+  border-top-width: 0;
+  border-bottom-width: 0;
+}
+.bio-panel > .bio-panel-content > *:first-child {
+  border-top-width: 0;
+}
+.bio-panel > .statusbar {
+  position: relative;
+  min-height: 20px;
+  text-size: 12px;
+  padding: 0.2em;
+  border-bottom: none;
+  margin: 0;
+  -webkit-border-radius: 0px;
+  -moz-border-radius: 0px;
+  border-radius: 0px;
+}
+.bio-panel > .statusbar > .ui-icon {
+  position: absolute;
+  top: 50%;
+  margin-top: -8px;
+  left: 6px;
+}
+.bio-panel > .statusbar > p {
+  margin: 2px 35px;
+  text-indent: -10px;
+}
+.bio-panel > .bio-footer {
+  height: 0.7em;
+}
+.bio-fragment-select > .bio-panel-content > .list {
+  overflow-y: auto;
+}
+.bio-fragment-select > .bio-panel-content > .searchbar {
+  padding: 0.2em 1em;
+}
+.bio-fragment-select > .bio-panel-content > div {
+  background-image: none;
+  border-bottom: none;
+  border-left: none;
+  border-right: none;
+}
+.bio-fragment-select > .bio-panel-content > div > ul {
+  list-style-type: none;
+  background-image: none;
+}
+.bio-fragment-select > .bio-panel-content > div > ul > li {
+  text-align: center;
+  margin: 0.3em 1em;
+  padding: 0.2em;
+  height: 1.5em;
+}
+.bio-fragment-select > .bio-panel-content > div > ul > .ui-widget-content {
+  background: none;
+  border-style: dotted;
 }

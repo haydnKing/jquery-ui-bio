@@ -9,8 +9,6 @@
 (function($, undefined) {
 
 var baseClasses   = 'bio-fragment-select ui-widget',
-    panelClasses  = 'bio-panel ui-widget-content ui-state-default',
-    bottomClasses = 'bio-bottom ui-widget ui-widget-header',
     defaultIcon   = 'ui-icon-circle-triangle-e';
 
 var test_frag = function(f, filter){
@@ -51,7 +49,7 @@ $.widget("bio.fragmentSelect", $.bio.panel, {
 
         this.timeout = null;
 
-        var searchbar = $('<div>').addClass('searchbar').appendTo(this.panel);
+        var searchbar = self._add_to_panel($('<div>').addClass('searchbar'));
         
         this.search = $('<div>')
             .search({
@@ -62,8 +60,7 @@ $.widget("bio.fragmentSelect", $.bio.panel, {
             })
             .appendTo(searchbar);
         
-        this.list = $('<div>').addClass('list ui-state-default')
-            .appendTo(this.panel);
+        this.list = self._add_to_panel($('<div>').addClass('list'));
 
         //copy any initial fragments
         var ul = this.ul = el.find('ul');

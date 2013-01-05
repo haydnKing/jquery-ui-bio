@@ -9,10 +9,11 @@
 (function($, undefined) {
 
 var baseClasses = 'ui-widget bio-panel',
-    headerClasses = 'ui-widget-header',
-    panelClasses  = 'bio-panel-content ui-widget-content ui-state-default',
-    statusClasses = 'ui-state-default statusbar',
-    footerClasses = 'bio-footer ui-widget ui-widget-header',
+    headerClasses = 'ui-widget-header ui-state-default',
+    panelClasses  = 'bio-panel-content ui-state-default',
+    panelItemClasses = 'ui-widget-content ui-state-default',
+    statusClasses = 'ui-state-default ui-widget-content statusbar',
+    footerClasses = 'bio-footer ui-widget-header ui-state-default',
     defaultIcon   = 'ui-icon-circle-triangle-e';
 
 $.widget("bio.panel", {
@@ -100,6 +101,11 @@ $.widget("bio.panel", {
             console.log('this['+i+'].outerHeight('+(stretch * this.stretch_factors[i] / total)+');');
             this[i].outerHeight(stretch * this.stretch_factors[i] / total);
         }
+    },
+    _add_to_panel: function($item){
+        $item.addClass(panelItemClasses);
+        this.panel.append($item);
+        return $item;
     }
 });
 
