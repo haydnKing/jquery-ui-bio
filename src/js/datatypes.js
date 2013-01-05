@@ -240,6 +240,10 @@ this.bio = this.bio || {};
     {
         return this.by_type[type.toLowerCase()];
     };
+    fs.getFeaturesByTile = function(tile)
+    {
+        return this.tiles[tile];
+    };
     fs.pos2tile = function(pos)
     {
         return Math.floor(pos/this.tile_size);
