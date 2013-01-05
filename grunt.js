@@ -5,7 +5,8 @@ function stripBanner( files ) {
     });
 }
 
-var src_files = [   'src/js/tooltip.js',
+var src_files = [   'src/js/datatypes.js',
+                    'src/js/tooltip.js',
                     'src/js/help.js',
                     'src/js/panel.js',
                     'src/js/color.js',
@@ -99,6 +100,9 @@ module.exports = function(grunt) {
                 names: src_files
             }
         }
+    },
+    phantomjs: {
+        timeout: 100000
     }
   });
 
