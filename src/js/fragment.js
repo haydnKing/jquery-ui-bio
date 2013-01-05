@@ -5,7 +5,7 @@
  * Copyright (c) 2012 Gibthon Developers
  * Licensed under the MIT, GPL licenses.
  */
-/*global next_color:false */
+/*global next_color:false Raphael:false */
 (function($, undefined) {
 
 var baseClasses = 'bio-fragment ui-widget',
@@ -13,13 +13,29 @@ var baseClasses = 'bio-fragment ui-widget',
     disabledClasses = 'ui-state-disabled',
     infoClasses = 'ui-corner-all';
 
-$.widget("bio.fragment", $.ui.draggable, {
+var tail_len = 10;
+
+var makeLinearFrag = function(w, h, right) {
+    if(right == null){
+        right = true;
+    }
+    var h2 = h / 2;
+    var wa = w - h2;
+    var t = (right) ? h2 : -h2;
+    var x0= (right) ? 0  :  h2;
+    var s = 'M'+x0+',0 h'+wa+' l'+h2+','+h2+' l'+(-h2)+','+h2+
+            ' h'+(-wa)+' l'+h2+','+(-h2)+' z';
+    return s;
+};
+
+$.widget("bio.fragment", {
     options: {
         name: null,
         desc: null,
         length: null,
         url: undefined,
         color: undefined,
+        width: undefined, //7em
         text: {
             goto_page: 'Goto Page',
             def_desc: 'No Description',
@@ -39,11 +55,20 @@ $.widget("bio.fragment", $.ui.draggable, {
         o.length = el.attr('length') || o.length || 0;
         o.url = el.attr('href') || o.url;
         o.color = o.color || next_color();
+        o.width = o.width || el.width();
+        el.width(o.width);
 
-        this.name = $("<p>")
-            .text(o.name)
-            .addClass('bio-name')
-            .appendTo(el);
+        var w = el.width(),
+            h = el.height();
+
+        this.paper = Raphael(this.element[0], w, h);
+        this.frag = this.paper.path('');
+        this.name = this.paper.text(w/2, h/2, this.options.name).attr({
+                fill: 'white',
+                font: 'inherit'
+            });
+
+
         this.info = $("<div>")
             .hide()
             .addClass(infoClasses)
@@ -55,32 +80,24 @@ $.widget("bio.fragment", $.ui.draggable, {
         this.refreshInfo();            
         
         el.css({
-            'background-color': o.color,
             'border-color': o.color
         });
 
         if(o.helper === 'clone'){
+            o.revert = true;
             o.helper = function(){
-                return $('<div>')
-                    .addClass(baseClasses)
-                    .css({
-                        'background-color': o.color,
-                        'border-color': o.color,
-                        'z-index': 100
-                    })
-                    .append($("<p>").text(o.name));
+                return $('<div>').addClass(baseClasses).css('z-index', 200)
+                    .append(el.children('svg').clone());
             };
         }
 
-        el.draggable(o).on('dragstart', function(){
-            self.info.tooltip('disable');
-        }).on('dragstop', function(){
-            self.info.tooltip('enable');
-        });
         this.info.tooltip({
             'mouseTarget': this.el,
             openDelay: 500
         });
+
+        this._redraw_frag();
+        this._set_color();
     },
     _init: function() {
     },
@@ -89,30 +106,28 @@ $.widget("bio.fragment", $.ui.draggable, {
         var o = this.options;
 
         if(value == null) {
-            return o[name] || this.$el.draggable(name);
+            return o[name];
         }
         o[name] = value;
         switch(name)
         {
             case 'name':
-                this.name.text(value);
+                this._redraw_frag();
                 break;
             case 'desc':
             case 'length':
             case 'url':
                 this.refreshInfo();
                 break;
+            case 'width':
+                this._redraw_frag();
+                break;
             case 'color':
                 this.el.css({
-                    'background-color':this.options.color,
                     'border-color':this.options.color
                 });
+                this._anim_color();
                 break;
-            case 'draggable':
-                this.el.draggable( (value) ? 'enable' : 'disable');
-                break;
-            default:
-                this.el.draggable(name, value);
         }
         return this;
     },
@@ -127,6 +142,65 @@ $.widget("bio.fragment", $.ui.draggable, {
         if(o.url != null){
             $('<div><a href=' + o.url + ' class="bio-url">'+o.text.goto_page+'</a></div>').
                 appendTo(this.info);
+        }
+    },
+    disable: function() {
+        this.info.tooltip('disable');
+    },
+    enable: function() {
+        this.info.tooltip('enable');
+    },
+    ghost: function(g) {
+        if(g == null) {g = true;}
+        if(!g) {
+            this.name.attr('opacity', 1.0);
+            this._set_color();
+            this.frag.attr('stroke-dasharray', '');
+        }
+        else {
+            this.name.attr('opacity', 0.0);
+            this.frag.attr({
+                'fill': null,
+                'stroke': '#555555',
+                'stroke-dasharray': '-'
+            });
+        }
+    },
+    _set_color: function() {
+        var hsl = this.options.color.match(/\d+/g);
+        this.frag.attr({
+            fill: Raphael.hsl(hsl[0], hsl[1], hsl[2]),
+            stroke: Raphael.hsl(hsl[0], hsl[1], Math.max(0, hsl[2]-10))
+        });
+    },
+    _anim_color: function() {
+        var hsl = this.options.color.match(/\d+/g);
+        var a = Raphael.animation({
+            fill: Raphael.hsl(hsl[0], hsl[1], hsl[2]),
+            stroke: Raphael.hsl(hsl[0], hsl[1], Math.max(0, hsl[2]-10))
+        }, 1000);
+        this.frag.animate(a.delay(100));
+    },
+    _redraw_frag: function()
+    {
+        var w = this.el.width(),
+            h = this.el.height();
+
+        this.paper.setSize(w,h);
+        this.frag.attr({
+            'path': makeLinearFrag(w,h)
+        });
+
+        this.name.attr({
+            x: w/2, 
+            y: h/2, 
+            text: this.options.name
+        });
+
+        var l = this.options.name.length - 1;
+        while((this.name.getBBox().width + h) > w){
+            l -= 1;
+            this.name.attr({text: this.options.name.substr(0, l)+'...'});           
         }
     }
 }); 

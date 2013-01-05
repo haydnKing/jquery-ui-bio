@@ -11,47 +11,47 @@
 var baseClasses   = 'bio-fragment-select ui-widget',
     panelClasses  = 'bio-panel ui-widget-content ui-state-default',
     bottomClasses = 'bio-bottom ui-widget ui-widget-header',
-    defaultIcon   = 'ui-icon-carat-1-e';
+    defaultIcon   = 'ui-icon-circle-triangle-e';
 
 var test_frag = function(f, filter){
     return filter.test(f.fragment('option','name')) || 
         filter.test(f.fragment('option','desc'));
 };
 
-$.widget("bio.fragmentSelect", {
+$.widget("bio.fragmentSelect", $.bio.panel, {
     options: {
+        title: undefined,
+        help: undefined,
         text: {
-            title: 'Fragment Selector',
-            helphtml: 'Drag and drop fragments to select them',
+            defaultTitle: 'Fragment Selector',
+            defaultHelp: 'Drag and drop fragments to select them',
             filter: 'filter',
             loading: 'Loading fragments...',
+            error: 'Error',
             none_loaded: 'No fragments are loaded',
             none_matching: 'No fragments match the filter',
             showing_all: 'Showing %total %fragment',
             showing_filter: 'Showing %filter of %total %fragment',
             fragment: 'fragment',
-            fragments: 'fragments'
+            fragments: 'fragments',
+            cberror: 'An error occurred'
         },
         defaultHelper: 'clone',
-        height: 400
+        height: 400,
+        src: undefined, //string URL or f(cb, error_cb)
+        color: null
     },
     _create: function() {
+        this._super();
         var self = this,
             o = this.options,
             el = this.el = $(this.element[0]).addClass(baseClasses);
 
+        this.stretch_factors = {'ul': 1};
+
         this.timeout = null;
 
-        var header = this.header = $('<div>').addClass('ui-widget-header').appendTo(el);
-        var panel = this.panel = $('<div>').addClass(panelClasses).appendTo(el);
-        var base = $('<div>').addClass(bottomClasses).appendTo(el);
-        
-        $('<span>').addClass('title').text(o.text.title).appendTo(header);
-        var h = $('<span>').appendTo(header).help({
-            helphtml: o.text.helphtml
-        });
-
-        var searchbar = $('<div>').addClass('searchbar').appendTo(panel);
+        var searchbar = $('<div>').addClass('searchbar').appendTo(this.panel);
         
         this.search = $('<div>')
             .search({
@@ -62,45 +62,102 @@ $.widget("bio.fragmentSelect", {
             })
             .appendTo(searchbar);
         
-        this.list = $('<div>').addClass('list ui-state-default').appendTo(panel);
-        var s = $('<div>').addClass('ui-state-default statusbar')
-            .appendTo(panel);
-        this.status_icon = $('<span>').addClass('ui-icon').appendTo(s);
-        this.status_text = $('<p>').appendTo(s);
+        this.list = $('<div>').addClass('list ui-state-default')
+            .appendTo(this.panel);
 
         //copy any initial fragments
-        var list = el.find('ul');
-        if(list.length === 1){
-            list.detach().appendTo(this.list);
+        var ul = this.ul = el.find('ul');
+        if(ul.length === 1){
+            ul.detach().appendTo(this.list);
         }
         else{
-            list = $('ul').appendTo(this.list);
+            ul = this.ul = $('<ul>').appendTo(this.list);
         }
 
-        //and initialise them
-        list.find('li').each(function() {
-            $(this).addClass('ui-state-default')
-                .children().fragment({helper: o.defaultHelper});
+        ul.sortable({
+            placeholder: 'ui-widget-content',
+            connectWith: '.bio-panel ul',
+            start: function(ev, ui) {
+                $(this).find(':bio-fragment').fragment('disable');
+            },
+            stop: function(ev, ui) {
+                $(this).find(':bio-fragment').fragment('enable');
+            },
+            receive: function(ev, ui) {
+                var f = ui.item.find(':bio-fragment');
+                f.fragment('option', 'color', o.color);
+                self.setStatus('Added fragment "'+f.fragment('option','name')+'"',
+                              'ui-icon-circle-plus');
+            },  
+            remove: function(ev, ui) {
+                var f = ui.item.find(':bio-fragment');
+                self.setStatus('Removed fragment "'+f.fragment('option','name')+'"',
+                              'ui-icon-circle-minus');
+            }
         });
 
-        //interaction clues
-        list.on({
-            'mouseenter': function(){
-                $(this).addClass('ui-state-hover');
-            },
-            'mouseleave dragstop': function(){
-                $(this).removeClass('ui-state-hover');
+        var success = function(data) {
+            //copy into the DOM
+            for(var i = 0; i < data.length; i++) {
+                var f = data[i];
+                $('<li>').append($('<div>').attr({
+                    name: f.name,
+                    length: f.length,
+                    desc: f.desc,
+                    href: f.url
+                })).appendTo(ul);
             }
-        }, 'ul > li');
+            //and initialise them
+            ul.find('li').each(function() {
+                var w = $(this).width();
+                $(this).children().fragment({
+                        color: o.color,
+                        width: w
+                    });
+            });
+            self.setStatus();
+            ul.animate({
+                'margin-top': '0px'
+            }, 'fast', function() {
+                self.list.css('overflow-y', 'auto');
+            });
 
-        this.setStatus();
-        this._set_height();
+        };
+
+
+        if(o.src != null) {
+            if(typeof(o.src) === 'string') {
+                //prepare for animations
+                this.list.css('overflow', 'hidden');
+                ul.css('margin-top', this.list.height() + 'px');
+                //interpret as an url to load from
+                this.setStatus(o.text.loading, 'ui-icon-loading');
+                $.ajax({
+                    'url': o.src,
+                    'dataType': 'json',
+                    'success': success,
+                    'error': function(jqXHR, textStatus, errorThrown) {
+                        self.setStatus(String(errorThrown),'ui-icon-alert');
+                    }
+                });
+            }
+            else if($.isFunction(o.src)){
+                try{
+                    o.src(success, function(){
+                        self.setStatus(o.text.cberror, 'ui-icon-alert');
+                    });
+                }
+                catch(e){
+                    self.setStatus(e.message, 'ui-icon-alert');
+                }
+            }
+            else {
+                throw("options.src must be a string URL or a function");
+            }
+        }
 
         if(el.hasClass('ui-corner-all')){
-            header.addClass('ui-corner-top');
             this.search.addClass('ui-corner-all');
-            base.addClass('ui-corner-bottom');
-            h.addClass('ui-corner-all');
         }
     },
     filter: function(str){
@@ -137,13 +194,6 @@ $.widget("bio.fragmentSelect", {
         }
         this.status_icon.attr('class', 'ui-icon ' + (icon || defaultIcon));
         this.status_text.text( this._get_text(text, fil, tot));
-    },
-    _set_height: function(){
-        var others = 0;
-        this.panel.siblings().add(this.list.siblings()).each(function() {
-            others += $(this).outerHeight();
-        });
-        this.list.outerHeight(this.options.height - others);
     },
     _get_text: function(str, filter, total){
         var t = this.options.text;

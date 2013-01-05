@@ -1,0 +1,59 @@
+.bio-sequence-view > .bio-panel-content {
+    & > .bio-overview {
+        border-color: inherit;
+        border-style: inherit;
+        border-width: 1px 0;
+        position: relative;
+        & > .bio-view {
+            border-color: inherit;
+            border-style: inherit;
+            border-width: 1px;
+            position: absolute;
+            top: -0.5em;
+            bottom: -0.5em;
+            left: 20%;
+            right: 60%;
+        }
+    }
+    & > .bio-zoomview {
+        border-color: inherit;
+        border-style: inherit;
+        border-width: 1px 0 0 0;
+        position: relative;
+        & > .bio-slidearrow {
+            position: absolute;
+            width: 32px;
+            top: 0;
+            bottom: 0;
+            background-image: none;
+            border: none;
+            cursor: pointer;
+            & > .ui-icon {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                margin-top: -8px;
+                margin-left: -8px;
+            }
+        }
+        & > .bio-slideleft {
+            left: 0;
+        }
+        & > .bio-slideright {
+            right: 0;
+        }
+    }
+}
+
+.bio-meta {
+    padding: 0.5em 1em;
+    & > .bio-name {
+        font-weight: bold;
+        font-size: 1.1em;
+    }
+    & > .bio-desc {
+        margin-left: 1em;
+        font-style: italic;
+    }
+}
+

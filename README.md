@@ -24,7 +24,12 @@ jQuery(function($) {
 _(Coming soon)_
 
 ## Examples
-_(Coming soon)_
+To run the demos you need django and mysqlite3
+'''cd demos
+python manage.py syncdb
+python manage.py runserver'''
+
+You can now access the demos at http://127.0.0.1:8000/
 
 ## Release History
 _(Nothing yet)_

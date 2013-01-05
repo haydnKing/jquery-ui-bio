@@ -42,7 +42,7 @@
   });
 
   test('set name', 1, function() {
-    equal(this.f.find('.bio-name').text(), o.name, 'name not set');
+    equal(this.f.fragment('option', 'name'), o.name, 'name not set');
   });
   test('set desc', 1, function() {
     equal(this.f.find('.bio-desc').text(), o.desc, 'desc not set');
@@ -62,7 +62,7 @@
   });
 
   test('set name', 1, function() {
-    equal(this.f.find('.bio-name').text(), o.name, 'name not set');
+    equal(this.f.fragment('option', 'name'), o.name, 'name not set');
   });
   test('set desc', 1, function() {
     equal(this.f.find('.bio-desc').text(), o.desc, 'desc not set');
@@ -82,7 +82,7 @@
 
   test('update name', 1, function() {
       this.f.fragment('option', 'name', 'New Name');
-      equal(this.f.find('.bio-name').text(), 'New Name', 'name not updated');
+      equal(this.f.fragment('option', 'name'), 'New Name', 'name not updated');
   });
   test('update desc', 1, function() {
       this.f.fragment('option', 'desc', 'New Desc');

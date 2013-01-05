@@ -1,0 +1,23 @@
+{% load dajaxice_templatetags %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>{% block title %}jQuery-ui-bio Demo{% endblock %}</title>
+
+<script type="text/javascript" src="/static/libs/jquery-loader.js"></script>
+<script type="text/javascript" src="/static/libs/raphael/raphael.js"></script>
+
+<script type="text/javascript" src="/static/libs/jquery-ui-bio-loader.js"></script>
+
+{% block style %}{% endblock %}
+
+{% dajaxice_js_import %}
+
+{% block script %}{% endblock %}
+
+</head>
+<body>
+{% block body %}{% endblock %}
+</body>
+</html>

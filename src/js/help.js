@@ -28,13 +28,17 @@ $.widget("bio.help", {
             tip.addClass('ui-corner-all');
         }
 
-        $('<p>').html(o.helphtml).appendTo(tip);
+        this.help = $('<p>').html(o.helphtml).appendTo(tip);
         tip.tooltip({
             mouseTarget: el
         });
 
     },
     _create: function() {
+    },
+    setHelp: function(help){
+        this.options.helphtml(help);
+        this.help.html(help);
     }
 });
 

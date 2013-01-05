@@ -1,6 +1,70 @@
+<<<<<<< HEAD
 /*! jQuery Ui Bio - v0.1.0 - 2013-01-03
+=======
+/*! jQuery Ui Bio - v0.1.0 - 2012-11-05
+>>>>>>> origin/django
 * https://github.com/Gibthon/jquery-ui-bio
 * Copyright (c) 2013 Haydn King; Licensed MIT, GPL */
+
+.bio-sequence-view > .bio-panel-content {
+    & > .bio-overview {
+        border-color: inherit;
+        border-style: inherit;
+        border-width: 1px 0;
+        position: relative;
+        & > .bio-view {
+            border-color: inherit;
+            border-style: inherit;
+            border-width: 1px;
+            position: absolute;
+            top: -0.5em;
+            bottom: -0.5em;
+            left: 20%;
+            right: 60%;
+        }
+    }
+    & > .bio-zoomview {
+        border-color: inherit;
+        border-style: inherit;
+        border-width: 1px 0 0 0;
+        position: relative;
+        & > .bio-slidearrow {
+            position: absolute;
+            width: 32px;
+            top: 0;
+            bottom: 0;
+            background-image: none;
+            border: none;
+            cursor: pointer;
+            & > .ui-icon {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                margin-top: -8px;
+                margin-left: -8px;
+            }
+        }
+        & > .bio-slideleft {
+            left: 0;
+        }
+        & > .bio-slideright {
+            right: 0;
+        }
+    }
+}
+
+.bio-meta {
+    padding: 0.5em 1em;
+    & > .bio-name {
+        font-weight: bold;
+        font-size: 1.1em;
+    }
+    & > .bio-desc {
+        margin-left: 1em;
+        font-style: italic;
+    }
+}
+
 
 .bio-search{
     position: relative;
@@ -40,7 +104,11 @@
     }
 }
 
+<<<<<<< HEAD
 .bio-fragment-select {
+=======
+.bio-panel {
+>>>>>>> origin/django
     background-image: none;
     & > .ui-widget-header {
         position: relative;
@@ -53,6 +121,7 @@
             margin-top: -0.5em;
         }
     }
+<<<<<<< HEAD
     & > .bio-panel{
         position: relative;
         background-image: none;
@@ -101,11 +170,41 @@
         }
     }
     & > .bio-bottom{
+=======
+    & > .bio-panel-content {
+        position: relative;
+        background-image: none;
+        border-top-width: 0;
+        border-bottom-width: 0;
+        &:first-child {
+            border-top-width: 0;
+        }
+    }
+    & > .statusbar {
+        position: relative;
+        min-height: 20px;
+        text-size: 12px;
+        padding: 0.2em;
+        border-bottom: none;
+        & > .ui-icon {
+            position: absolute;
+            top: 50%;
+            margin-top: -8px;
+            left: 6px;
+        }
+        & > p {
+            margin: 2px 35px;
+            text-indent: -10px;
+        }
+    }
+    & > .bio-footer {
+>>>>>>> origin/django
         height: 0.7em;
     }
 }
 
 
+<<<<<<< HEAD
 @def_color: hsl(0,40%,50%);
 @fragHeight: 1.5em;
 
@@ -216,6 +315,33 @@
         margin-left: -10em;
         & > * {
             margin: 1.5em 0.5em;
+=======
+.bio-fragment-select  > .bio-panel-content {
+    & > .list {
+        overflow-y: auto;
+    }
+    & > .searchbar {
+        padding: 0.2em 1em;
+    }
+    & > div{
+        background-image: none;
+        border-bottom: none;
+        border-left: none;
+        border-right: none;
+        & > ul{
+            list-style-type: none;
+            background-image: none;
+             & > li{
+                text-align: center;
+                margin: 0.3em 1em;
+                padding: 0.2em;
+                height: 1.5em;
+            }
+            & > .ui-widget-content {
+                background: none;
+                border-style: dotted;
+            }
+>>>>>>> origin/django
         }
     }
 }
@@ -310,3 +436,61 @@
         margin-top: -@size - @border-width; 
     }
 }
+<<<<<<< HEAD
+=======
+
+.bio-length:after {
+    content: " bp";
+}
+.ui-icon-loading, .ui-state-default .ui-icon-loading  {
+    background-image: url('images/loading16.gif');
+}
+.ui-corner-inherit {
+    -moz-border-radius: inherit; 
+    -webkit-border-radius: inherit;
+    -khtml-border-radius: inherit; 
+    border-radius: inherit;
+}
+
+@def_color: hsl(0,40%,50%);
+@fragHeight: 1.5em;
+
+.bio-fragment
+{
+    position: relative;
+    display: inline-block;
+    height: @fragHeight;
+    background-image: none;
+    cursor: pointer;
+    font: 0.75em Verdana sans-serif;
+    font-size: (@fragHeight / 2);
+    line-height: 100%;
+    width: 10em;
+
+    & > svg{
+        z-index: 0;
+    }
+
+    & > div{
+        .arrow_top(white, @def_color, 7px, 1px);
+        top: @fragHeight + 0.5em;
+        left: 0;
+        right: 0;
+        padding: 0 0.5em;
+        border-color: inherit;
+        cursor: auto;
+        z-index: 100;
+    }
+    & > div > div {
+        padding: 0.5em 0;
+    }
+    & > div a
+    {
+        display: block;
+        &:hover {
+            color: white;
+            background-color: gray;
+        }
+    }
+}
+>>>>>>> origin/django

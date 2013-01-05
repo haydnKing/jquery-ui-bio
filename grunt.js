@@ -5,11 +5,21 @@ function stripBanner( files ) {
     });
 }
 
+var src_files = [   'src/js/tooltip.js',
+                    'src/js/help.js',
+                    'src/js/panel.js',
+                    'src/js/color.js',
+                    'src/js/search.js',
+                    'src/js/fragment.js',
+                    'src/js/fragmentSelect.js',
+                    'src/js/sequenceView.js'
+];
+
 /*global module:false*/
 module.exports = function(grunt) {
     /*Load grunt-contrib-less*/
     grunt.loadNpmTasks('grunt-contrib-less');
-
+    grunt.loadNpmTasks('grunt-templater');
 
   // Project configuration.
   grunt.initConfig({
@@ -23,7 +33,7 @@ module.exports = function(grunt) {
     },
     concat: {
       js: {
-        src: ['<banner:meta.banner>', stripBanner(grunt.file.expandFiles('src/js/*.js'))],
+        src: ['<banner:meta.banner>', stripBanner(src_files)],
         dest: 'dist/<%= pkg.name %>.js'
       },
       css: {
@@ -45,7 +55,7 @@ module.exports = function(grunt) {
     },
     watch: {
       files: ['grunt.js', 'src/**/*.*', 'test/**/*.js'],
-      tasks: 'lint qunit concat less:development'
+      tasks: 'lint qunit concat template less:development'
     },
     jshint: {
       options: {
@@ -53,7 +63,6 @@ module.exports = function(grunt) {
         eqeqeq: true,
         immed: true,
         latedef: true,
-        newcap: true,
         noarg: true,
         sub: true,
         undef: true,
@@ -81,10 +90,19 @@ module.exports = function(grunt) {
                 "dist/<%= pkg.name %>.min.css": "src/less/<%= pkg.name %>.less"
             }
         }
+    },
+    template: {
+        dev: {
+            src: 'libs/jquery-ui-bio-loader.dust',
+            dest: 'libs/jquery-ui-bio-loader.js',
+            variables: {
+                names: src_files
+            }
+        }
     }
   });
 
   // Default task.
-  grunt.registerTask('default', 'lint qunit concat min less');
+  grunt.registerTask('default', 'lint qunit concat min less template');
 
 };
