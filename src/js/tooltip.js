@@ -169,7 +169,7 @@ $.widget("bio.tooltip", {
         //if the width is a string percentage, then we mean percentage of the
         //el, not of the body!
         if(typeof(w) === 'string') {
-            if(w.test('%')){
+            if(/%$/.test(w)){
                 var pc = parseFloat(w.match("([0-9.]+)%")[1]);
                 w = this.el.width() * pc / 100.0;
             }

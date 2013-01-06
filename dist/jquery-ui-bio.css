@@ -312,6 +312,7 @@
 }
 .tooltip > div {
   border: 0;
+  overflow: auto;
 }
 .tooltip > div > p.stringContent {
   text-align: center;
