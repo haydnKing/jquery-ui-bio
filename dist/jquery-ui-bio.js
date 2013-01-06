@@ -885,10 +885,8 @@ $.widget("bio.panel", {
         }
         var fixed = this.el.outerHeight() - stretch;
         stretch = Math.max(0, this.options.height - fixed);
-        console.log('Stretch = ' + stretch);
         for(i in this.stretch_factors)
         {
-            console.log('this['+i+'].outerHeight('+(stretch * this.stretch_factors[i] / total)+');');
             this[i].outerHeight(stretch * this.stretch_factors[i] / total);
         }
     },
@@ -1292,10 +1290,10 @@ $.widget("bio.fragmentSelect", $.bio.panel, {
             placeholder: 'ui-widget-content',
             connectWith: '.bio-panel ul',
             start: function(ev, ui) {
-                $(this).find(':bio-fragment').fragment('disable');
+                ui.item.find(':bio-fragment').fragment('disable');
             },
             stop: function(ev, ui) {
-                $(this).find(':bio-fragment').fragment('enable');
+                ui.item.find(':bio-fragment').fragment('enable');
             },
             receive: function(ev, ui) {
                 var f = ui.item.find(':bio-fragment');

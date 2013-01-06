@@ -95,10 +95,8 @@ $.widget("bio.panel", {
         }
         var fixed = this.el.outerHeight() - stretch;
         stretch = Math.max(0, this.options.height - fixed);
-        console.log('Stretch = ' + stretch);
         for(i in this.stretch_factors)
         {
-            console.log('this['+i+'].outerHeight('+(stretch * this.stretch_factors[i] / total)+');');
             this[i].outerHeight(stretch * this.stretch_factors[i] / total);
         }
     },

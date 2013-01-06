@@ -75,10 +75,10 @@ $.widget("bio.fragmentSelect", $.bio.panel, {
             placeholder: 'ui-widget-content',
             connectWith: '.bio-panel ul',
             start: function(ev, ui) {
-                $(this).find(':bio-fragment').fragment('disable');
+                ui.item.find(':bio-fragment').fragment('disable');
             },
             stop: function(ev, ui) {
-                $(this).find(':bio-fragment').fragment('enable');
+                ui.item.find(':bio-fragment').fragment('enable');
             },
             receive: function(ev, ui) {
                 var f = ui.item.find(':bio-fragment');
