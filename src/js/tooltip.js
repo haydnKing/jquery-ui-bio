@@ -60,7 +60,9 @@ $.widget("bio.tooltip", {
         this._bind_events();
     },
     show: function() {
-        if(!this._enabled) {return;}
+        if(!this._enabled || (this._trigger('beforeShow') === false)) {
+            return;
+        }
         if(this._visible){
             this.hide();
         }
@@ -70,17 +72,21 @@ $.widget("bio.tooltip", {
         this._set_location();
         this._set_color();
 
-        this._tooltip.fadeTo(this.options.fadeIn, 1.0);
+        var self = this;
+        this._tooltip.fadeTo(this.options.fadeIn, 1.0, function(){
+            self._trigger('show');
+        });
         this._visible = true;
     },
     hide: function() {
-        if(!this._visible){
+        if(!this._visible || (this._trigger('beforeHide') === false)){
             return;
         }
         var self = this;
         var tt = self._tooltip;
         this._tooltip.fadeOut(this.options.fadeOut, function(){
             tt.remove();
+            self._trigger('hide');
         });
         this._visible = false;
         self._tooltip = null;
