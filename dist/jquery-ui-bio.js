@@ -1156,10 +1156,10 @@ $.widget("bio.fragment", {
         }
     },
     disable: function() {
-        this.info.tooltip('disable');
+        this.el.tooltip('disable');
     },
     enable: function() {
-        this.info.tooltip('enable');
+        this.el.tooltip('enable');
     },
     ghost: function(g) {
         if(g == null) {g = true;}
