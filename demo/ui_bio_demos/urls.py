@@ -6,6 +6,7 @@ dajaxice_autodiscover()
 
 urlpatterns = patterns('',
 		
+		url(r'^tooltip/$', direct_to_template, {'template':"tooltip.html",}),
 		url(r'^fragment/$', direct_to_template, {'template':"fragment.html",}),
 		url(r'^fragmentSelect/$', direct_to_template,
 			{'template':'fragmentSelect.html'}),
