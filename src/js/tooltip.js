@@ -139,29 +139,29 @@ $.widget("bio.tooltip", {
             .appendTo($('body'));
     },
     _set_content: function() {
-        var content;
         var c = this.options.content;
+
+        if($.isFunction(c)){
+            c = c(this._evt);
+        }
+
         if(this.el.attr(attr) != null){
-            content = $('<p>')
+            c = $('<p>')
                 .text(this.el.attr(attr))
                 .addClass(textC);
         }
         else if(typeof(c) === "string"){
-            content = $('<p>').text(c);
+            c = $('<p>')
+                .text(c)
+                .addClass(textC);
         }
-        else if(c instanceof $){
-            content = c;
-        }
-        else if($.isFunction(c)){
-            content = c(this._evt);
-        }
-        else {
+        else if(!(c instanceof $)){
             throw("No content specified");
         }
         //apply the content 
         this._tooltip.children('div')
             .empty()
-            .append(content);
+            .append(c);
     },
     _set_size: function() {
         var w = this.options.width,
