@@ -1,4 +1,4 @@
-/*! jQuery Ui Bio - v0.1.0 - 2013-01-05
+/*! jQuery Ui Bio - v0.1.0 - 2013-01-06
 * https://github.com/Gibthon/jquery-ui-bio
 * Copyright (c) 2013 Haydn King; Licensed MIT, GPL */
 .bio-sequence-view > .bio-panel-content > .bio-overview {
@@ -303,4 +303,163 @@
 .bio-fragment-select > .bio-panel-content > div > ul > .ui-widget-content {
   background: none;
   border-style: dotted;
+}
+.tooltip {
+  position: absolute;
+}
+.tooltip > div {
+  position: absolute;
+  width: 100%;
+}
+.tooltip.tooltip-top > div {
+  position: absolute;
+  background: #ffffff;
+  border: 1px solid #b34d4d;
+  bottom: 100%;
+  left: -50%;
+  margin: 7px 0;
+}
+.tooltip.tooltip-top > div:before,
+.tooltip.tooltip-top > div:after {
+  border: solid transparent;
+  content: " ";
+  height: 0;
+  width: 0;
+  position: absolute;
+  pointer-events: none;
+  border-color: rgba(0, 0, 0, 0);
+}
+.tooltip.tooltip-top > div:after {
+  border-width: 7px;
+}
+.tooltip.tooltip-top > div:before {
+  border-width: 8px;
+}
+.tooltip.tooltip-top > div:before,
+.tooltip.tooltip-top > div:after {
+  bottom: 100%;
+}
+.tooltip.tooltip-top > div:after {
+  border-bottom-color: #ffffff;
+  left: 50%;
+  margin-left: -7px;
+}
+.tooltip.tooltip-top > div:before {
+  border-bottom-color: inherit;
+  left: 50%;
+  margin-left: -8px;
+}
+.tooltip.tooltip-bottom > div {
+  position: absolute;
+  background: #ffffff;
+  border: 1px solid #b34d4d;
+  top: 100%;
+  left: -50%;
+  margin: 7px 0;
+}
+.tooltip.tooltip-bottom > div:before,
+.tooltip.tooltip-bottom > div:after {
+  border: solid transparent;
+  content: " ";
+  height: 0;
+  width: 0;
+  position: absolute;
+  pointer-events: none;
+  border-color: rgba(0, 0, 0, 0);
+}
+.tooltip.tooltip-bottom > div:after {
+  border-width: 7px;
+}
+.tooltip.tooltip-bottom > div:before {
+  border-width: 8px;
+}
+.tooltip.tooltip-bottom > div:before,
+.tooltip.tooltip-bottom > div:after {
+  top: 100%;
+}
+.tooltip.tooltip-bottom > div:after {
+  border-top-color: inherit;
+  left: 50%;
+  margin-left: -7px;
+}
+.tooltip.tooltip-bottom > div:before {
+  border-top-color: #b34d4d;
+  left: 50%;
+  margin-left: -8px;
+}
+.tooltip.tooltip-left > div {
+  position: absolute;
+  background: #ffffff;
+  border: 1px solid #b34d4d;
+  right: 100%;
+  top: -50%;
+  margin: 0 7px;
+}
+.tooltip.tooltip-left > div:before,
+.tooltip.tooltip-left > div:after {
+  border: solid transparent;
+  content: " ";
+  height: 0;
+  width: 0;
+  position: absolute;
+  pointer-events: none;
+  border-color: rgba(0, 0, 0, 0);
+}
+.tooltip.tooltip-left > div:after {
+  border-width: 7px;
+}
+.tooltip.tooltip-left > div:before {
+  border-width: 8px;
+}
+.tooltip.tooltip-left > div:before,
+.tooltip.tooltip-left > div:after {
+  right: 100%;
+}
+.tooltip.tooltip-left > div:after {
+  border-right-color: inherit;
+  top: 50%;
+  margin-top: -7px;
+}
+.tooltip.tooltip-left > div:before {
+  border-right-color: #b34d4d;
+  top: 50%;
+  margin-top: -8px;
+}
+.tooltip.tooltip-right > div {
+  position: absolute;
+  background: #ffffff;
+  border: 1px solid #b34d4d;
+  left: 100%;
+  top: -50%;
+  margin: 0 7px;
+}
+.tooltip.tooltip-right > div:before,
+.tooltip.tooltip-right > div:after {
+  border: solid transparent;
+  content: " ";
+  height: 0;
+  width: 0;
+  position: absolute;
+  pointer-events: none;
+  border-color: rgba(0, 0, 0, 0);
+}
+.tooltip.tooltip-right > div:after {
+  border-width: 7px;
+}
+.tooltip.tooltip-right > div:before {
+  border-width: 8px;
+}
+.tooltip.tooltip-right > div:before,
+.tooltip.tooltip-right > div:after {
+  left: 100%;
+}
+.tooltip.tooltip-right > div:after {
+  border-left-color: inherit;
+  top: 50%;
+  margin-top: -7px;
+}
+.tooltip.tooltip-right > div:before {
+  border-left-color: #b34d4d;
+  top: 50%;
+  margin-top: -8px;
 }

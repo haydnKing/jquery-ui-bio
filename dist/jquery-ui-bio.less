@@ -1,4 +1,4 @@
-/*! jQuery Ui Bio - v0.1.0 - 2013-01-05
+/*! jQuery Ui Bio - v0.1.0 - 2013-01-06
 * https://github.com/Gibthon/jquery-ui-bio
 * Copyright (c) 2013 Haydn King; Licensed MIT, GPL */
 
@@ -353,4 +353,43 @@
         top: 50%; 
         margin-top: -@size - @border-width; 
     }
+}
+
+@tip_arrow_size: 7px;
+@tip_border_width: 1px;
+@tip_border_color: hsl(0,40%,50%);
+
+.tooltip {
+    position: absolute;
+    & > div {
+        position: absolute;
+        width: 100%;
+    }
+
+    &.tooltip-top > div {
+        .arrow_top(white, @tip_border_color, @tip_arrow_size, @tip_border_width);
+        bottom: 100%;
+        left: -50%;
+        margin: @tip_arrow_size 0;
+    }
+
+    &.tooltip-bottom > div {
+        .arrow_bottom(white, @tip_border_color, @tip_arrow_size, @tip_border_width);
+        top: 100%;
+        left: -50%;
+        margin: @tip_arrow_size 0;
+    }
+    &.tooltip-left > div {
+        .arrow_left(white, @tip_border_color, @tip_arrow_size, @tip_border_width);
+        right: 100%;
+        top: -50%;
+        margin: 0 @tip_arrow_size;
+    }
+    &.tooltip-right > div {
+        .arrow_right(white, @tip_border_color, @tip_arrow_size, @tip_border_width);
+        left: 100%;
+        top: -50%;
+        margin: 0 @tip_arrow_size;
+    }
+
 }

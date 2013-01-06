@@ -1,4 +1,4 @@
-/*! jQuery Ui Bio - v0.1.0 - 2013-01-05
+/*! jQuery Ui Bio - v0.1.0 - 2013-01-06
 * https://github.com/Gibthon/jquery-ui-bio
 * Copyright (c) 2013 Haydn King; Licensed MIT, GPL */
 
