@@ -476,7 +476,7 @@ $.widget("bio.tooltip", {
         var tt = self._tooltip;
         this._tooltip.fadeOut(this.options.fadeOut, function(){
             tt.remove();
-            this._trigger('hide');
+            self._trigger('hide');
         });
         this._visible = false;
         self._tooltip = null;
@@ -549,7 +549,8 @@ $.widget("bio.tooltip", {
             .appendTo($('body'));
     },
     _set_content: function() {
-        var c = this.options.content;
+        var c = this.options.content,
+            t, i;
 
         if($.isFunction(c)){
             c = c(this._evt);
@@ -566,10 +567,10 @@ $.widget("bio.tooltip", {
                 .addClass(textC);
         }
         else if(Array.isArray(c)){
-            var t = c;
+            t = c;
             c = $();
-            for(var i = 0; i < t.length; i++){
-                c = c.add(this._make_item(t[i]));
+            for(i = 0; i < t.length; i++){
+                c = c.add(this._make_item(t[i], i));
             }             
         }
         else if(!(c instanceof $)){
@@ -715,7 +716,7 @@ $.widget("bio.tooltip", {
         }
         this._tooltip.css('border-color', c); 
     },
-    _make_item: function(data) {
+    _make_item: function(data, index) {
         var self = this;
         var icon = $('<span>');
         if(data.icon != null && data.icon !== ''){
@@ -750,9 +751,11 @@ $.widget("bio.tooltip", {
                 item.removeClass('ui-state-active');
             })
             .click(function(evt) {
-                if($.isFunction(data.click)){
-                    data.click(evt, self);
-                }
+                self._trigger('selected', evt, {
+                    index:index, 
+                    tooltip: self.el,
+                    item: item
+                });
             });
         return item;
     }
