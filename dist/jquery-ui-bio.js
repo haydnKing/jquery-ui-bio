@@ -1001,7 +1001,7 @@ $.widget("bio.search", {
 var baseClasses = 'bio-fragment ui-widget',
     hoverClasses = 'ui-state-hover ui-state-active',
     disabledClasses = 'ui-state-disabled',
-    infoClasses = 'ui-corner-all';
+    infoClasses = 'bio-fragment-info';
 
 var tail_len = 10;
 
@@ -1060,9 +1060,7 @@ $.widget("bio.fragment", {
 
 
         this.info = $("<div>")
-            .hide()
             .addClass(infoClasses)
-            .appendTo(el)
             .mousedown(function(ev){
                 //stop the fragment from being dragged
                 ev.stopPropagation();
@@ -1081,9 +1079,10 @@ $.widget("bio.fragment", {
             };
         }
 
-        this.info.tooltip({
-            'mouseTarget': this.el,
-            openDelay: 500
+        this.el.tooltip({
+            color: o.color,
+            content: this.info,
+            width: "125%"
         });
 
         this._redraw_frag();
