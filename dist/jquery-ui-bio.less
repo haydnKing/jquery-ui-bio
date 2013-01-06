@@ -310,12 +310,12 @@
     }
     &:after
     { 
-        border-top-color: inherit; 
+        border-top-color: @background; 
         left: 50%; 
         margin-left: -@size; 
     } 
     &:before {
-        border-top-color: @border; 
+        border-top-color: inherit; 
         left: 50%; 
         margin-left: -@size - @border-width; 
     }
@@ -327,12 +327,12 @@
     }
     &:after
     { 
-        border-right-color: inherit; 
+        border-right-color: @background; 
         top: 50%; 
         margin-top: -@size; 
     } 
     &:before {
-        border-right-color: @border; 
+        border-right-color: inherit; 
         top: 50%; 
         margin-top: -@size - @border-width; 
     }
@@ -344,12 +344,12 @@
     }
     &:after
     { 
-        border-left-color: inherit; 
+        border-left-color: @background; 
         top: 50%; 
         margin-top: -@size; 
     } 
     &:before {
-        border-left-color: @border; 
+        border-left-color: inherit; 
         top: 50%; 
         margin-top: -@size - @border-width; 
     }
@@ -357,39 +357,32 @@
 
 @tip_arrow_size: 7px;
 @tip_border_width: 1px;
-@tip_border_color: hsl(0,40%,50%);
+@tip_border_color: black;
 
 .tooltip {
     position: absolute;
+    padding: 0.3em;
+    z-index: 1000;
+    margin: @tip_arrow_size;
     & > div {
-        position: absolute;
-        width: 100%;
+        border: 0;
+        & > p.stringContent {
+            text-align: center;
+        }
     }
 
-    &.tooltip-top > div {
-        .arrow_top(white, @tip_border_color, @tip_arrow_size, @tip_border_width);
-        bottom: 100%;
-        left: -50%;
-        margin: @tip_arrow_size 0;
-    }
-
-    &.tooltip-bottom > div {
+    &.tooltip-top {
         .arrow_bottom(white, @tip_border_color, @tip_arrow_size, @tip_border_width);
-        top: 100%;
-        left: -50%;
-        margin: @tip_arrow_size 0;
     }
-    &.tooltip-left > div {
-        .arrow_left(white, @tip_border_color, @tip_arrow_size, @tip_border_width);
-        right: 100%;
-        top: -50%;
-        margin: 0 @tip_arrow_size;
+
+    &.tooltip-bottom {
+        .arrow_top(white, @tip_border_color, @tip_arrow_size, @tip_border_width);
     }
-    &.tooltip-right > div {
+    &.tooltip-left {
         .arrow_right(white, @tip_border_color, @tip_arrow_size, @tip_border_width);
-        left: 100%;
-        top: -50%;
-        margin: 0 @tip_arrow_size;
+    }
+    &.tooltip-right {
+        .arrow_left(white, @tip_border_color, @tip_arrow_size, @tip_border_width);
     }
 
 }

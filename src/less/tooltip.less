@@ -1,0 +1,31 @@
+@tip_arrow_size: 7px;
+@tip_border_width: 1px;
+@tip_border_color: black;
+
+.tooltip {
+    position: absolute;
+    padding: 0.3em;
+    z-index: 1000;
+    margin: @tip_arrow_size;
+    & > div {
+        border: 0;
+        & > p.stringContent {
+            text-align: center;
+        }
+    }
+
+    &.tooltip-top {
+        .arrow_bottom(white, @tip_border_color, @tip_arrow_size, @tip_border_width);
+    }
+
+    &.tooltip-bottom {
+        .arrow_top(white, @tip_border_color, @tip_arrow_size, @tip_border_width);
+    }
+    &.tooltip-left {
+        .arrow_right(white, @tip_border_color, @tip_arrow_size, @tip_border_width);
+    }
+    &.tooltip-right {
+        .arrow_left(white, @tip_border_color, @tip_arrow_size, @tip_border_width);
+    }
+
+}

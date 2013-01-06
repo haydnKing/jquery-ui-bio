@@ -69,11 +69,13 @@
 {% block script %}
 <script type="text/javascript">
 $(window).ready( function(){
-    $('#background').height($(window).height());
-
     $('.hover-target').each(function(){
         $(this).css('background-color', 
             'hsl(' + (360*Math.random()) + ', 50%, 50%)');
+    });
+
+    $('.outer').each(function(){
+        $(this).tooltip({color: $(this).css('background-color')});
     });
 });
 </script>
@@ -83,12 +85,16 @@ $(window).ready( function(){
 {% block body %}
 
 <div id='background'>
-    <div id='tophover' class='hover-target absolute'></div>
-    <div id='bottomhover' class='hover-target absolute'></div>
+    <div id='tophover' class='hover-target absolute outer' 
+        tip="I'm near the top"></div>
+    <div id='bottomhover' class='hover-target absolute outer' 
+        tip="I'm near the bottom"></div>
 
     <div id='centered' class='absolute'>
-        <div id='lefthover' class='hover-target absolute'></div>
-        <div id='righthover' class='hover-target absolute'></div>
+        <div id='lefthover' class='hover-target absolute outer'
+            tip="I'm near the left"></div>
+        <div id='righthover' class='hover-target absolute outer'
+            tip="I'm near the right"></div>
 
         <div id='centerpad' class='absolute'>
             <div id='cl' class='hover-target absolute'></div>

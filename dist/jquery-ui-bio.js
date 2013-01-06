@@ -397,92 +397,288 @@ this.bio = this.bio || {};
 
 (function($, undefined) {
 
+    var outerC  = "tooltip ui-widget ui-corner-all",
+        leftC   = "tooltip-left",
+        rightC  = "tooltip-right",
+        topC    = "tooltip-top",
+        bottomC = "tooltip-bottom",
+        innerC  = "ui-widget-content",
+        textC   = "stringContent",
+        attr    = "tip",
+        close_wait = 100,
+        def_border = "black";
+
 $.widget("bio.tooltip", {
     options: {
-        mouseTarget: 'this', //'this', a jQuery selector or an object
-        openDelay: 250,
-        closeDelay: 250,
-        openAnim: 0,
-        closeAnim: 200
+        hover: 250, //Delay to wait after the mouse hovers. 0 = don't open
+        click: false, //Whether to open on-click
+        holdOpen: true, //whether to hold open when the mouse enters the tip
+        autoClose: true, //whether to close automatically when the mouse leaves
+        /* content: widget tests for these things in order and accepts the
+         * first one it finds
+         *  - 'tip' property on DOM element
+         *  - content option
+         *      + string text
+         *      + jquery object
+         *      + function(event): returns jquery object
+         */
+        content: null,
+        width: 100, //integer in px, or string 'x%' of target element
+        color: 'default', // border color: 
+        //                 'default'|'parent'|'css string'|function
+        location: 'center', //popup location: 'center'|'mouse'
+        direction: 'auto', //'auto'|'n'|'s'|'e'|'w'|function
+        fadeIn: 0, //length to animate appearence
+        fadeOut: 100 //length to animate disappear
     },
     _create: function() {
-        var el = this.el = $(this.element[0]).hide();
+        var el = this.el = $(this.element[0]);
         var o = this.options,
             self = this;
 
-        if(typeof o.mouseTarget === "string"){
-            if(o.mouseTarget === "this"){
-                o.mouseTarget = el;
+        this._tooltip = null;
+
+        //the last mouse event
+        this._evt = null;
+
+        this._visible = false;
+        this._timeout = null;
+    },
+    _init: function(){
+        this._bind_events();
+    },
+    show: function() {
+        if(this._visible){
+            this.hide();
+        }
+        this._create_tip();
+        this._set_content();
+        this._set_size();
+        this._set_location();
+        this._set_color();
+
+        this._tooltip.fadeTo(this.options.fadeIn, 1.0);
+        this._visible = true;
+    },
+    hide: function() {
+        if(!this._visible){
+            return;
+        }
+        var self = this;
+        var tt = self._tooltip;
+        this._tooltip.fadeOut(this.options.fadeOut, function(){
+            tt.remove();
+        });
+        this._visible = false;
+        self._tooltip = null;
+    },
+    _bind_events: function() {
+        var self = this;
+        this.el
+            .mousemove(function(e) {self._mousemove(e);})
+            .mouseleave(function(e) {self._mouseleave(e);})
+            .mouseenter(function(e) {self._mouseenter(e);})
+            .click(function(e) {self._mouseclick(e);});
+    },
+    _mousemove: function(evt) {
+        this._evt = evt;
+        var self = this;
+        if(!this._visible && this.options.hover > 0){
+            this._clear_timeout();
+            this._set_timeout(this.options.hover, function() {self.show();});
+        }
+    },
+    _mouseleave: function(evt) {
+        this._evt = evt;
+        var self = this;
+        if(this.options.autoClose){
+            this._set_timeout(close_wait, function() {self.hide();});
+        }
+    },
+    _mouseenter: function(evt) {
+        this._evt = evt;
+        this._clear_timeout();
+    },
+    _mouseclick: function(evt) {
+        this._evt = evt;
+        if(this.options.click){
+            this.open();
+        }
+    },
+    _clear_timeout: function() {
+        if(typeof(this._timeout) === 'number'){
+            clearTimeout(this._timeout);
+            this._timeout = null;
+        }
+    },
+    _set_timeout: function(time, fn) {
+        this._clear_timeout();
+        this._timeout = setTimeout(function(){
+            this._timout = null;
+            fn();
+        }, time);
+    },
+    _create_tip: function() {
+        var self = this;
+        this._tooltip = $('<div>')
+            .addClass(outerC)
+            .fadeTo(0,0)
+            .mouseenter(function(e) {self._mouseenter(e);})
+            .mouseleave(function(e) {self._mouseleave(e);})
+            .append($('<div>').addClass(innerC))
+            .appendTo($('body'));
+    },
+    _set_content: function() {
+        var content;
+        var c = this.options.content;
+        if(this.el.attr(attr) != null){
+            content = $('<p>')
+                .text(this.el.attr(attr))
+                .addClass(textC);
+        }
+        else if(typeof(c) === "string"){
+            content = $('<p>').text(c);
+        }
+        else if(c instanceof $){
+            content = c;
+        }
+        else if($.isFunction(c)){
+            content = c(this._evt);
+        }
+        else {
+            throw("No content specified");
+        }
+        //apply the content 
+        this._tooltip.children('div')
+            .empty()
+            .append(content);
+    },
+    _set_size: function() {
+        var w = this.options.width,
+            width;
+        //if the width is a string percentage, then we mean percentage of the
+        //el, not of the body!
+        if(typeof(w) === 'string') {
+            if(w.test('%')){
+                var pc = parseFloat(w.match("([0-9.]+)%")[1]);
+                w = this.el.width() * pc / 100.0;
             }
-            else{
-                o.mouseTarget = el.find(o.mouseTarget);
+        }
+        
+        this._tooltip.width(w);
+        //update the outer height
+        //this._tooltip.height(this._tooltip.children('div').height());
+    },
+    _set_location: function() {
+        var l = this.options.location,
+            d = this.options.direction,
+            pos, view, scroll, size, margins;
+        if(l === 'center'){
+            pos = this.el.offset();
+            pos.left += this.el.width() / 2.0;
+            pos.top += this.el.height() / 2.0;
+        }
+        else if(l === 'mouse'){
+            pos = {top:this._evt.pageY, left: this._evt.pageX};
+        }
+        else {
+            throw('Invalid location \''+ l + '\'');
+        }
+
+        
+        if(d === 'auto'){
+            view = {
+                width: $(window).width(), 
+                height: $(window).height()
+            };
+            scroll = {
+                top: $(document).scrollTop(), 
+                left: $(document).scrollLeft()
+            };
+            size = {
+                width: this._tooltip.outerWidth(true), 
+                height: this._tooltip.outerHeight(true)
+            };
+            margins = {
+                top: pos.top - scroll.top,
+                left: pos.left - scroll.left,
+                bottom: scroll.top + view.height - pos.top,
+                right: scroll.left + view.width - pos.left
+            };
+
+            //test for South
+            if(      (margins.bottom >= size.height) &&
+                     (margins.left >= size.width / 2.0) &&
+                     (margins.right >= size.width / 2.0)) {
+                d = 's';
+            }
+            //test for North
+            else if( (margins.top >= size.height) &&
+                     (margins.left >= size.width / 2.0) &&
+                     (margins.right >= size.width / 2.0)) {
+                d = 'n';
+            }
+            //test for East
+            else if( (margins.right >= size.width) &&
+                     (margins.top >= size.height / 2.0) &&
+                     (margins.bottom >= size.height / 2.0)){
+                d = 'e';
+            }
+            //test for West
+            else if( (margins.left >= size.width) &&
+                     (margins.top >= size.height / 2.0) &&
+                     (margins.bottom >= size.height / 2.0)){
+                d = 'w';
+            }
+            else {
+                //either we're in a corner, or the viewport is too small
+                //go towars the largest side
+                if(margins.right >= margins.left) {
+                    d = 'e';
+                }
+                else {
+                    d = 'w';
+                }
             }
         }
 
-        this.timeout = null;
-        this._is_open = false;
-        this._enabled = true;
-
-        o.mouseTarget.mouseenter(function(){self._on_enter();})
-          .mouseleave(function(){self._on_leave();});
-    },
-    close: function(){
-        this._clear_timeout();
-        this.el.fadeOut(this.options.closeAnim);
-        this._is_open = false;
-        this._trigger('close');
-    },
-    open: function(){
-        this._clear_timeout();
-        this.el.fadeIn(this.options.openAnim);
-        this._is_open = true;
-        this._trigger('open');
-    },
-    disable: function(){
-        this.close();
-        this._enabled = false;
-    },
-    enable: function(){
-        this._enabled = true;
-    },
-    _on_enter: function(){
-        if(!this._enabled) {return;}
-
-        var self = this,
-            o = this.options;
-
-        //don't close
-        this._clear_timeout();
-
-        //if we're closed, open
-        if(!this._is_open){
-            this.timeout = setTimeout(function() {
-                self.open();
-            }, o.openDelay);
+        if($.isFunction(d)){
+            d = d(this._evt);
         }
-    },
-    _on_leave: function(){
-        if(!this._enabled) {return;}
 
-        var self = this,
-            o = this.options;
-
-        //don't open
-        this._clear_timeout();
-
-        //close if we're open
-        if(this._is_open){
-            this.timeout = setTimeout(function() {
-                self.close();
-            }, o.closeDelay);
+        var t = this._tooltip;
+        if(d === 'n'){
+            t.addClass(topC);
+            pos.left -= size.width / 2.0;
+            pos.top -= size.height;
         }
-    },
-    _clear_timeout: function()
-    {
-        if(this.timeout != null){
-            clearTimeout(this.timeout);
-            this.timeout = null;
+        else if(d === 's'){
+            t.addClass(bottomC);
+            pos.left -= size.width / 2.0;
         }
+        else if(d === 'e'){
+            t.addClass(rightC);
+            pos.top -= size.height / 2.0;
+        }
+        else if(d === 'w'){
+            t.addClass(leftC);
+            pos.left -= size.width;
+            pos.top -= size.height / 2.0;
+        }
+        else {
+            throw('Unknown direction \''+d+'\'');
+        }
+        t.css(pos);
+    },
+    _set_color: function() {
+        var c = this.options.color;
+        if(c === "default"){
+            c = def_border;
+        }
+        else if(c === "parent"){
+            c = this.el.css('border-color');
+        }
+        this._tooltip.css('border-color', c); 
     }
 });
         

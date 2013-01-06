@@ -306,21 +306,23 @@
 }
 .tooltip {
   position: absolute;
+  padding: 0.3em;
+  z-index: 1000;
+  margin: 7px;
 }
 .tooltip > div {
-  position: absolute;
-  width: 100%;
+  border: 0;
 }
-.tooltip.tooltip-top > div {
+.tooltip > div > p.stringContent {
+  text-align: center;
+}
+.tooltip.tooltip-top {
   position: absolute;
   background: #ffffff;
-  border: 1px solid #b34d4d;
-  bottom: 100%;
-  left: -50%;
-  margin: 7px 0;
+  border: 1px solid #000000;
 }
-.tooltip.tooltip-top > div:before,
-.tooltip.tooltip-top > div:after {
+.tooltip.tooltip-top:before,
+.tooltip.tooltip-top:after {
   border: solid transparent;
   content: " ";
   height: 0;
@@ -329,36 +331,68 @@
   pointer-events: none;
   border-color: rgba(0, 0, 0, 0);
 }
-.tooltip.tooltip-top > div:after {
+.tooltip.tooltip-top:after {
   border-width: 7px;
 }
-.tooltip.tooltip-top > div:before {
+.tooltip.tooltip-top:before {
   border-width: 8px;
 }
-.tooltip.tooltip-top > div:before,
-.tooltip.tooltip-top > div:after {
+.tooltip.tooltip-top:before,
+.tooltip.tooltip-top:after {
+  top: 100%;
+}
+.tooltip.tooltip-top:after {
+  border-top-color: #ffffff;
+  left: 50%;
+  margin-left: -7px;
+}
+.tooltip.tooltip-top:before {
+  border-top-color: inherit;
+  left: 50%;
+  margin-left: -8px;
+}
+.tooltip.tooltip-bottom {
+  position: absolute;
+  background: #ffffff;
+  border: 1px solid #000000;
+}
+.tooltip.tooltip-bottom:before,
+.tooltip.tooltip-bottom:after {
+  border: solid transparent;
+  content: " ";
+  height: 0;
+  width: 0;
+  position: absolute;
+  pointer-events: none;
+  border-color: rgba(0, 0, 0, 0);
+}
+.tooltip.tooltip-bottom:after {
+  border-width: 7px;
+}
+.tooltip.tooltip-bottom:before {
+  border-width: 8px;
+}
+.tooltip.tooltip-bottom:before,
+.tooltip.tooltip-bottom:after {
   bottom: 100%;
 }
-.tooltip.tooltip-top > div:after {
+.tooltip.tooltip-bottom:after {
   border-bottom-color: #ffffff;
   left: 50%;
   margin-left: -7px;
 }
-.tooltip.tooltip-top > div:before {
+.tooltip.tooltip-bottom:before {
   border-bottom-color: inherit;
   left: 50%;
   margin-left: -8px;
 }
-.tooltip.tooltip-bottom > div {
+.tooltip.tooltip-left {
   position: absolute;
   background: #ffffff;
-  border: 1px solid #b34d4d;
-  top: 100%;
-  left: -50%;
-  margin: 7px 0;
+  border: 1px solid #000000;
 }
-.tooltip.tooltip-bottom > div:before,
-.tooltip.tooltip-bottom > div:after {
+.tooltip.tooltip-left:before,
+.tooltip.tooltip-left:after {
   border: solid transparent;
   content: " ";
   height: 0;
@@ -367,74 +401,33 @@
   pointer-events: none;
   border-color: rgba(0, 0, 0, 0);
 }
-.tooltip.tooltip-bottom > div:after {
+.tooltip.tooltip-left:after {
   border-width: 7px;
 }
-.tooltip.tooltip-bottom > div:before {
+.tooltip.tooltip-left:before {
   border-width: 8px;
 }
-.tooltip.tooltip-bottom > div:before,
-.tooltip.tooltip-bottom > div:after {
-  top: 100%;
+.tooltip.tooltip-left:before,
+.tooltip.tooltip-left:after {
+  left: 100%;
 }
-.tooltip.tooltip-bottom > div:after {
-  border-top-color: inherit;
-  left: 50%;
-  margin-left: -7px;
-}
-.tooltip.tooltip-bottom > div:before {
-  border-top-color: #b34d4d;
-  left: 50%;
-  margin-left: -8px;
-}
-.tooltip.tooltip-left > div {
-  position: absolute;
-  background: #ffffff;
-  border: 1px solid #b34d4d;
-  right: 100%;
-  top: -50%;
-  margin: 0 7px;
-}
-.tooltip.tooltip-left > div:before,
-.tooltip.tooltip-left > div:after {
-  border: solid transparent;
-  content: " ";
-  height: 0;
-  width: 0;
-  position: absolute;
-  pointer-events: none;
-  border-color: rgba(0, 0, 0, 0);
-}
-.tooltip.tooltip-left > div:after {
-  border-width: 7px;
-}
-.tooltip.tooltip-left > div:before {
-  border-width: 8px;
-}
-.tooltip.tooltip-left > div:before,
-.tooltip.tooltip-left > div:after {
-  right: 100%;
-}
-.tooltip.tooltip-left > div:after {
-  border-right-color: inherit;
+.tooltip.tooltip-left:after {
+  border-left-color: #ffffff;
   top: 50%;
   margin-top: -7px;
 }
-.tooltip.tooltip-left > div:before {
-  border-right-color: #b34d4d;
+.tooltip.tooltip-left:before {
+  border-left-color: inherit;
   top: 50%;
   margin-top: -8px;
 }
-.tooltip.tooltip-right > div {
+.tooltip.tooltip-right {
   position: absolute;
   background: #ffffff;
-  border: 1px solid #b34d4d;
-  left: 100%;
-  top: -50%;
-  margin: 0 7px;
+  border: 1px solid #000000;
 }
-.tooltip.tooltip-right > div:before,
-.tooltip.tooltip-right > div:after {
+.tooltip.tooltip-right:before,
+.tooltip.tooltip-right:after {
   border: solid transparent;
   content: " ";
   height: 0;
@@ -443,23 +436,23 @@
   pointer-events: none;
   border-color: rgba(0, 0, 0, 0);
 }
-.tooltip.tooltip-right > div:after {
+.tooltip.tooltip-right:after {
   border-width: 7px;
 }
-.tooltip.tooltip-right > div:before {
+.tooltip.tooltip-right:before {
   border-width: 8px;
 }
-.tooltip.tooltip-right > div:before,
-.tooltip.tooltip-right > div:after {
-  left: 100%;
+.tooltip.tooltip-right:before,
+.tooltip.tooltip-right:after {
+  right: 100%;
 }
-.tooltip.tooltip-right > div:after {
-  border-left-color: inherit;
+.tooltip.tooltip-right:after {
+  border-right-color: #ffffff;
   top: 50%;
   margin-top: -7px;
 }
-.tooltip.tooltip-right > div:before {
-  border-left-color: #b34d4d;
+.tooltip.tooltip-right:before {
+  border-right-color: inherit;
   top: 50%;
   margin-top: -8px;
 }
