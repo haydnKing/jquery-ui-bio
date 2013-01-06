@@ -90,7 +90,9 @@ $.widget("bio.fragment", {
         }
 
         this.el.tooltip({
-            color: o.color,
+            color: function() {
+                return o.color;
+            },
             content: this.info,
             width: "125%"
         });

@@ -693,13 +693,15 @@ $.widget("bio.tooltip", {
     },
     _set_color: function() {
         var c = this.options.color;
+        if($.isFunction(c)){
+            c = c(this._evt);
+        }
         if(c === "default"){
             //if the border color has been set
             if(this.el.css('border-color').length > 0){
                 //don't override it
                 return;
             }
-            console.log('Applying a default border as none set');
             c = def_border;
         }
         else if(c === "parent"){
@@ -1102,7 +1104,9 @@ $.widget("bio.fragment", {
         }
 
         this.el.tooltip({
-            color: o.color,
+            color: function() {
+                return o.color;
+            },
             content: this.info,
             width: "125%"
         });
