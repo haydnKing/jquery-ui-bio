@@ -79,8 +79,8 @@ $(window).ready( function(){
     });
 
     $('#cc').tooltip({color: $('#cc').css('background-color'),
-        content: $( '<h5 style=\'text-align:center\'>'+
-                        'Content given as arbitrary HTML'+
+        content: $( '<h5 style=\'text-align:center\'>'+ 
+                    'Content given as arbitrary HTML' +
                     '</h5>'+
                     '<p>The width is set as a '+
                     'percentage of the parent. '+
@@ -94,6 +94,62 @@ $(window).ready( function(){
             '<p>At: '+(new Date()).toTimeString() + '</p>');
         },
         width: 300
+    });
+
+    $('#cl').tooltip({color: $('#cl').css('background-color'),
+        width: "300%",
+        content: [
+            {
+                title: "Item 1",
+                sub: "The first option",
+                click: function(evt, $tip){
+                    $tip.hide();
+                },
+                iconClass: '',
+                iconCSS: {'background-color': 
+                    'hsl(' + (360*Math.random()) + ', 50%, 50%)'}
+            }, 
+            {
+                title: "Item 2",
+                sub: "The second option",
+                click: function(evt, $tip){
+                    $tip.hide();
+                },
+                iconClass: '',
+                iconCSS: {'background-color': 
+                    'hsl(' + (360*Math.random()) + ', 50%, 50%)'}
+            }, 
+            {
+                title: "Item 3",
+                sub: "The third option",
+                click: function(evt, $tip){
+                    $tip.hide();
+                },
+                iconClass: '',
+                iconCSS: {'background-color': 
+                    'hsl(' + (360*Math.random()) + ', 50%, 50%)'}
+            }, 
+            {
+                title: "Item 4",
+                sub: "The fourth option",
+                click: function(evt, $tip){
+                    $tip.hide();
+                },
+                iconClass: '',
+                iconCSS: {'background-color': 
+                    'hsl(' + (360*Math.random()) + ', 50%, 50%)'}
+            }, 
+            {
+                title: "Item 5",
+                sub: "The fifth option",
+                click: function(evt, $tip){
+                    $tip.hide();
+                },
+                iconClass: '',
+                iconCSS: {'background-color': 
+                    'hsl(' + (360*Math.random()) + ', 50%, 50%)'}
+            }, 
+        ]
     });
 });
 </script>

@@ -405,7 +405,7 @@ this.bio = this.bio || {};
         innerC  = "ui-widget-content",
         textC   = "stringContent",
         attr    = "tip",
-        close_wait = 100,
+        close_wait = 150,
         def_border = "black";
 
 $.widget("bio.tooltip", {
@@ -545,6 +545,13 @@ $.widget("bio.tooltip", {
                 .text(c)
                 .addClass(textC);
         }
+        else if(Array.isArray(c)){
+            var t = c;
+            c = $();
+            for(var i = 0; i < t.length; i++){
+                c = c.add(this._make_item(t[i]));
+            }             
+        }
         else if(!(c instanceof $)){
             throw("No content specified");
         }
@@ -679,6 +686,47 @@ $.widget("bio.tooltip", {
             c = this.el.css('border-color');
         }
         this._tooltip.css('border-color', c); 
+    },
+    _make_item: function(data) {
+        var self = this;
+        var icon = $('<span>');
+        if(data.icon != null && data.icon !== ''){
+            icon.addClass('ui-icon ' + data.iconClass || '');
+        }
+        else{
+            icon.css(data.iconCSS || {})
+                .addClass('ui-corner-all');
+        }
+
+        var item = $('<div>')
+            .addClass('tooltip-item ui-widget-content ui-state-default')
+            .append( $('<div>')
+                .addClass('tooltip-icon')
+                .append(icon)
+                   )
+            .append( $('<div>')
+                .addClass('tooltip-desc')
+                .append( $('<span>').text(data.title))
+                .append( $('<p>').text(data.sub || ''))
+                   )
+            .mouseenter(function(evt) {
+                item.addClass('ui-state-hover');
+            })
+            .mouseleave(function(evt) {
+                item.removeClass('ui-state-hover');
+            })
+            .mousedown(function(evt) {
+                item.addClass('ui-state-active');
+            })
+            .mouseup(function(evt) {
+                item.removeClass('ui-state-active');
+            })
+            .click(function(evt) {
+                if($.isFunction(data.click)){
+                    data.click(evt, self);
+                }
+            });
+        return item;
     }
 });
         

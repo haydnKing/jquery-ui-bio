@@ -358,6 +358,8 @@
 @tip_arrow_size: 7px;
 @tip_border_width: 1px;
 @tip_border_color: black;
+@tip_icon_w: 24px;
+@icon_w: 16px;
 
 .tooltip {
     position: absolute;
@@ -369,6 +371,38 @@
         overflow: auto;
         & > p.stringContent {
             text-align: center;
+        }
+        & > .tooltip-item {
+            position: relative;
+            cursor: pointer;
+            & > .tooltip-icon {
+                position: absolute;
+                width: @tip_icon_w;
+                top: 0;
+                bottom: 0;
+                left: 0;
+                & > span {
+                    width: @icon_w;
+                    height: @icon_w;
+                    position: absolute;
+                    left: 0.5 * (@tip_icon_w - @icon_w);
+                    top: 50%;
+                    margin-top: -8px;
+                }
+            }
+            & > .tooltip-desc {
+                margin-left: @tip_icon_w;
+                & > p { 
+                    margin: 0 0.5em 0.5em;
+                }
+                & > span {
+                    margin: 0.5em 0.5em 0;
+                    font-weight: bold;
+                }
+            }
+        }
+        & > .tooltip-item:not(:first-child) {
+            border-top: none;
         }
     }
 
