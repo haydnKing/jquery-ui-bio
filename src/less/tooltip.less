@@ -1,6 +1,5 @@
 @tip_arrow_size: 7px;
 @tip_border_width: 1px;
-@tip_border_color: black;
 @tip_icon_w: 24px;
 @icon_w: 16px;
 
@@ -50,17 +49,17 @@
     }
 
     &.tooltip-top {
-        .arrow_bottom(white, @tip_border_color, @tip_arrow_size, @tip_border_width);
+        .arrow_bottom(white, @tip_arrow_size, @tip_border_width);
     }
 
     &.tooltip-bottom {
-        .arrow_top(white, @tip_border_color, @tip_arrow_size, @tip_border_width);
+        .arrow_top(white, @tip_arrow_size, @tip_border_width);
     }
     &.tooltip-left {
-        .arrow_right(white, @tip_border_color, @tip_arrow_size, @tip_border_width);
+        .arrow_right(white, @tip_arrow_size, @tip_border_width);
     }
     &.tooltip-right {
-        .arrow_left(white, @tip_border_color, @tip_arrow_size, @tip_border_width);
+        .arrow_left(white, @tip_arrow_size, @tip_border_width);
     }
 
 }

@@ -167,16 +167,11 @@
     &:hover {
         opacity: 1.0;
     }
-    & > .tip {
-        .arrow_top(white, inherit, 10px, 1px);
-        position: absolute;
-        top: 2em;
-        width: 20em;
-        left: 50%;
-        margin-left: -10em;
-        & > * {
-            margin: 1.5em 0.5em;
-        }
+}
+.bio-help-tip {
+    & > * {
+        margin: 1em 0.5em;
+        text-align: center;
     }
 }
 
@@ -260,10 +255,11 @@
 }
 
 
-.arrow_box(@background, @border, @size, @border-width) { 
+.arrow_box(@background, @size, @border-width) { 
     position: absolute; 
     background: @background; 
-    border: @border-width solid @border; 
+    border-width: @border-width;
+    border-style: solid; 
  
     &:before, &:after { 
         border: solid transparent; 
@@ -281,8 +277,8 @@
         border-width: @size + @border-width;
     }
 }
-.arrow_top(@background, @border, @size, @border-width) {
-    .arrow_box(@background, @border, @size, @border-width);
+.arrow_top(@background, @size, @border-width) {
+    .arrow_box(@background, @size, @border-width);
     &:before, &:after {
         bottom: 100%;
     }
@@ -298,8 +294,8 @@
         margin-left: -@size - @border-width; 
     }
 }
-.arrow_bottom(@background, @border, @size, @border-width) {
-    .arrow_box(@background, @border, @size, @border-width);
+.arrow_bottom(@background, @size, @border-width) {
+    .arrow_box(@background, @size, @border-width);
     &:before, &:after {
         top: 100%;
     }
@@ -315,8 +311,8 @@
         margin-left: -@size - @border-width; 
     }
 }
-.arrow_left(@background, @border, @size, @border-width) {
-    .arrow_box(@background, @border, @size, @border-width);
+.arrow_left(@background, @size, @border-width) {
+    .arrow_box(@background, @size, @border-width);
     &:before, &:after {
         right: 100%;
     }
@@ -332,8 +328,8 @@
         margin-top: -@size - @border-width; 
     }
 }
-.arrow_right(@background, @border, @size, @border-width) {
-    .arrow_box(@background, @border, @size, @border-width);
+.arrow_right(@background, @size, @border-width) {
+    .arrow_box(@background, @size, @border-width);
     &:before, &:after {
         left: 100%;
     }
@@ -352,7 +348,6 @@
 
 @tip_arrow_size: 7px;
 @tip_border_width: 1px;
-@tip_border_color: black;
 @tip_icon_w: 24px;
 @icon_w: 16px;
 
@@ -402,17 +397,17 @@
     }
 
     &.tooltip-top {
-        .arrow_bottom(white, @tip_border_color, @tip_arrow_size, @tip_border_width);
+        .arrow_bottom(white, @tip_arrow_size, @tip_border_width);
     }
 
     &.tooltip-bottom {
-        .arrow_top(white, @tip_border_color, @tip_arrow_size, @tip_border_width);
+        .arrow_top(white, @tip_arrow_size, @tip_border_width);
     }
     &.tooltip-left {
-        .arrow_right(white, @tip_border_color, @tip_arrow_size, @tip_border_width);
+        .arrow_right(white, @tip_arrow_size, @tip_border_width);
     }
     &.tooltip-right {
-        .arrow_left(white, @tip_border_color, @tip_arrow_size, @tip_border_width);
+        .arrow_left(white, @tip_arrow_size, @tip_border_width);
     }
 
 }

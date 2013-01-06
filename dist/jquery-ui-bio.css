@@ -150,47 +150,9 @@
 .bio-help:hover {
   opacity: 1.0;
 }
-.bio-help > .tip {
-  background: #ffffff;
-  border: 1px solid inherit;
-  position: absolute;
-  top: 2em;
-  width: 20em;
-  left: 50%;
-  margin-left: -10em;
-}
-.bio-help > .tip:before,
-.bio-help > .tip:after {
-  border: solid transparent;
-  content: " ";
-  height: 0;
-  width: 0;
-  position: absolute;
-  pointer-events: none;
-  border-color: rgba(0, 0, 0, 0);
-}
-.bio-help > .tip:after {
-  border-width: 10px;
-}
-.bio-help > .tip:before {
-  border-width: 11px;
-}
-.bio-help > .tip:before,
-.bio-help > .tip:after {
-  bottom: 100%;
-}
-.bio-help > .tip:after {
-  border-bottom-color: #ffffff;
-  left: 50%;
-  margin-left: -10px;
-}
-.bio-help > .tip:before {
-  border-bottom-color: inherit;
-  left: 50%;
-  margin-left: -11px;
-}
-.bio-help > .tip > * {
-  margin: 1.5em 0.5em;
+.bio-help-tip > * {
+  margin: 1em 0.5em;
+  text-align: center;
 }
 .bio-panel {
   background-image: none;
@@ -313,7 +275,8 @@
 .tooltip.tooltip-top {
   position: absolute;
   background: #ffffff;
-  border: 1px solid #000000;
+  border-width: 1px;
+  border-style: solid;
 }
 .tooltip.tooltip-top:before,
 .tooltip.tooltip-top:after {
@@ -348,7 +311,8 @@
 .tooltip.tooltip-bottom {
   position: absolute;
   background: #ffffff;
-  border: 1px solid #000000;
+  border-width: 1px;
+  border-style: solid;
 }
 .tooltip.tooltip-bottom:before,
 .tooltip.tooltip-bottom:after {
@@ -383,7 +347,8 @@
 .tooltip.tooltip-left {
   position: absolute;
   background: #ffffff;
-  border: 1px solid #000000;
+  border-width: 1px;
+  border-style: solid;
 }
 .tooltip.tooltip-left:before,
 .tooltip.tooltip-left:after {
@@ -418,7 +383,8 @@
 .tooltip.tooltip-right {
   position: absolute;
   background: #ffffff;
-  border: 1px solid #000000;
+  border-width: 1px;
+  border-style: solid;
 }
 .tooltip.tooltip-right:before,
 .tooltip.tooltip-right:after {

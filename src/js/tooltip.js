@@ -7,7 +7,7 @@
  */
 (function($, undefined) {
 
-    var outerC  = "tooltip ui-widget ui-corner-all",
+    var outerC  = "tooltip ui-widget ui-widget-content ui-corner-all",
         leftC   = "tooltip-left",
         rightC  = "tooltip-right",
         topC    = "tooltip-top",
@@ -33,6 +33,7 @@ $.widget("bio.tooltip", {
          *      + function(event): returns jquery object
          */
         content: null,
+        extraClasses: null, //any extra CSS classes for the tooltip
         width: 100, //integer in px, or string 'x%' of target element
         color: 'default', // border color: 
         //                 'default'|'parent'|'css string'|function
@@ -131,7 +132,7 @@ $.widget("bio.tooltip", {
     _create_tip: function() {
         var self = this;
         this._tooltip = $('<div>')
-            .addClass(outerC)
+            .addClass(outerC + ' ' + (this.options.extraClasses || ''))
             .fadeTo(0,0)
             .mouseenter(function(e) {self._mouseenter(e);})
             .mouseleave(function(e) {self._mouseleave(e);})
@@ -290,6 +291,12 @@ $.widget("bio.tooltip", {
     _set_color: function() {
         var c = this.options.color;
         if(c === "default"){
+            //if the border color has been set
+            if(this.el.css('border-color').length > 0){
+                //don't override it
+                return;
+            }
+            console.log('Applying a default border as none set');
             c = def_border;
         }
         else if(c === "parent"){
