@@ -443,12 +443,14 @@ $.widget("bio.tooltip", {
         this._evt = null;
 
         this._visible = false;
+        this._enabled = true;
         this._timeout = null;
     },
     _init: function(){
         this._bind_events();
     },
     show: function() {
+        if(!this._enabled) {return;}
         if(this._visible){
             this.hide();
         }
@@ -473,6 +475,13 @@ $.widget("bio.tooltip", {
         this._visible = false;
         self._tooltip = null;
     },
+    enable: function() {
+        this._enabled = true;
+    },
+    disable: function() {
+        this._enabled = false;
+        this.hide();
+    },
     _bind_events: function() {
         var self = this;
         this.el
@@ -482,6 +491,7 @@ $.widget("bio.tooltip", {
             .click(function(e) {self._mouseclick(e);});
     },
     _mousemove: function(evt) {
+        if(!this._enabled) {return;}
         this._evt = evt;
         var self = this;
         if(!this._visible && this.options.hover > 0){
@@ -490,6 +500,7 @@ $.widget("bio.tooltip", {
         }
     },
     _mouseleave: function(evt) {
+        if(!this._enabled) {return;}
         this._evt = evt;
         var self = this;
         if(this.options.autoClose){
@@ -497,10 +508,12 @@ $.widget("bio.tooltip", {
         }
     },
     _mouseenter: function(evt) {
+        if(!this._enabled) {return;}
         this._evt = evt;
         this._clear_timeout();
     },
     _mouseclick: function(evt) {
+        if(!this._enabled) {return;}
         this._evt = evt;
         if(this.options.click){
             this.open();
