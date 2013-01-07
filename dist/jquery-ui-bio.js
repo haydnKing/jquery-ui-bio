@@ -507,6 +507,9 @@ $.widget("bio.tooltip", {
         this._enabled = false;
         this.hide();
     },
+    updateContent: function(c) {
+        this._set_content(c, true);
+    },
     _bind_events: function() {
         var self = this;
         this.el
@@ -568,9 +571,10 @@ $.widget("bio.tooltip", {
             .append($('<div>').addClass(innerC))
             .appendTo($('body'));
     },
-    _set_content: function() {
-        var c = this.options.content,
-            t, i;
+    _set_content: function(c, anim) {
+        c = c || this.options.content;
+        anim = anim || false;
+        var t, i, self = this;
 
         if($.isFunction(c)){
             c = c(this._evt);
@@ -602,10 +606,31 @@ $.widget("bio.tooltip", {
         else {
             throw("No content specified");
         }
-        //apply the content 
-        this._tooltip.children('div')
-            .empty()
-            .append(c);
+        if(!anim){
+            //apply the content 
+            this._tooltip.children('div')
+                .empty()
+                .append(c);
+        }
+        else {
+            //fix the height
+            this._tooltip.height(this._tooltip.height());
+            //apply the content 
+            this._tooltip.children('div')
+                .empty()
+                .append(c);
+            //animate to new height
+            this._tooltip.animate({
+                height: this._tooltip.children('div').height()
+            }, 'fast', function() {
+                //unset the height
+                self._tooltip.css('height', '');
+                //set the size and location (may have been messed up by the
+                //anim
+                self._set_size();
+                self._set_location();
+            });
+        }
     },
     _get_title: function() {
         var t = this.options.title;

@@ -149,8 +149,10 @@ $(window).ready( function(){
         ]
     })
     .on('tooltipselected', function(evt, ui){
-        ui.tooltip.tooltip('hide');
-        console.log('Selected '+ui.index);
+        ui.tooltip.tooltip('updateContent', 'Selected Item '+(ui.index+1));
+        setTimeout(function() {
+            ui.tooltip.tooltip('hide');
+        }, 1000);
     });
 
     $('#clickpad').tooltip({color: $('#clickpad').css('background-color'),
