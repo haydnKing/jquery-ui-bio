@@ -82,7 +82,7 @@ $.widget("bio.fragmentSelect", $.bio.panel, {
         }
 
         ul.sortable({
-            placeholder: 'ui-widget-content',
+            placeholder: 'ui-widget-content bio-fragment-placeholder',
             connectWith: '.bio-panel ul',
             start: function(ev, ui) {
                 ui.item.find(':bio-fragment').fragment('disable');
@@ -100,6 +100,12 @@ $.widget("bio.fragmentSelect", $.bio.panel, {
                 var f = ui.item.find(':bio-fragment');
                 self.setStatus('Removed fragment "'+f.fragment('option','name')+'"',
                               'ui-icon-circle-minus');
+            },
+            helper: function(ev, item) {
+                return $(item)
+                    .find(':bio-fragment')
+                    .clone()
+                    .appendTo($('body'));
             }
         });
 
@@ -124,9 +130,10 @@ $.widget("bio.fragmentSelect", $.bio.panel, {
             });
             self.setStatus();
             ul.animate({
-                'margin-top': '0px'
+                'margin-top': 0
             }, 'fast', function() {
-                self.list.css('overflow-y', 'auto');
+                self.list.css('overflow', '');
+                ul.css('margin-top', '');
             });
 
         };
