@@ -2,42 +2,29 @@
 * https://github.com/Gibthon/jquery-ui-bio
 * Copyright (c) 2013 Haydn King; Licensed MIT, GPL */
 
-.bio-sequence-view > .bio-panel-content {
-    & .bio-overview {
-        border-color: inherit;
-        border-style: inherit;
-        border-width: 1px 0;
-        position: relative;
-    }
-    & .bio-zoomview {
-        border-color: inherit;
-        border-style: inherit;
-        border-width: 1px 0 0 0;
-        position: relative;
-        & > .bio-slidearrow {
-            position: absolute;
-            width: 32px;
-            top: 0;
-            bottom: 0;
-            background-image: none;
-            border: none;
-            cursor: pointer;
-            & > .ui-icon {
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                margin-top: -8px;
-                margin-left: -8px;
-            }
+.bio-zoomview  > .bio-slidearrow {
+    position: absolute;
+    width: 32px;
+    top: 0;
+    bottom: 0;
+    background-image: none;
+    border: none;
+    cursor: pointer;
+    & > .ui-icon {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        margin-top: -8px;
+        margin-left: -8px;
         }
-        & > .bio-slideleft {
+        &.bio-slideleft {
             left: 0;
-        }
-        & > .bio-slideright {
-            right: 0;
-        }
+    }
+    &.bio-slideright {
+        right: 0;
     }
 }
+
 
 .bio-meta {
     padding: 0.5em 1em;
@@ -172,29 +159,33 @@
         position: relative;
         text-align: center;
         padding: 0.25em;
+        margin-bottom: -1px;
         & > .bio-help {
             position: absolute;
             right: 0.5em;
             top: 50%;
             margin-top: -0.5em;
         }
+        z-index: 5;
     }
     & > .bio-panel-content {
         position: relative;
-        background-image: none;
         border-top-width: 0;
         border-bottom-width: 0;
-        & > *:first-child {
-            border-top-width: 0;
+        z-index: 1;
+        & div.bio-panel-item {
+            border-width: 0 0 1px 0;
+            position: relative;
         }
     }
     & > .statusbar {
+        z-index: 5;
         position: relative;
         min-height: 20px;
         text-size: 12px;
         padding: 0.2em;
         border-bottom: none;
-        margin: 0;
+        margin: -1px 0 0;
         -webkit-border-radius: 0px;
         -moz-border-radius: 0px;
         border-radius: 0px;
@@ -216,21 +207,16 @@
 
 
 .bio-fragment-select  > .bio-panel-content {
-    & > .list {
-        overflow-y: auto;
-    }
+
     & > .searchbar {
-        padding: 0.2em 1em;
+        padding: 0.4em 1em;
     }
-    & > div{
-        background-image: none;
-        border-bottom: none;
-        border-left: none;
-        border-right: none;
-        & > ul{
+    & .list {
+        overflow-y: auto;
+        & > ul {
             list-style-type: none;
             background-image: none;
-             & > li{
+             & li {
                 text-align: center;
                 margin: 0.3em 1em;
                 padding: 0.2em;

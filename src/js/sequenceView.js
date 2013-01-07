@@ -52,7 +52,7 @@ $.widget("bio.sequenceView", $.bio.panel, {
         // Make metadata
         // --------------------------------------------------------------
 
-        var m = this.metadata = $('<div>')
+        var m = this.metadata = this._panel_item()
             .addClass(metaClass);
 
         this.name = $('<p>')
@@ -70,15 +70,15 @@ $.widget("bio.sequenceView", $.bio.panel, {
 
         this.seqview = $('<div>');
 
-        this.overview = $('<div>')
+        this.overview = this._panel_item()
             .addClass(overviewClass)
             .appendTo(this.seqview);
 
-        this.spacer = $('<div>')
+        this.spacer = this._panel_item()
             .addClass(spacerClass)
             .appendTo(this.seqview);
 
-        var zv = this.zoomview = $('<div>')
+        var zv = this.zoomview = this._panel_item()
             .addClass(zoomClass)
             .appendTo(this.seqview);
 

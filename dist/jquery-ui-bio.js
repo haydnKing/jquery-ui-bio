@@ -878,8 +878,8 @@ $.widget("bio.help", {
 
 var baseClasses = 'ui-widget bio-panel',
     headerClasses = 'ui-widget-header ui-state-default',
-    panelClasses  = 'bio-panel-content ui-state-default',
-    panelItemClasses = 'ui-widget-content ui-state-default',
+    panelClasses  = 'bio-panel-content ui-widget-content',
+    panelItemClasses = 'bio-panel-item ui-widget-content',
     statusClasses = 'ui-state-default ui-widget-content statusbar',
     footerClasses = 'bio-footer ui-widget-header ui-state-default',
     defaultIcon   = 'ui-icon-circle-triangle-e';
@@ -968,10 +968,8 @@ $.widget("bio.panel", {
             this[i].outerHeight(stretch * this.stretch_factors[i] / total);
         }
     },
-    _add_to_panel: function($item){
-        $item.addClass(panelItemClasses);
-        this.panel.append($item);
-        return $item;
+    _panel_item: function(i){
+        return (i || $('<div>')).addClass(panelItemClasses);
     }
 });
 
@@ -1342,7 +1340,9 @@ $.widget("bio.fragmentSelect", $.bio.panel, {
 
         this.timeout = null;
 
-        var searchbar = self._add_to_panel($('<div>').addClass('searchbar'));
+        var searchbar = self._panel_item()
+            .addClass('searchbar')
+            .appendTo(this.panel);
         
         this.search = $('<div>')
             .search({
@@ -1353,7 +1353,9 @@ $.widget("bio.fragmentSelect", $.bio.panel, {
             })
             .appendTo(searchbar);
         
-        this.list = self._add_to_panel($('<div>').addClass('list'));
+        this.list = this._panel_item()
+            .addClass('list')
+            .appendTo(this.panel);
 
         //copy any initial fragments
         var ul = this.ul = el.find('ul');
@@ -1544,7 +1546,7 @@ $.widget("bio.sequenceView", $.bio.panel, {
         // Make metadata
         // --------------------------------------------------------------
 
-        var m = this.metadata = $('<div>')
+        var m = this.metadata = this._panel_item()
             .addClass(metaClass);
 
         this.name = $('<p>')
@@ -1562,15 +1564,15 @@ $.widget("bio.sequenceView", $.bio.panel, {
 
         this.seqview = $('<div>');
 
-        this.overview = $('<div>')
+        this.overview = this._panel_item()
             .addClass(overviewClass)
             .appendTo(this.seqview);
 
-        this.spacer = $('<div>')
+        this.spacer = this._panel_item()
             .addClass(spacerClass)
             .appendTo(this.seqview);
 
-        var zv = this.zoomview = $('<div>')
+        var zv = this.zoomview = this._panel_item()
             .addClass(zoomClass)
             .appendTo(this.seqview);
 

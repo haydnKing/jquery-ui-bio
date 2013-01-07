@@ -4,29 +4,33 @@
         position: relative;
         text-align: center;
         padding: 0.25em;
+        margin-bottom: -1px;
         & > .bio-help {
             position: absolute;
             right: 0.5em;
             top: 50%;
             margin-top: -0.5em;
         }
+        z-index: 5;
     }
     & > .bio-panel-content {
         position: relative;
-        background-image: none;
         border-top-width: 0;
         border-bottom-width: 0;
-        & > *:first-child {
-            border-top-width: 0;
+        z-index: 1;
+        & div.bio-panel-item {
+            border-width: 0 0 1px 0;
+            position: relative;
         }
     }
     & > .statusbar {
+        z-index: 5;
         position: relative;
         min-height: 20px;
         text-size: 12px;
         padding: 0.2em;
         border-bottom: none;
-        margin: 0;
+        margin: -1px 0 0;
         -webkit-border-radius: 0px;
         -moz-border-radius: 0px;
         border-radius: 0px;

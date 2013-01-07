@@ -10,8 +10,8 @@
 
 var baseClasses = 'ui-widget bio-panel',
     headerClasses = 'ui-widget-header ui-state-default',
-    panelClasses  = 'bio-panel-content ui-state-default',
-    panelItemClasses = 'ui-widget-content ui-state-default',
+    panelClasses  = 'bio-panel-content ui-widget-content',
+    panelItemClasses = 'bio-panel-item ui-widget-content',
     statusClasses = 'ui-state-default ui-widget-content statusbar',
     footerClasses = 'bio-footer ui-widget-header ui-state-default',
     defaultIcon   = 'ui-icon-circle-triangle-e';
@@ -100,10 +100,8 @@ $.widget("bio.panel", {
             this[i].outerHeight(stretch * this.stretch_factors[i] / total);
         }
     },
-    _add_to_panel: function($item){
-        $item.addClass(panelItemClasses);
-        this.panel.append($item);
-        return $item;
+    _panel_item: function(i){
+        return (i || $('<div>')).addClass(panelItemClasses);
     }
 });
 

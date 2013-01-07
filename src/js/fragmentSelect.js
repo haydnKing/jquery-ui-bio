@@ -49,7 +49,9 @@ $.widget("bio.fragmentSelect", $.bio.panel, {
 
         this.timeout = null;
 
-        var searchbar = self._add_to_panel($('<div>').addClass('searchbar'));
+        var searchbar = self._panel_item()
+            .addClass('searchbar')
+            .appendTo(this.panel);
         
         this.search = $('<div>')
             .search({
@@ -60,7 +62,9 @@ $.widget("bio.fragmentSelect", $.bio.panel, {
             })
             .appendTo(searchbar);
         
-        this.list = self._add_to_panel($('<div>').addClass('list'));
+        this.list = this._panel_item()
+            .addClass('list')
+            .appendTo(this.panel);
 
         //copy any initial fragments
         var ul = this.ul = el.find('ul');
