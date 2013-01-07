@@ -1,29 +1,19 @@
 /*! jQuery Ui Bio - v0.1.0 - 2013-01-07
 * https://github.com/Gibthon/jquery-ui-bio
 * Copyright (c) 2013 Haydn King; Licensed MIT, GPL */
-.bio-sequence-view > .bio-panel-content > .bio-overview {
+.bio-sequence-view > .bio-panel-content .bio-overview {
   border-color: inherit;
   border-style: inherit;
   border-width: 1px 0;
   position: relative;
 }
-.bio-sequence-view > .bio-panel-content > .bio-overview > .bio-view {
-  border-color: inherit;
-  border-style: inherit;
-  border-width: 1px;
-  position: absolute;
-  top: -0.5em;
-  bottom: -0.5em;
-  left: 20%;
-  right: 60%;
-}
-.bio-sequence-view > .bio-panel-content > .bio-zoomview {
+.bio-sequence-view > .bio-panel-content .bio-zoomview {
   border-color: inherit;
   border-style: inherit;
   border-width: 1px 0 0 0;
   position: relative;
 }
-.bio-sequence-view > .bio-panel-content > .bio-zoomview > .bio-slidearrow {
+.bio-sequence-view > .bio-panel-content .bio-zoomview > .bio-slidearrow {
   position: absolute;
   width: 32px;
   top: 0;
@@ -32,17 +22,17 @@
   border: none;
   cursor: pointer;
 }
-.bio-sequence-view > .bio-panel-content > .bio-zoomview > .bio-slidearrow > .ui-icon {
+.bio-sequence-view > .bio-panel-content .bio-zoomview > .bio-slidearrow > .ui-icon {
   position: absolute;
   top: 50%;
   left: 50%;
   margin-top: -8px;
   margin-left: -8px;
 }
-.bio-sequence-view > .bio-panel-content > .bio-zoomview > .bio-slideleft {
+.bio-sequence-view > .bio-panel-content .bio-zoomview > .bio-slideleft {
   left: 0;
 }
-.bio-sequence-view > .bio-panel-content > .bio-zoomview > .bio-slideright {
+.bio-sequence-view > .bio-panel-content .bio-zoomview > .bio-slideright {
   right: 0;
 }
 .bio-meta {

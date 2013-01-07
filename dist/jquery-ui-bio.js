@@ -1505,7 +1505,6 @@ var baseClasses = 'bio-sequence-view ui-widget',
     nameClass = 'bio-name',
     descClass = 'bio-desc',
     overviewClass = 'bio-overview',
-    viewClass = 'bio-view',
     spacerClass = 'bio-spacer',
     zoomClass = 'bio-zoomview',
     arrowClass = 'bio-slidearrow ui-widget-header',
@@ -1517,7 +1516,7 @@ $.widget("bio.sequenceView", $.bio.panel, {
         title: undefined,
         help: undefined,
         text: {
-            defaultTitle: 'Fragment View',
+            defaultTitle: 'Sequence View',
             defaultHelp: 'Drag to scroll around in the fragment',
             defaultStatus: 'No fragment loaded'
         },
@@ -1529,16 +1528,24 @@ $.widget("bio.sequenceView", $.bio.panel, {
             o = this.options,
             el = this.el = $(this.element[0]).addClass(baseClasses);
 
-        //set the stretch_factors
-        this.stretch_factors = {
-            'zoomview': 5,
-            'spacer': 1,
-            'overview': 2
-        };
+        this._build_elements(); 
+
+        this._show_meta();
+        this._show_seqview();
+        
+    },
+    _init: function() {
+        this._super();
+        this.setStatus(this.options.text.defaultStatus);
+    },
+    _build_elements: function() {
+        
+        // --------------------------------------------------------------
+        // Make metadata
+        // --------------------------------------------------------------
 
         var m = this.metadata = $('<div>')
-            .addClass(metaClass)
-            .appendTo(this.panel);
+            .addClass(metaClass);
 
         this.name = $('<p>')
             .addClass(nameClass)
@@ -1548,21 +1555,24 @@ $.widget("bio.sequenceView", $.bio.panel, {
             .addClass(descClass)
             .text('Fragment Description')
             .appendTo(m);
+        
+        // --------------------------------------------------------------
+        // Make seqview
+        // --------------------------------------------------------------
+
+        this.seqview = $('<div>');
 
         this.overview = $('<div>')
             .addClass(overviewClass)
-            .appendTo(this.panel);
-        this.viewpane = $('<div>')
-            .addClass(viewClass)
-            .appendTo(this.overview);
+            .appendTo(this.seqview);
 
         this.spacer = $('<div>')
             .addClass(spacerClass)
-            .appendTo(this.panel);
+            .appendTo(this.seqview);
 
         var zv = this.zoomview = $('<div>')
             .addClass(zoomClass)
-            .appendTo(this.panel);
+            .appendTo(this.seqview);
 
         this.right_arrow = $('<div>')
             .addClass(arrowClass + ' ' + rightClass)
@@ -1575,7 +1585,6 @@ $.widget("bio.sequenceView", $.bio.panel, {
                 .addClass('ui-icon ui-icon-triangle-1-w'))
             .appendTo(zv);
 
-
         //Events
         this.right_arrow.add(this.left_arrow).mouseenter(function(){
             $(this).addClass('ui-state-hover');
@@ -1583,9 +1592,17 @@ $.widget("bio.sequenceView", $.bio.panel, {
             $(this).removeClass('ui-state-hover');
         });
     },
-    _init: function() {
-        this._super();
-        this.setStatus(this.options.text.defaultStatus);
+    _show_meta: function() {
+        this.panel.append(this.metadata);
+    },
+    _show_seqview: function() {
+        //set the stretch_factors
+        this.stretch_factors = {
+            'zoomview': 5,
+            'spacer': 1,
+            'overview': 2
+        };
+        this.panel.append(this.seqview);
     }
 });
 
