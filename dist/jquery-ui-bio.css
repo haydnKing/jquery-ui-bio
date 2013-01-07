@@ -237,21 +237,26 @@
   border: 0;
   overflow: auto;
 }
+.tooltip > div > div.tooltip-title {
+  text-align: center;
+  padding: 0.2em 0;
+  font-weight: bold;
+}
 .tooltip > div > p.stringContent {
   text-align: center;
 }
-.tooltip > div > .tooltip-item {
+.tooltip > div .tooltip-item {
   position: relative;
   cursor: pointer;
 }
-.tooltip > div > .tooltip-item > .tooltip-icon {
+.tooltip > div .tooltip-item > .tooltip-icon {
   position: absolute;
   width: 24px;
   top: 0;
   bottom: 0;
   left: 0;
 }
-.tooltip > div > .tooltip-item > .tooltip-icon > span {
+.tooltip > div .tooltip-item > .tooltip-icon > span {
   width: 16px;
   height: 16px;
   position: absolute;
@@ -259,13 +264,13 @@
   top: 50%;
   margin-top: -8px;
 }
-.tooltip > div > .tooltip-item > .tooltip-desc {
+.tooltip > div .tooltip-item > .tooltip-desc {
   margin-left: 24px;
 }
-.tooltip > div > .tooltip-item > .tooltip-desc > p {
+.tooltip > div .tooltip-item > .tooltip-desc > p {
   margin: 0 0.5em 0.5em;
 }
-.tooltip > div > .tooltip-item > .tooltip-desc > span {
+.tooltip > div .tooltip-item > .tooltip-desc > span {
   margin: 0.5em 0.5em 0;
   font-weight: bold;
 }

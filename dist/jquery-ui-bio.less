@@ -359,10 +359,15 @@
     & > div {
         border: 0;
         overflow: auto;
+        & > div.tooltip-title {
+            text-align: center;
+            padding: 0.2em 0;
+            font-weight: bold;
+        }
         & > p.stringContent {
             text-align: center;
         }
-        & > .tooltip-item {
+        & .tooltip-item {
             position: relative;
             cursor: pointer;
             & > .tooltip-icon {

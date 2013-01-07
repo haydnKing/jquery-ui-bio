@@ -28,11 +28,22 @@ $.widget("bio.tooltip", {
          * first one it finds
          *  - 'tip' property on DOM element
          *  - content option
-         *      + string text
-         *      + jquery object
          *      + function(event): returns jquery object
+         *      + string text
+         *      + array of items for a drop-down select. Item props
+         *          - title: the title
+         *          - [sub]: optional subtitle
+         *          - [iconClass]: optional css class to apply to the icon
+         *              e.g. ui-icon-close etc.
+         *          - [iconCSS]: optional map of CSS attributes to apply to the
+         *              icon        
+         *      + jquery object
          */
         content: null,
+        /* title: optional title for the tooltip, shown in bold at the top
+         *  function(evt) | $-object | string
+         */
+        title: null,
         extraClasses: null, //any extra CSS classes for the tooltip
         width: 100, //integer in px, or string 'x%' of target element
         color: 'default', // border color: 
@@ -176,29 +187,53 @@ $.widget("bio.tooltip", {
         }
 
         if(this.el.attr(attr) != null){
-            c = $('<p>')
-                .text(this.el.attr(attr))
-                .addClass(textC);
+            c = this._get_title()
+                    .add($('<p>')
+                        .text(this.el.attr(attr))
+                        .addClass(textC));
         }
         else if(typeof(c) === "string"){
-            c = $('<p>')
-                .text(c)
-                .addClass(textC);
+            c = this._get_title()
+                    .add($('<p>')
+                        .text(c)
+                        .addClass(textC));
         }
-        else if(Array.isArray(c)){
-            t = c;
-            c = $();
-            for(i = 0; i < t.length; i++){
-                c = c.add(this._make_item(t[i], i));
-            }             
+        else if(Array.isArray(c)) {
+            t = $();
+            for(i = 0; i < c.length; i++) {
+                t = t.add(this._make_item(c[i], i));
+            } 
+            c = this._get_title() 
+                .add($('<div>').append(t));
         }
-        else if(!(c instanceof $)){
+        else if(c instanceof $){
+            c = this._get_title().add(c);
+        }
+        else {
             throw("No content specified");
         }
         //apply the content 
         this._tooltip.children('div')
             .empty()
             .append(c);
+    },
+    _get_title: function() {
+        var t = this.options.title;
+        if($.isFunction(t)) {
+            t = t(this._evt);
+        }
+        if(t == null || t === '') {
+            return $();
+        }
+        else if(typeof(t) === 'string') {
+            return $('<div>')
+                    .addClass('tooltip-title')
+                    .append($('<span>')
+                        .text(t));
+        }
+        else {
+            throw("Unknown title type");
+        }
     },
     _set_size: function() {
         var w = this.options.width,
