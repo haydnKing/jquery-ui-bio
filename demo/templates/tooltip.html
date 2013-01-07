@@ -46,6 +46,15 @@
         left: 0;
         right: 0;
     }
+    #clickpad {
+        top: 75%;
+        margin-top: -25px;
+        width: 200px;
+        margin-left: -100px;
+        left: 50%;
+        text-align:center;
+        padding: 0.2em;
+    }
 
     #centerpad {
         left: 25%;
@@ -140,6 +149,15 @@ $(window).ready( function(){
         ui.tooltip.tooltip('hide');
         console.log('Selected '+ui.index);
     });
+
+    $('#clickpad').tooltip({color: $('#clickpad').css('background-color'),
+        click: true,
+        hover: 0,
+        autoClose: false,
+        location: 'mouse',
+        content: "And you have to click elsewhere on the page to close me"
+    });
+
 });
 </script>
 
@@ -164,6 +182,11 @@ $(window).ready( function(){
             <div id='cc' class='hover-target absolute'></div>
             <div id='cr' class='hover-target absolute'></div>
         </div>
+
+    </div>
+
+    <div id='clickpad' class='hover-target absolute'>
+        <p>You have to click on me to show the tooltip</p>
     </div>
 </div>
 

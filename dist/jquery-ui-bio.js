@@ -1,4 +1,4 @@
-/*! jQuery Ui Bio - v0.1.0 - 2013-01-06
+/*! jQuery Ui Bio - v0.1.0 - 2013-01-07
 * https://github.com/Gibthon/jquery-ui-bio
 * Copyright (c) 2013 Haydn King; Licensed MIT, GPL */
 
@@ -445,6 +445,9 @@ $.widget("bio.tooltip", {
         this._visible = false;
         this._enabled = true;
         this._timeout = null;
+        this._hidefn = function(){
+            self.hide();
+        };
     },
     _init: function(){
         this._bind_events();
@@ -467,8 +470,13 @@ $.widget("bio.tooltip", {
             self._trigger('show');
         });
         this._visible = true;
+        //hide if there's another click anywhere
+        $(document).one('click', function(){
+            $(document).on('click', self._hidefn);
+        });
     },
     hide: function() {
+        $(document).off('click', this._hidefn);
         if(!this._visible || (this._trigger('beforeHide') === false)){
             return;
         }
@@ -522,7 +530,7 @@ $.widget("bio.tooltip", {
         if(!this._enabled) {return;}
         this._evt = evt;
         if(this.options.click){
-            this.open();
+            this.show();
         }
     },
     _clear_timeout: function() {
@@ -545,6 +553,7 @@ $.widget("bio.tooltip", {
             .fadeTo(0,0)
             .mouseenter(function(e) {self._mouseenter(e);})
             .mouseleave(function(e) {self._mouseleave(e);})
+            .click(function(e) {e.stopPropagation();})//don't close
             .append($('<div>').addClass(innerC))
             .appendTo($('body'));
     },
