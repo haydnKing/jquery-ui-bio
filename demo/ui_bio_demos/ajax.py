@@ -1,6 +1,8 @@
-from django.utils import simplejson
+from django.utils import simplejson as json
 from dajaxice.decorators import dajaxice_register
 from django.http import HttpResponseNotFound
+from Bio import SeqIO
+import os.path
 
 _fragment_sets = [[
         {"name": "Fragment A", "Length": 15, 
@@ -78,6 +80,14 @@ _fragment_sets = [[
 ],
 ]
 
+files = [os.path.join(os.path.dirname(__file__), 'ecoli.gb'),
+		]
+
+meta = [{
+	'description': "Escherichia coli str. K-12 substr. MG1655, complete genome.",
+	'id': "U00096.2",
+	'name': "U00096",
+	},]
 
 @dajaxice_register
 def fragmentSelect(request, **kwargs):
@@ -87,3 +97,26 @@ def fragmentSelect(request, **kwargs):
 	else:
 		return HttpResponseNotFound()
 		
+@dajaxice_register
+def getTestMeta(request, **kwargs):
+	id = int(kwargs.get('id', 0))
+	return json.dumps(meta[id])
+
+@dajaxice_register
+def getTestFeatures(request, **kwargs):
+	id = int(kwargs.get('id', 0))
+	seq = SeqIO.read(files[id], 'genbank')
+	ret = []
+	for f in seq.features:
+		ret += {
+				'type': f.type,
+				'id': f.id,
+				'qualifiers': f.qualifiers,
+				'location': {
+					'start': int(f.location.start),
+					'end':   int(f.location.end),
+					'strand': f.location.strand,
+					}
+				}
+	return json.dumps(ret)
+
