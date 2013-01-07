@@ -11,7 +11,8 @@
 var baseClasses   = 'bio-fragment-select ui-widget',
     defaultIcon   = 'ui-icon-circle-triangle-e';
 
-var test_frag = function(f, filter){
+var test_frag = function(filter, f){
+    f = f.children(':bio-fragment');
     return filter.test(f.fragment('option','name')) || 
         filter.test(f.fragment('option','desc'));
 };
@@ -56,9 +57,14 @@ $.widget("bio.fragmentSelect", $.bio.panel, {
         this.search = $('<div>')
             .search({
                 text: {search: 'filter'},
-                change: function(){
-                    self.filter(self.search.search('value'));
-                }
+                filter: function(ev, data){
+                    self.filterStatus(data.show.length, data.hide.length);
+                },
+                filterFunc: test_frag,
+                items: function() {
+                    return self.list.find(':bio-fragment').parent();
+                },
+                anim: 200
             })
             .appendTo(searchbar);
         
@@ -161,43 +167,47 @@ $.widget("bio.fragmentSelect", $.bio.panel, {
             this.search.addClass('ui-corner-all');
         }
     },
-    filter: function(str){
-        var reg = new RegExp(str, 'i');
-        this.el.find(':bio-fragment').each( function(){
-            var f = $(this);
-            if(test_frag(f, reg)){
-                f.parent().show();
-            }
-            else{
-                f.parent().hide();
-            }
-        });
-        this.setStatus();
-    },
     showAll: function(){
         this.el.find(':bio-fragment').show();
     },
+    filterStatus: function(shown, hidden){
+        var text,
+            icon = null,
+            t = this.options.text;
+        
+        if(hidden > 0 && shown > 0) {
+            text = t.showing_filter;
+            icon = defaultIcon;
+        }           
+        else if(hidden === 0 && shown === 0) {
+            text = t.none_loaded;
+            icon = 'ui-icon-alert';
+        }
+        else if(hidden > 0 && shown === 0) {
+            text = t.none_matching;
+            icon = 'ui-icon-alert';
+        }
+        else if(hidden === 0) {text = t.showing_all;}
+
+        this.setStatus(this._get_text(text, shown+hidden, shown), icon);
+    },
     setStatus: function(text, icon) {
-        var tot = this.list.find(':bio-fragment').length;
-        var fil = this.list.find(':bio-fragment:visible').length;
+        var tot = this.list.find(':bio-fragment').length,
+            t = this.options.text;
+
         if(text == null){
-            var t = this.options.text;
-            if(tot === 0 && fil === 0) {
+            if(tot === 0) {
                 text = t.none_loaded;
                 icon = 'ui-icon-alert';
             }
-            else if(tot > 0 && fil === 0) {
-                text = t.none_matching;
-                icon = 'ui-icon-alert';
-            }
-            else if(tot === fil) {text = t.showing_all;}
-            else {text = t.showing_filter;}
+            else {text = t.showing_all;}
         }
         this.status_icon.attr('class', 'ui-icon ' + (icon || defaultIcon));
-        this.status_text.text( this._get_text(text, fil, tot));
+        this.status_text.text( this._get_text(text, tot));
     },
-    _get_text: function(str, filter, total){
+    _get_text: function(str, total, filter){
         var t = this.options.text;
+        filter = filter || 0;
         return str
             .replace('%filter', filter)
             .replace('%total', total)

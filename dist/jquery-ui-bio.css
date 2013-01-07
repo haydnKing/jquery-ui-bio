@@ -34,18 +34,19 @@
   margin-left: 1em;
   font-style: italic;
 }
-.bio-search {
+.ui-widget.bio-search {
   position: relative;
   height: 1.3em;
+  margin: 0;
 }
-.bio-search > div {
+.ui-widget.bio-search > div {
   position: absolute;
   top: 0;
   left: 16px;
   right: 16px;
   bottom: 0;
 }
-.bio-search > div > input {
+.ui-widget.bio-search > div > input {
   height: 100%;
   width: 100%;
   border: none;
@@ -53,25 +54,26 @@
   position: absolute;
   padding: 0 16px;
   margin: 0 -16px;
+  color: inherit;
 }
-.bio-search > .hint {
+.ui-widget.bio-search > .hint {
   font-style: italic;
   cursor: text;
 }
-.bio-search > .ui-icon {
+.ui-widget.bio-search > .ui-icon {
   position: absolute;
   margin-top: -8px;
   top: 50%;
 }
-.bio-search > .ui-icon-search {
+.ui-widget.bio-search > .ui-icon-search {
   left: 0;
 }
-.bio-search > .ui-icon-close {
+.ui-widget.bio-search > .ui-icon-close {
   right: 0;
   cursor: pointer;
   opacity: 0.6;
 }
-.bio-search > .ui-icon-close:hover {
+.ui-widget.bio-search > .ui-icon-close:hover {
   opacity: 1.0;
 }
 .bio-fragment {
