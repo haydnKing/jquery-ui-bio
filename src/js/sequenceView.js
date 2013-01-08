@@ -41,7 +41,7 @@ $.widget("bio.sequenceView", $.bio.panel, {
 
         this._show_meta();
         this._show_loader();
-        
+
     },
     _init: function() {
         this._super();
