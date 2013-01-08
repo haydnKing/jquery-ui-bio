@@ -12,7 +12,6 @@ var baseClasses = 'ui-widget bio-panel',
     headerClasses = 'ui-widget-header ui-state-default',
     panelClasses  = 'bio-panel-content ui-widget-content',
     panelItemClasses = 'bio-panel-item ui-widget-content',
-    statusClasses = 'ui-state-default ui-widget-content statusbar',
     footerClasses = 'bio-footer ui-widget-header ui-state-default',
     defaultIcon   = 'ui-icon-circle-triangle-e';
 
@@ -37,10 +36,18 @@ $.widget("bio.panel", {
         o.help = o.help || o.text.defaultHelp;
         o.color = o.color || next_color();
 
-        var head = this.head = $('<div>').addClass(headerClasses).appendTo(el);
-        var panel = this.panel = $('<div>').addClass(panelClasses).appendTo(el);
-        var s = this.status_bar = $('<div>').addClass(statusClasses).appendTo(el);
-        var foot = this.foot = $('<div>').addClass(footerClasses).appendTo(el);
+        var head = this.head = $('<div>')
+            .addClass(headerClasses)
+            .appendTo(el);
+        var panel = this.panel = $('<div>')
+            .addClass(panelClasses)
+            .appendTo(el);
+        var s = this.status = $('<div>')
+            .statusBar()
+            .appendTo(el);
+        var foot = this.foot = $('<div>')
+            .addClass(footerClasses)
+            .appendTo(el);
         
         //define how items should scale with height
         this.stretch_factors = {'panel': 1};
@@ -50,8 +57,6 @@ $.widget("bio.panel", {
             helphtml: o.help
         });
 
-        this.status_icon = $('<span>').addClass('ui-icon').appendTo(s);
-        this.status_text = $('<p>').appendTo(s);
         if(!o.showStatus){
             s.hide();
         }
@@ -81,10 +86,6 @@ $.widget("bio.panel", {
                 break;
         }
         this.options[key] = value;
-    },
-    setStatus: function(text, icon) {
-        this.status_icon.attr('class', 'ui-icon ' + (icon || defaultIcon));
-        this.status_text.text(text || this.options.text.defaultStatus);
     },
     _set_height: function(){
         var stretch = 0, total = 0;

@@ -1,6 +1,28 @@
 /*! jQuery Ui Bio - v0.1.0 - 2013-01-08
 * https://github.com/Gibthon/jquery-ui-bio
 * Copyright (c) 2013 Haydn King; Licensed MIT, GPL */
+.bio-statusbar.ui-widget-content {
+  z-index: 5;
+  position: relative;
+  min-height: 20px;
+  text-size: 12px;
+  padding: 0.2em;
+  border-bottom: none;
+  margin: -1px 0 0;
+  -webkit-border-radius: 0px;
+  -moz-border-radius: 0px;
+  border-radius: 0px;
+}
+.bio-statusbar.ui-widget-content > .ui-icon {
+  position: absolute;
+  top: 50%;
+  margin-top: -8px;
+  left: 6px;
+}
+.bio-statusbar.ui-widget-content > p {
+  margin: 2px 35px;
+  text-indent: -10px;
+}
 .bio-zoomview > .bio-slidearrow {
   position: absolute;
   width: 32px;
@@ -206,28 +228,6 @@
   border-width: 0 0 1px 0;
   position: relative;
 }
-.bio-panel > .statusbar {
-  z-index: 5;
-  position: relative;
-  min-height: 20px;
-  text-size: 12px;
-  padding: 0.2em;
-  border-bottom: none;
-  margin: -1px 0 0;
-  -webkit-border-radius: 0px;
-  -moz-border-radius: 0px;
-  border-radius: 0px;
-}
-.bio-panel > .statusbar > .ui-icon {
-  position: absolute;
-  top: 50%;
-  margin-top: -8px;
-  left: 6px;
-}
-.bio-panel > .statusbar > p {
-  margin: 2px 35px;
-  text-indent: -10px;
-}
 .bio-panel > .bio-footer {
   height: 0.7em;
 }
@@ -235,7 +235,7 @@
   padding: 0.4em 1em;
 }
 .bio-fragment-select > .bio-panel-content .list {
-  overflow-y: auto;
+  overflow-x: hidden;
 }
 .bio-fragment-select > .bio-panel-content .list > ul {
   margin: 0.5em 0;

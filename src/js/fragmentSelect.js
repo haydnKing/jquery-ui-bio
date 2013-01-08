@@ -26,11 +26,14 @@ $.widget("bio.fragmentSelect", $.bio.panel, {
             defaultHelp: 'Drag and drop fragments to select them',
             filter: 'filter',
             loading: 'Loading fragments...',
+            loaded: 'Loaded %(total) %(fragment)',
             error: 'Error',
             none_loaded: 'No fragments are loaded',
             none_matching: 'No fragments match the filter',
-            showing_all: 'Showing %total %fragment',
-            showing_filter: 'Showing %filter of %total %fragment',
+            showing_all: 'Showing %(total) %(fragment)',
+            showing_filter: 'Showing %(filter) of %(total) %(fragment)',
+            add_fragment: 'Added fragment \'%(name)\'',
+            remove_fragment: 'Removed fragment \'%(name)\'',
             fragment: 'fragment',
             fragments: 'fragments',
             cberror: 'An error occurred'
@@ -93,13 +96,15 @@ $.widget("bio.fragmentSelect", $.bio.panel, {
             receive: function(ev, ui) {
                 var f = ui.item.find(':bio-fragment');
                 f.fragment('option', 'color', o.color);
-                self.setStatus('Added fragment "'+f.fragment('option','name')+'"',
-                              'ui-icon-circle-plus');
+                self.status.statusBar('set', o.text.add_fragment, {
+                    name: f.fragment('option', 'name')
+                }, 'add');
             },  
             remove: function(ev, ui) {
                 var f = ui.item.find(':bio-fragment');
-                self.setStatus('Removed fragment "'+f.fragment('option','name')+'"',
-                              'ui-icon-circle-minus');
+                self.status.statusBar('set', o.text.remove_fragment, {
+                    name: f.fragment('option', 'name')
+                }, 'remove');
             },
             helper: function(ev, item) {
                 return $(item)
@@ -128,7 +133,10 @@ $.widget("bio.fragmentSelect", $.bio.panel, {
                         width: w
                     });
             });
-            self.setStatus();
+            self.status.statusBar('set', o.text.loaded, {
+                total: data.length,
+                fragment: data.length === 1 ? o.text.fragment:o.text.fragments
+            }, 'ok');
             ul.animate({
                 'margin-top': 0
             }, 'fast', function() {
@@ -145,24 +153,25 @@ $.widget("bio.fragmentSelect", $.bio.panel, {
                 this.list.css('overflow', 'hidden');
                 ul.css('margin-top', this.list.height() + 'px');
                 //interpret as an url to load from
-                this.setStatus(o.text.loading, 'ui-icon-loading');
+                this.status.statusBar('set', o.text.loading, 'loading');
                 $.ajax({
                     'url': o.src,
                     'dataType': 'json',
                     'success': success,
                     'error': function(jqXHR, textStatus, errorThrown) {
-                        self.setStatus(String(errorThrown),'ui-icon-alert');
+                        self.status.statusBar('set', String(errorThrown),
+                                              'error');
                     }
                 });
             }
             else if($.isFunction(o.src)){
                 try{
                     o.src(success, function(){
-                        self.setStatus(o.text.cberror, 'ui-icon-alert');
+                        self.status.statusBar('set', o.text.cberror, 'error');
                     });
                 }
                 catch(e){
-                    self.setStatus(e.message, 'ui-icon-alert');
+                    self.status.statusBar('set', e.message, 'error');
                 }
             }
             else {
@@ -179,46 +188,31 @@ $.widget("bio.fragmentSelect", $.bio.panel, {
     },
     filterStatus: function(shown, hidden){
         var text,
-            icon = null,
+            state = '',
             t = this.options.text;
         
         if(hidden > 0 && shown > 0) {
             text = t.showing_filter;
-            icon = defaultIcon;
+            state = 'info';
         }           
         else if(hidden === 0 && shown === 0) {
             text = t.none_loaded;
-            icon = 'ui-icon-alert';
+            state = 'warning';
         }
         else if(hidden > 0 && shown === 0) {
             text = t.none_matching;
-            icon = 'ui-icon-alert';
+            state = 'warning';
         }
-        else if(hidden === 0) {text = t.showing_all;}
-
-        this.setStatus(this._get_text(text, shown+hidden, shown), icon);
-    },
-    setStatus: function(text, icon) {
-        var tot = this.list.find(':bio-fragment').length,
-            t = this.options.text;
-
-        if(text == null){
-            if(tot === 0) {
-                text = t.none_loaded;
-                icon = 'ui-icon-alert';
-            }
-            else {text = t.showing_all;}
+        else if(hidden === 0) {
+            text = t.showing_all;
+            state = 'default';
         }
-        this.status_icon.attr('class', 'ui-icon ' + (icon || defaultIcon));
-        this.status_text.text( this._get_text(text, tot));
-    },
-    _get_text: function(str, total, filter){
-        var t = this.options.text;
-        filter = filter || 0;
-        return str
-            .replace('%filter', filter)
-            .replace('%total', total)
-            .replace('%fragment', (total === 1)? t.fragment : t.fragments);
+
+        this.status.statusBar('set', text, {
+            filter: shown,
+            total: shown+hidden,
+            fragment: (shown+hidden) === 1 ? t.fragment : t.fragments
+        }, state);
     }
 });
 
