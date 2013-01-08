@@ -93,7 +93,7 @@ meta = [{
 def fragmentSelect(request, **kwargs):
 	num = kwargs.get('num')
 	if num > 0 and num <= len(_fragment_sets):
-		return simplejson.dumps(_fragment_sets[num-1])
+		return json.dumps(_fragment_sets[num-1])
 	else:
 		return HttpResponseNotFound()
 		
