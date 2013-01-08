@@ -13,6 +13,7 @@ var src_files = [   'src/js/datatypes.js',
                     'src/js/search.js',
                     'src/js/fragment.js',
                     'src/js/fragmentSelect.js',
+                    'src/js/sequenceLoader.js',
                     'src/js/sequenceView.js'
 ];
 

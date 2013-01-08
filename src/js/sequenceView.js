@@ -17,7 +17,8 @@ var baseClasses = 'bio-sequence-view ui-widget',
     zoomClass = 'bio-zoomview',
     arrowClass = 'bio-slidearrow ui-widget-header',
     leftClass = 'bio-slideleft',
-    rightClass = 'bio-slideright';
+    rightClass = 'bio-slideright',
+    loadpanelC = 'load-panel';
 
 $.widget("bio.sequenceView", $.bio.panel, {
     options: {
@@ -39,7 +40,7 @@ $.widget("bio.sequenceView", $.bio.panel, {
         this._build_elements(); 
 
         this._show_meta();
-        this._show_seqview();
+        this._show_loader();
         
     },
     _init: function() {
@@ -99,9 +100,27 @@ $.widget("bio.sequenceView", $.bio.panel, {
         }).mouseleave(function() {
             $(this).removeClass('ui-state-hover');
         });
+        
+        // --------------------------------------------------------------
+        // Make sequenceLoader
+        // --------------------------------------------------------------
+        
+        this.loader = $('<div>').sequenceLoader();
+        this.loaderpanel = this._panel_item()
+            .addClass(loadpanelC)
+            .append(this.loader);
     },
     _show_meta: function() {
         this.panel.append(this.metadata);
+    },
+    _show_loader: function() {
+        this.panel.append(this.loaderpanel);
+        this.stretch_factors = {
+            'loaderpanel': 1
+        };
+    },
+    _hide_loader: function() {
+        this.loaderpanel.remove();
     },
     _show_seqview: function() {
         //set the stretch_factors

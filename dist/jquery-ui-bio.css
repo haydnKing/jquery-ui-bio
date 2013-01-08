@@ -1,4 +1,4 @@
-/*! jQuery Ui Bio - v0.1.0 - 2013-01-07
+/*! jQuery Ui Bio - v0.1.0 - 2013-01-08
 * https://github.com/Gibthon/jquery-ui-bio
 * Copyright (c) 2013 Haydn King; Licensed MIT, GPL */
 .bio-zoomview > .bio-slidearrow {
@@ -22,6 +22,9 @@
 }
 .bio-zoomview > .bio-slidearrow.bio-slideright {
   right: 0;
+}
+.bio-sequence-view .bio-panel-item.load-panel {
+  padding: 10em 5em 5em;
 }
 .bio-meta {
   padding: 0.5em 1em;
@@ -75,6 +78,45 @@
 }
 .ui-widget.bio-search > .ui-icon-close:hover {
   opacity: 1.0;
+}
+.bio-sequence-loader {
+  position: relative;
+  margin: 0;
+  padding: 0;
+}
+.bio-sequence-loader > .loader-warnings {
+  display: none;
+  position: absolute;
+  margin: 0;
+  left: 5%;
+  right: 5%;
+  bottom: 100%;
+  border-bottom: none;
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+  -moz-border-bottom-right-radius: 0;
+  -moz-border-bottom-left-radius: 0;
+  -webkit-border-bottom-right-radius: 0;
+  -webkit-border-bottom-left-radius: 0;
+}
+.bio-sequence-loader > .loader-warnings > .ui-widget-header {
+  border: none;
+  padding: 0.3em;
+}
+.bio-sequence-loader > .loader-warnings > .ui-widget-header > .warning-title {
+  margin-left: 2em;
+}
+.bio-sequence-loader > .loader-warnings > .ui-widget-header > .ui-icon {
+  float: right;
+  cursor: pointer;
+}
+.bio-sequence-loader > .loader-warnings > ul {
+  border: none;
+  list-style-type: none;
+  padding: 0.5em 5%;
+}
+.bio-sequence-loader > .loader-warnings > ul li {
+  margin: 0.3em 0;
 }
 .bio-fragment.ui-widget {
   position: relative;
