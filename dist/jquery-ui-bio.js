@@ -1038,15 +1038,19 @@ $.widget("bio.panel", {
     setStatus: function(msg, filter, state){
         this.status.statusBar('set', msg, filter, state);
     },
-    _set_height: function(){
+    _refresh: function(){
+        this._set_height();
+    },
+    _set_height: function(height){
         var stretch = 0, total = 0;
+        height = height || this.options.height;
         for(var i in this.stretch_factors)
         {
             total += this.stretch_factors[i];
             stretch += this[i].outerHeight();
         }
         var fixed = this.el.outerHeight() - stretch;
-        stretch = Math.max(0, this.options.height - fixed);
+        stretch = Math.max(0, height - fixed);
         for(i in this.stretch_factors)
         {
             this[i].outerHeight(stretch * this.stretch_factors[i] / total);
@@ -1642,7 +1646,6 @@ var baseC       = 'bio-sequence-loader ui-widget',
     headerC     = 'ui-widget-header',
     wtitleC     = 'warning-title',
     closeC      = 'ui-icon ui-icon-close',
-    closeHoverC = 'ui-state-hover',
     listC       = 'ui-widget-content';
 
 var hasXHR2 = function() {
@@ -1697,12 +1700,6 @@ $.widget("bio.sequenceLoader", {
                     .addClass(closeC)
                     .click(function() {
                         self._hide_warnings();
-                    })
-                    .mouseenter(function() {
-                        self.addClass(closeHoverC);
-                    })
-                    .mouseleave(function() {
-                        self.removeClass(closeHoverC);
                     })))
             .append($('<ul>')
                 .addClass(listC)
@@ -1775,7 +1772,7 @@ $.widget("bio.sequenceView", $.bio.panel, {
 
         this._show_meta();
         this._show_loader();
-        
+
     },
     _init: function() {
         this._super();
@@ -1852,6 +1849,7 @@ $.widget("bio.sequenceView", $.bio.panel, {
         this.stretch_factors = {
             'loaderpanel': 1
         };
+        this._refresh();
     },
     _hide_loader: function() {
         this.loaderpanel.remove();
@@ -1864,6 +1862,7 @@ $.widget("bio.sequenceView", $.bio.panel, {
             'overview': 2
         };
         this.panel.append(this.seqview);
+        this._refresh();
     }
 });
 

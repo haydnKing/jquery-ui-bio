@@ -118,6 +118,7 @@ $.widget("bio.sequenceView", $.bio.panel, {
         this.stretch_factors = {
             'loaderpanel': 1
         };
+        this._refresh();
     },
     _hide_loader: function() {
         this.loaderpanel.remove();
@@ -130,6 +131,7 @@ $.widget("bio.sequenceView", $.bio.panel, {
             'overview': 2
         };
         this.panel.append(this.seqview);
+        this._refresh();
     }
 });
 

@@ -90,15 +90,19 @@ $.widget("bio.panel", {
     setStatus: function(msg, filter, state){
         this.status.statusBar('set', msg, filter, state);
     },
-    _set_height: function(){
+    _refresh: function(){
+        this._set_height();
+    },
+    _set_height: function(height){
         var stretch = 0, total = 0;
+        height = height || this.options.height;
         for(var i in this.stretch_factors)
         {
             total += this.stretch_factors[i];
             stretch += this[i].outerHeight();
         }
         var fixed = this.el.outerHeight() - stretch;
-        stretch = Math.max(0, this.options.height - fixed);
+        stretch = Math.max(0, height - fixed);
         for(i in this.stretch_factors)
         {
             this[i].outerHeight(stretch * this.stretch_factors[i] / total);

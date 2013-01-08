@@ -13,7 +13,6 @@ var baseC       = 'bio-sequence-loader ui-widget',
     headerC     = 'ui-widget-header',
     wtitleC     = 'warning-title',
     closeC      = 'ui-icon ui-icon-close',
-    closeHoverC = 'ui-state-hover',
     listC       = 'ui-widget-content';
 
 var hasXHR2 = function() {
@@ -68,12 +67,6 @@ $.widget("bio.sequenceLoader", {
                     .addClass(closeC)
                     .click(function() {
                         self._hide_warnings();
-                    })
-                    .mouseenter(function() {
-                        self.addClass(closeHoverC);
-                    })
-                    .mouseleave(function() {
-                        self.removeClass(closeHoverC);
                     })))
             .append($('<ul>')
                 .addClass(listC)

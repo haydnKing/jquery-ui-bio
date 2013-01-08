@@ -132,6 +132,9 @@
   float: right;
   cursor: pointer;
 }
+.bio-sequence-loader > .loader-warnings > .ui-widget-header > .ui-icon:hover {
+  opacity: 0.8;
+}
 .bio-sequence-loader > .loader-warnings > ul {
   border: none;
   list-style-type: none;
