@@ -1,0 +1,42 @@
+.bio-sequence-loader {
+    position: relative;
+    margin: 0;
+    padding: 0;
+    & > .loader-warnings {
+        display:none;
+        position: absolute;
+        margin: 0;
+        left: 5%;
+        right: 5%;
+        bottom: 100%;
+        border-bottom: none;
+        border-bottom-right-radius: 0;
+        border-bottom-left-radius: 0;
+        -moz-border-bottom-right-radius: 0;
+        -moz-border-bottom-left-radius: 0;
+        -webkit-border-bottom-right-radius: 0;
+        -webkit-border-bottom-left-radius: 0;
+        & > .ui-widget-header {
+            border: none;
+            padding: 0.3em;
+            & > .warning-title {
+                margin-left: 2em;
+            }
+            & > .ui-icon {
+                float: right;
+                cursor: pointer;
+            }
+        }
+        & > ul {
+            border: none;
+            list-style-type: none;
+            padding: 0.5em 5%;
+            & li {
+                margin: 0.3em 0;
+            }
+        }
+    }
+}
+
+            
+        
