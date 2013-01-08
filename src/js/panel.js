@@ -87,6 +87,9 @@ $.widget("bio.panel", {
         }
         this.options[key] = value;
     },
+    setStatus: function(msg, filter, state){
+        this.status.statusBar('set', msg, filter, state);
+    },
     _set_height: function(){
         var stretch = 0, total = 0;
         for(var i in this.stretch_factors)

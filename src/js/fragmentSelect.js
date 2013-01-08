@@ -96,13 +96,13 @@ $.widget("bio.fragmentSelect", $.bio.panel, {
             receive: function(ev, ui) {
                 var f = ui.item.find(':bio-fragment');
                 f.fragment('option', 'color', o.color);
-                self.status.statusBar('set', o.text.add_fragment, {
+                self.setStatus( o.text.add_fragment, {
                     name: f.fragment('option', 'name')
                 }, 'add');
             },  
             remove: function(ev, ui) {
                 var f = ui.item.find(':bio-fragment');
-                self.status.statusBar('set', o.text.remove_fragment, {
+                self.setStatus( o.text.remove_fragment, {
                     name: f.fragment('option', 'name')
                 }, 'remove');
             },
@@ -133,7 +133,7 @@ $.widget("bio.fragmentSelect", $.bio.panel, {
                         width: w
                     });
             });
-            self.status.statusBar('set', o.text.loaded, {
+            self.setStatus( o.text.loaded, {
                 total: data.length,
                 fragment: data.length === 1 ? o.text.fragment:o.text.fragments
             }, 'ok');
@@ -153,13 +153,13 @@ $.widget("bio.fragmentSelect", $.bio.panel, {
                 this.list.css('overflow', 'hidden');
                 ul.css('margin-top', this.list.height() + 'px');
                 //interpret as an url to load from
-                this.status.statusBar('set', o.text.loading, 'loading');
+                this.setStatus( o.text.loading, 'loading');
                 $.ajax({
                     'url': o.src,
                     'dataType': 'json',
                     'success': success,
                     'error': function(jqXHR, textStatus, errorThrown) {
-                        self.status.statusBar('set', String(errorThrown),
+                        self.setStatus( String(errorThrown),
                                               'error');
                     }
                 });
@@ -167,11 +167,11 @@ $.widget("bio.fragmentSelect", $.bio.panel, {
             else if($.isFunction(o.src)){
                 try{
                     o.src(success, function(){
-                        self.status.statusBar('set', o.text.cberror, 'error');
+                        self.setStatus( o.text.cberror, 'error');
                     });
                 }
                 catch(e){
-                    self.status.statusBar('set', e.message, 'error');
+                    self.setStatus( e.message, 'error');
                 }
             }
             else {
@@ -208,7 +208,7 @@ $.widget("bio.fragmentSelect", $.bio.panel, {
             state = 'default';
         }
 
-        this.status.statusBar('set', text, {
+        this.setStatus( text, {
             filter: shown,
             total: shown+hidden,
             fragment: (shown+hidden) === 1 ? t.fragment : t.fragments
