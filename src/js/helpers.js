@@ -69,9 +69,16 @@ this.bio = this.bio || {};
             };
         }
 
-        xhr.onprogress = function(p){
-            fire_evt('progress', p);
-        };
+        $(xhr).on('progress', function(e){
+            var oe = e.originalEvent;
+            // Make sure the progress event properties get copied over:
+            e.lengthComputable = oe.lengthComputable;
+            e.loaded = oe.loaded;
+            e.total = oe.total;
+            if(e.lengthComputable) {
+                fire_evt('progress', e);
+            }
+        });
 
     };
 }(jQuery));

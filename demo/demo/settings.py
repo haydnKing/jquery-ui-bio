@@ -102,6 +102,7 @@ TEMPLATE_PROCESSORS = ("django.contrib.auth.context_processors.auth",
 
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
+		'django.middleware.http.ConditionalGetMiddleware',
     #'django.contrib.sessions.middleware.SessionMiddleware',
     #'django.middleware.csrf.CsrfViewMiddleware',
     #'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -165,3 +166,5 @@ LOGGING = {
         },
     }
 }
+
+DAJAXICE_XMLHTTPREQUEST_JS_IMPORT = False

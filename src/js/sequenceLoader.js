@@ -61,7 +61,7 @@ $.widget("bio.sequenceLoader", {
                 self._trigger('error', ev, data);
             })
             .on('progress', function(ev, data){
-                self._update(data.done, data.total, 0);
+                self._update(data.loaded, data.total, 0);
             });
         
         if(o.auto_start){
@@ -75,12 +75,10 @@ $.widget("bio.sequenceLoader", {
 
     },
     start: function() {
-        console.log('sequenceLoader.start');
         var self = this,
             o = this.options;
         bio.read_data(function(data) {self._got_data(data);},
             o.features, o.post_data, this.el);
-        console.log('this._trigger(\'start\');');
         this._trigger('start');
     },
     _build_elements: function() {
@@ -129,8 +127,8 @@ $.widget("bio.sequenceLoader", {
                                       50.0 * state + 50.0 * (done / total));
         }
         this._trigger('update', null, {
-            'state': this.options.states[state],
-            'done': done,
+            'state': this.options.text.states[state],
+            'loaded': done,
             'total': total
         });
     }

@@ -20,6 +20,8 @@ var baseClasses = 'bio-sequence-view ui-widget',
     rightClass = 'bio-slideright',
     loadpanelC = 'load-panel';
 
+var names = ['B', 'kB', 'MB', 'GB', 'PB'];
+
 $.widget("bio.sequenceView", $.bio.panel, {
     options: {
         title: undefined,
@@ -168,11 +170,13 @@ $.widget("bio.sequenceView", $.bio.panel, {
                 self.setStatus(t.featureError, data, 'error');
             })
             .on('sequenceloaderupdate', function(ev, data) {
-                self.setStatus(t.loading_status, data, 'loading');
+                self.setStatus(t.loading_status, {
+                    status: data.status,
+                    loaded: self._readable(data.loaded),
+                    total: self._readable(data.total)
+                }, 'loading');
             })
             .on('sequenceloaderstart', function(ev) {
-                console.log('caught sequenceloaderstart');
-                console.log('self.setStatus('+t.download_start+', \'loading\');');
                 self.setStatus(t.download_start, 'loading');
             });
     },
@@ -189,6 +193,19 @@ $.widget("bio.sequenceView", $.bio.panel, {
         };
         this.panel.append(this.seqview);
         this._refresh();
+    },
+    _readable: function(bytes) {
+        console.log('_readable('+bytes+')');
+        var i = 0;
+        for(;i < names.length; i++)
+        {
+            if((bytes / Math.pow(1024.0, i+1)) < 1.0) {
+                break;
+            }
+        }
+
+        return (parseFloat(bytes) / Math.pow(1024.0, i)).toFixed(2) + 
+            ' ' + names[i];
     }
 });
 

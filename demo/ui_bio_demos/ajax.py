@@ -89,6 +89,27 @@ meta = [{
 	'name': "U00096",
 	},]
 
+def load_features():
+	ret = []
+	for f in files:
+		seq = SeqIO.read(f, 'genbank')
+		feats = []
+		for f in seq.features:
+			feats += {
+					'type': f.type,
+					'id': f.id,
+					'qualifiers': f.qualifiers,
+					'location': {
+						'start': int(f.location.start),
+						'end':   int(f.location.end),
+						'strand': f.location.strand,
+						}
+					}
+		ret.append(feats)
+	return ret
+
+features = load_features()
+
 @dajaxice_register
 def fragmentSelect(request, **kwargs):
 	num = kwargs.get('num')
@@ -105,18 +126,4 @@ def getTestMeta(request, **kwargs):
 @dajaxice_register
 def getTestFeatures(request, **kwargs):
 	id = int(kwargs.get('id', 0))
-	seq = SeqIO.read(files[id], 'genbank')
-	ret = []
-	for f in seq.features:
-		ret += {
-				'type': f.type,
-				'id': f.id,
-				'qualifiers': f.qualifiers,
-				'location': {
-					'start': int(f.location.start),
-					'end':   int(f.location.end),
-					'strand': f.location.strand,
-					}
-				}
-	return json.dumps(ret)
-
+	return json.dumps(features[id])

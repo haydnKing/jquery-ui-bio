@@ -459,9 +459,16 @@ this.bio = this.bio || {};
             };
         }
 
-        xhr.onprogress = function(p){
-            fire_evt('progress', p);
-        };
+        $(xhr).on('progress', function(e){
+            var oe = e.originalEvent;
+            // Make sure the progress event properties get copied over:
+            e.lengthComputable = oe.lengthComputable;
+            e.loaded = oe.loaded;
+            e.total = oe.total;
+            if(e.lengthComputable) {
+                fire_evt('progress', e);
+            }
+        });
 
     };
 }(jQuery));
@@ -1765,7 +1772,7 @@ $.widget("bio.sequenceLoader", {
                 self._trigger('error', ev, data);
             })
             .on('progress', function(ev, data){
-                self._update(data.done, data.total, 0);
+                self._update(data.loaded, data.total, 0);
             });
         
         if(o.auto_start){
@@ -1779,12 +1786,10 @@ $.widget("bio.sequenceLoader", {
 
     },
     start: function() {
-        console.log('sequenceLoader.start');
         var self = this,
             o = this.options;
         bio.read_data(function(data) {self._got_data(data);},
             o.features, o.post_data, this.el);
-        console.log('this._trigger(\'start\');');
         this._trigger('start');
     },
     _build_elements: function() {
@@ -1833,8 +1838,8 @@ $.widget("bio.sequenceLoader", {
                                       50.0 * state + 50.0 * (done / total));
         }
         this._trigger('update', null, {
-            'state': this.options.states[state],
-            'done': done,
+            'state': this.options.text.states[state],
+            'loaded': done,
             'total': total
         });
     }
@@ -1857,6 +1862,8 @@ var baseClasses = 'bio-sequence-view ui-widget',
     leftClass = 'bio-slideleft',
     rightClass = 'bio-slideright',
     loadpanelC = 'load-panel';
+
+var names = ['B', 'kB', 'MB', 'GB', 'PB'];
 
 $.widget("bio.sequenceView", $.bio.panel, {
     options: {
@@ -2006,11 +2013,13 @@ $.widget("bio.sequenceView", $.bio.panel, {
                 self.setStatus(t.featureError, data, 'error');
             })
             .on('sequenceloaderupdate', function(ev, data) {
-                self.setStatus(t.loading_status, data, 'loading');
+                self.setStatus(t.loading_status, {
+                    status: data.status,
+                    loaded: self._readable(data.loaded),
+                    total: self._readable(data.total)
+                }, 'loading');
             })
             .on('sequenceloaderstart', function(ev) {
-                console.log('caught sequenceloaderstart');
-                console.log('self.setStatus('+t.download_start+', \'loading\');');
                 self.setStatus(t.download_start, 'loading');
             });
     },
@@ -2027,6 +2036,19 @@ $.widget("bio.sequenceView", $.bio.panel, {
         };
         this.panel.append(this.seqview);
         this._refresh();
+    },
+    _readable: function(bytes) {
+        console.log('_readable('+bytes+')');
+        var i = 0;
+        for(;i < names.length; i++)
+        {
+            if((bytes / Math.pow(1024.0, i+1)) < 1.0) {
+                break;
+            }
+        }
+
+        return (parseFloat(bytes) / Math.pow(1024.0, i)).toFixed(2) + 
+            ' ' + names[i];
     }
 });
 
