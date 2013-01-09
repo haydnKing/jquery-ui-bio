@@ -2,11 +2,15 @@
 * https://github.com/Gibthon/jquery-ui-bio
 * Copyright (c) 2013 Haydn King; Licensed MIT, GPL */
 
-/*global bio:false */
+/*global bio:false, */
 
 this.bio = this.bio || {};
 
-(function() {
+(function($) {
+
+    //get the script location
+    var worker_src = $('script').last().attr('src')
+        .replace(/\w+\.js$/, 'jquery-ui-bio-worker.js');
 
     /**#######################################################################
      * FeatureLocation
@@ -263,9 +267,17 @@ this.bio = this.bio || {};
             this.tile_size = parseInt(s,10);
         }
         this.length = l;
+        if(this.length == null){
+            throw('Error: sequence length must be specified');
+        }
+        console.log('tiles: length / tile_size = '+this.length+' / '+
+                    this.tile_size+' =  '+(this.length / this.tile_size));
 
+        console.log('types');
         this._calc_types();
+        console.log('tracks');
         this._calc_tracks();
+        console.log('tiles');
         this._calc_tiles();
     };
 
@@ -385,7 +397,7 @@ this.bio = this.bio || {};
             //add the feature to each tile in [first, last]
             for(t = first; t <= last; t++)
             {
-                this.tiles[t][f.type].push(f);
+                this.tiles[t][f.type.toLowerCase()].push(f);
             }
         }
     };
@@ -393,7 +405,7 @@ this.bio = this.bio || {};
     //Export to namespace
     bio.FeatureStore = FeatureStore;
 
-}());
+}(jQuery));
 
 this.bio = this.bio || {};
 
@@ -1740,6 +1752,7 @@ var hasWebWorker = function() {
 
 $.widget("bio.sequenceLoader", {
     options: {
+        seq_length: null,
         features: null,
         post_data: null,
         auto_start: false,
@@ -1750,7 +1763,6 @@ $.widget("bio.sequenceLoader", {
             warnNoWebWorkers: 'Warning: Your browser does not appear to ' +
                 'support webWorkers. The browser may freeze during loading '+
                 '- please consider updating your browser.',
-            states: ['Downloading', 'Processing'],
             warnings: 'Warnings'
         }
     },
@@ -1785,13 +1797,28 @@ $.widget("bio.sequenceLoader", {
         
     },
     _got_data: function(data) {
+        var self = this;
+
         this._trigger('downloaded');
         this.progress.progressbar('value', 50);
 
+        var features = bio.loadSeqFeature(data);
+        this._update(0, features.length, 1);
+
+        setTimeout(function(){
+            self._process(features);
+        }, 100);
     },
-    start: function() {
+    _process: function(features)
+    {
+        this.fs = new bio.FeatureStore(features, 
+                                       this.length || this.options.seq_length);
+        this._update(features.length, features.length, 1);
+    },
+    start: function(length) {
         var self = this,
             o = this.options;
+        this.length = length;
         bio.read_data(function(data) {self._got_data(data);},
             o.features, o.post_data, this.el);
         this._trigger('start');
@@ -1841,8 +1868,7 @@ $.widget("bio.sequenceLoader", {
             this.progress.progressbar('value',
                                       50.0 * state + 50.0 * (done / total));
         }
-        this._trigger('update', null, {
-            'state': this.options.text.states[state],
+        this._trigger(state === 0 ? 'download' : 'process', null, {
             'loaded': done,
             'total': total
         });
@@ -1896,7 +1922,8 @@ $.widget("bio.sequenceView", $.bio.panel, {
             defaultStatus: 'No fragment loaded',
             metaError: 'Error fetching metadata: %(message)',
             featureError: 'Error fetching features: %(message)',
-            loading_status: '%(state) Features: %(loaded) of %(total)',
+            download_status: 'Downloading Features: %(loaded) of %(total)',
+            process_status: 'Processing Features: %(loaded) of %(total)',
             download_start: 'Downloading Features...'
         },
         height: 400
@@ -1918,7 +1945,6 @@ $.widget("bio.sequenceView", $.bio.panel, {
         this._super();
         var self = this,
             o = this.options;
-        this.loader.sequenceLoader('start');
 
         this.el.on('metadata.error', function(ev, data){
             self.setStatus(o.text.metaError, data, 'error');
@@ -1926,12 +1952,12 @@ $.widget("bio.sequenceView", $.bio.panel, {
 
         bio.read_data(function(data){
             self._update_meta(data);
+            self.loader.sequenceLoader('start', self.meta.length);
         }, o.metadata, o.post_data, this.el, 'metadata');
     },
     _update_meta: function(data) {
         this.name.text(data.name);
         this.desc.text(data.description);
-        this.length = data.length;
         this.meta = data;
         this._refresh();
     },
@@ -2016,12 +2042,14 @@ $.widget("bio.sequenceView", $.bio.panel, {
             .on('sequenceloadererror', function(ev, data) {
                 self.setStatus(t.featureError, data, 'error');
             })
-            .on('sequenceloaderupdate', function(ev, data) {
-                self.setStatus(t.loading_status, {
-                    state: data.state,
+            .on('sequenceloaderdownload', function(ev, data) {
+                self.setStatus(t.download_status, {
                     loaded: self._readable(data.loaded),
                     total: self._readable(data.total)
                 }, 'loading');
+            })
+            .on('sequenceloaderprocess', function(ev, data) {
+                self.setStatus(t.process_status, data, 'loading');
             })
             .on('sequenceloaderstart', function(ev) {
                 self.setStatus(t.download_start, 'loading');

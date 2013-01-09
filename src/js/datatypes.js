@@ -5,11 +5,15 @@
  * Copyright (c) 2012 Gibthon Developers
  * Licensed under the MIT, GPL licenses.
  */
-/*global bio:false */
+/*global bio:false, */
 
 this.bio = this.bio || {};
 
-(function() {
+(function($) {
+
+    //get the script location
+    var worker_src = $('script').last().attr('src')
+        .replace(/\w+\.js$/, 'jquery-ui-bio-worker.js');
 
     /**#######################################################################
      * FeatureLocation
@@ -266,9 +270,17 @@ this.bio = this.bio || {};
             this.tile_size = parseInt(s,10);
         }
         this.length = l;
+        if(this.length == null){
+            throw('Error: sequence length must be specified');
+        }
+        console.log('tiles: length / tile_size = '+this.length+' / '+
+                    this.tile_size+' =  '+(this.length / this.tile_size));
 
+        console.log('types');
         this._calc_types();
+        console.log('tracks');
         this._calc_tracks();
+        console.log('tiles');
         this._calc_tiles();
     };
 
@@ -388,7 +400,7 @@ this.bio = this.bio || {};
             //add the feature to each tile in [first, last]
             for(t = first; t <= last; t++)
             {
-                this.tiles[t][f.type].push(f);
+                this.tiles[t][f.type.toLowerCase()].push(f);
             }
         }
     };
@@ -396,4 +408,4 @@ this.bio = this.bio || {};
     //Export to namespace
     bio.FeatureStore = FeatureStore;
 
-}());
+}(jQuery));

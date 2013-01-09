@@ -25,6 +25,7 @@ var hasWebWorker = function() {
 
 $.widget("bio.sequenceLoader", {
     options: {
+        seq_length: null,
         features: null,
         post_data: null,
         auto_start: false,
@@ -35,7 +36,6 @@ $.widget("bio.sequenceLoader", {
             warnNoWebWorkers: 'Warning: Your browser does not appear to ' +
                 'support webWorkers. The browser may freeze during loading '+
                 '- please consider updating your browser.',
-            states: ['Downloading', 'Processing'],
             warnings: 'Warnings'
         }
     },
@@ -70,13 +70,28 @@ $.widget("bio.sequenceLoader", {
         
     },
     _got_data: function(data) {
+        var self = this;
+
         this._trigger('downloaded');
         this.progress.progressbar('value', 50);
 
+        var features = bio.loadSeqFeature(data);
+        this._update(0, features.length, 1);
+
+        setTimeout(function(){
+            self._process(features);
+        }, 100);
     },
-    start: function() {
+    _process: function(features)
+    {
+        this.fs = new bio.FeatureStore(features, 
+                                       this.length || this.options.seq_length);
+        this._update(features.length, features.length, 1);
+    },
+    start: function(length) {
         var self = this,
             o = this.options;
+        this.length = length;
         bio.read_data(function(data) {self._got_data(data);},
             o.features, o.post_data, this.el);
         this._trigger('start');
@@ -126,8 +141,7 @@ $.widget("bio.sequenceLoader", {
             this.progress.progressbar('value',
                                       50.0 * state + 50.0 * (done / total));
         }
-        this._trigger('update', null, {
-            'state': this.options.text.states[state],
+        this._trigger(state === 0 ? 'download' : 'process', null, {
             'loaded': done,
             'total': total
         });

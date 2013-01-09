@@ -49,7 +49,8 @@ $.widget("bio.sequenceView", $.bio.panel, {
             defaultStatus: 'No fragment loaded',
             metaError: 'Error fetching metadata: %(message)',
             featureError: 'Error fetching features: %(message)',
-            loading_status: '%(state) Features: %(loaded) of %(total)',
+            download_status: 'Downloading Features: %(loaded) of %(total)',
+            process_status: 'Processing Features: %(loaded) of %(total)',
             download_start: 'Downloading Features...'
         },
         height: 400
@@ -71,7 +72,6 @@ $.widget("bio.sequenceView", $.bio.panel, {
         this._super();
         var self = this,
             o = this.options;
-        this.loader.sequenceLoader('start');
 
         this.el.on('metadata.error', function(ev, data){
             self.setStatus(o.text.metaError, data, 'error');
@@ -79,12 +79,12 @@ $.widget("bio.sequenceView", $.bio.panel, {
 
         bio.read_data(function(data){
             self._update_meta(data);
+            self.loader.sequenceLoader('start', self.meta.length);
         }, o.metadata, o.post_data, this.el, 'metadata');
     },
     _update_meta: function(data) {
         this.name.text(data.name);
         this.desc.text(data.description);
-        this.length = data.length;
         this.meta = data;
         this._refresh();
     },
@@ -169,12 +169,14 @@ $.widget("bio.sequenceView", $.bio.panel, {
             .on('sequenceloadererror', function(ev, data) {
                 self.setStatus(t.featureError, data, 'error');
             })
-            .on('sequenceloaderupdate', function(ev, data) {
-                self.setStatus(t.loading_status, {
-                    state: data.state,
+            .on('sequenceloaderdownload', function(ev, data) {
+                self.setStatus(t.download_status, {
                     loaded: self._readable(data.loaded),
                     total: self._readable(data.total)
                 }, 'loading');
+            })
+            .on('sequenceloaderprocess', function(ev, data) {
+                self.setStatus(t.process_status, data, 'loading');
             })
             .on('sequenceloaderstart', function(ev) {
                 self.setStatus(t.download_start, 'loading');
