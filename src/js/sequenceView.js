@@ -171,7 +171,7 @@ $.widget("bio.sequenceView", $.bio.panel, {
             })
             .on('sequenceloaderupdate', function(ev, data) {
                 self.setStatus(t.loading_status, {
-                    status: data.status,
+                    state: data.state,
                     loaded: self._readable(data.loaded),
                     total: self._readable(data.total)
                 }, 'loading');
@@ -195,7 +195,6 @@ $.widget("bio.sequenceView", $.bio.panel, {
         this._refresh();
     },
     _readable: function(bytes) {
-        console.log('_readable('+bytes+')');
         var i = 0;
         for(;i < names.length; i++)
         {

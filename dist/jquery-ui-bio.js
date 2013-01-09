@@ -957,7 +957,7 @@ $.widget("bio.help", {
 var baseC = 'bio-statusbar ui-widget-content ui-state-default',
     iconC = 'ui-icon';
 
-var reg = /([^\\])%\(([\w]+)\)/g,
+var reg = /%\(([\w]+)\)/g,
     defaultState = 'default';
 
 $.widget("bio.statusBar", {
@@ -1022,8 +1022,12 @@ $.widget("bio.statusBar", {
         this.el.attr('class', baseC + ' ' + state.state);
     },
     _format: function(s, fmt){
-        return s.replace(reg, function(m, $0, $1){
-            return $0 + String(fmt[$1]);
+        return s.replace(reg, function(m, $0, offset){
+            //don't replace if it's excaped
+            if(offset > 0 && s.charAt(offset-1) === '\\'){
+                return '%(' + $0 + ')';
+            }
+            return String(fmt[$0]);
         });
     }
 });
@@ -2014,7 +2018,7 @@ $.widget("bio.sequenceView", $.bio.panel, {
             })
             .on('sequenceloaderupdate', function(ev, data) {
                 self.setStatus(t.loading_status, {
-                    status: data.status,
+                    state: data.state,
                     loaded: self._readable(data.loaded),
                     total: self._readable(data.total)
                 }, 'loading');
@@ -2038,7 +2042,6 @@ $.widget("bio.sequenceView", $.bio.panel, {
         this._refresh();
     },
     _readable: function(bytes) {
-        console.log('_readable('+bytes+')');
         var i = 0;
         for(;i < names.length; i++)
         {

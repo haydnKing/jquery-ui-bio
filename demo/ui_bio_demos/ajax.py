@@ -87,15 +87,16 @@ meta = [{
 	'description': "Escherichia coli str. K-12 substr. MG1655, complete genome.",
 	'id': "U00096.2",
 	'name': "U00096",
+	'length': 4639675,
 	},]
 
 def load_features():
 	ret = []
-	for f in files:
-		seq = SeqIO.read(f, 'genbank')
+	for filename in files:
+		seq = SeqIO.read(filename, 'genbank')
 		feats = []
 		for f in seq.features:
-			feats += {
+			feat = {
 					'type': f.type,
 					'id': f.id,
 					'qualifiers': f.qualifiers,
@@ -105,6 +106,7 @@ def load_features():
 						'strand': f.location.strand,
 						}
 					}
+			feats.append(feat)
 		ret.append(feats)
 	return ret
 

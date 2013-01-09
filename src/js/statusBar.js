@@ -11,7 +11,7 @@
 var baseC = 'bio-statusbar ui-widget-content ui-state-default',
     iconC = 'ui-icon';
 
-var reg = /([^\\])%\(([\w]+)\)/g,
+var reg = /%\(([\w]+)\)/g,
     defaultState = 'default';
 
 $.widget("bio.statusBar", {
@@ -76,8 +76,12 @@ $.widget("bio.statusBar", {
         this.el.attr('class', baseC + ' ' + state.state);
     },
     _format: function(s, fmt){
-        return s.replace(reg, function(m, $0, $1){
-            return $0 + String(fmt[$1]);
+        return s.replace(reg, function(m, $0, offset){
+            //don't replace if it's excaped
+            if(offset > 0 && s.charAt(offset-1) === '\\'){
+                return '%(' + $0 + ')';
+            }
+            return String(fmt[$0]);
         });
     }
 });
