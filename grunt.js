@@ -6,6 +6,7 @@ function stripBanner( files ) {
 }
 
 var src_files = [   'src/js/datatypes.js',
+                    'src/js/helpers.js',
                     'src/js/tooltip.js',
                     'src/js/help.js',
                     'src/js/statusBar.js',

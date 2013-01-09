@@ -5,7 +5,7 @@
  * Copyright (c) 2012 Gibthon Developers
  * Licensed under the MIT, GPL licenses.
  */
-/*global next_color:false */
+/*global next_color:false,bio:false */
 (function($, undefined) {
 
 var baseClasses = 'bio-sequence-view ui-widget',
@@ -44,7 +44,11 @@ $.widget("bio.sequenceView", $.bio.panel, {
         text: {
             defaultTitle: 'Sequence View',
             defaultHelp: 'Drag to scroll around in the fragment',
-            defaultStatus: 'No fragment loaded'
+            defaultStatus: 'No fragment loaded',
+            metaError: 'Error fetching metadata: %(message)',
+            featureError: 'Error fetching features: %(message)',
+            loading_status: '%(state) Features: %(loaded) of %(total)',
+            download_start: 'Downloading Features...'
         },
         height: 400
     },
@@ -59,10 +63,28 @@ $.widget("bio.sequenceView", $.bio.panel, {
         this._show_meta();
         this._show_loader();
 
+
     },
     _init: function() {
         this._super();
-        this.setStatus(this.options.text.defaultStatus);
+        var self = this,
+            o = this.options;
+        this.loader.sequenceLoader('start');
+
+        this.el.on('metadata.error', function(ev, data){
+            self.setStatus(o.text.metaError, data, 'error');
+        });
+
+        bio.read_data(function(data){
+            self._update_meta(data);
+        }, o.metadata, o.post_data, this.el, 'metadata');
+    },
+    _update_meta: function(data) {
+        this.name.text(data.name);
+        this.desc.text(data.description);
+        this.length = data.length;
+        this.meta = data;
+        this._refresh();
     },
     _build_elements: function() {
         
@@ -75,11 +97,11 @@ $.widget("bio.sequenceView", $.bio.panel, {
 
         this.name = $('<p>')
             .addClass(nameClass)
-            .text('Fragment Name')
+            .text('')
             .appendTo(m);
         this.desc = $('<p>')
             .addClass(descClass)
-            .text('Fragment Description')
+            .text('')
             .appendTo(m);
         
         // --------------------------------------------------------------
@@ -122,7 +144,10 @@ $.widget("bio.sequenceView", $.bio.panel, {
         // Make sequenceLoader
         // --------------------------------------------------------------
         
-        this.loader = $('<div>').sequenceLoader();
+        this.loader = $('<div>').sequenceLoader({
+            features: this.options.features,
+            post_data: this.options.post_data
+        });
         this.loaderpanel = this._panel_item()
             .addClass(loadpanelC)
             .append(this.loader);
@@ -131,14 +156,29 @@ $.widget("bio.sequenceView", $.bio.panel, {
         this.panel.append(this.metadata);
     },
     _show_loader: function() {
+        var t = this.options.text,
+            self = this;
         this.panel.append(this.loaderpanel);
         this.stretch_factors = {
             'loaderpanel': 1
         };
         this._refresh();
+        this.loader
+            .on('sequenceloadererror', function(ev, data) {
+                self.setStatus(t.featureError, data, 'error');
+            })
+            .on('sequenceloaderupdate', function(ev, data) {
+                self.setStatus(t.loading_status, data, 'loading');
+            })
+            .on('sequenceloaderstart', function(ev) {
+                console.log('caught sequenceloaderstart');
+                console.log('self.setStatus('+t.download_start+', \'loading\');');
+                self.setStatus(t.download_start, 'loading');
+            });
     },
     _hide_loader: function() {
         this.loaderpanel.remove();
+        this.loader.off();
     },
     _show_seqview: function() {
         //set the stretch_factors

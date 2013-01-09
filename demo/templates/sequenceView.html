@@ -21,7 +21,17 @@
 {% block script %}
 <script type="text/javascript">
 $(window).ready( function(){
-    $('#sequence_view').sequenceView();
+    $('#sequence_view').sequenceView({
+        metadata: function(cb, data){
+            return Dajaxice.call('ui_bio_demos.getTestMeta', 'POST',
+                cb, data);
+        },
+        features: function(cb, data){
+            return Dajaxice.call('ui_bio_demos.getTestFeatures', 'POST',
+                cb, data);
+        },
+        post_data: {id: 0,}
+    });
 });
 </script>
 {% endblock %}

@@ -395,6 +395,77 @@ this.bio = this.bio || {};
 
 }());
 
+this.bio = this.bio || {};
+
+(function($, undefined) {
+
+    /*
+     * data_read: read JSON data from the server
+     *  - cb: function(data) to be called on success
+     *  - target: either
+     *      + url to fetch data
+     *      + function(cb, send_data) -> XHR
+     *  - send_data: OPTIONAL data to send to the server
+     *  - event_object: OPTIONAL jQuery object on which to fire events
+     *  - event_prefix: OPTIONAL only valid if event_object is set
+     *      if supplied events are triggered with type
+     *      event_prefix + '.' + event
+     */
+    this.bio.read_data = function(
+            cb, target, send_data, event_object, event_prefix) {
+        var xhr;
+
+        //normalise input
+        if(!$.isFunction(cb)){
+            throw('Error: cb must be a function');
+        }
+        if(target == null){
+            throw('Error: target must be provided');
+        }
+        if(send_data == null){
+            event_prefix = '';
+            event_object = null;
+            send_data = {};
+        }
+        else if(send_data instanceof $){
+            event_prefix = event_object || '';
+            event_object = send_data;
+            send_data = {};
+        }
+        event_prefix = event_prefix || '';
+        send_data = send_data || {};
+        if(event_prefix !== ''){event_prefix = event_prefix + '.';}
+
+        var fire_evt = function(type, data){
+            if(event_object != null){
+                event_object.trigger(event_prefix+type, data);
+            }
+        };
+
+        //send the request
+        if(typeof(target) === 'string'){
+            xhr = $.ajax(target, {
+                data: send_data,
+                success: cb,
+                error: function(jqXHR, status, errorThrown){
+                    fire_evt('error', {status: status, message: errorThrown});
+                }
+            });
+        }
+        else if($.isFunction(target)){
+            xhr = target(cb, send_data);
+            xhr.onerror = function(prog) {
+                fire_evt('error', {status: 'error', message: xhr.statusText});
+            };
+        }
+
+        xhr.onprogress = function(p){
+            fire_evt('progress', p);
+        };
+
+    };
+}(jQuery));
+
 (function($, undefined) {
 
     var outerC  = "tooltip ui-widget ui-widget-content ui-corner-all",
@@ -1638,6 +1709,7 @@ $.widget("bio.fragmentSelect", $.bio.panel, {
 }(jQuery));
 
 
+/*global bio:false */
 (function($, undefined) {
 
 var baseC       = 'bio-sequence-loader ui-widget',
@@ -1657,6 +1729,9 @@ var hasWebWorker = function() {
 
 $.widget("bio.sequenceLoader", {
     options: {
+        features: null,
+        post_data: null,
+        auto_start: false,
         text: {
             warnNoXHR2: 'Warning: Your browser does not appear to support '+
                 'XMLHttpRequest Level 2. You will not see download progress '+
@@ -1682,6 +1757,35 @@ $.widget("bio.sequenceLoader", {
         
     },
     _init: function() {
+        var self = this,
+            o = this.options;
+
+        this.el
+            .on('error', function(ev, data){
+                self._trigger('error', ev, data);
+            })
+            .on('progress', function(ev, data){
+                self._update(data.done, data.total, 0);
+            });
+        
+        if(o.auto_start){
+            this.start();
+        }
+        
+    },
+    _got_data: function(data) {
+        this._trigger('downloaded');
+        this.progress.progressbar('value', 50);
+
+    },
+    start: function() {
+        console.log('sequenceLoader.start');
+        var self = this,
+            o = this.options;
+        bio.read_data(function(data) {self._got_data(data);},
+            o.features, o.post_data, this.el);
+        console.log('this._trigger(\'start\');');
+        this._trigger('start');
     },
     _build_elements: function() {
         var self = this, t = this.options.text;
@@ -1724,7 +1828,10 @@ $.widget("bio.sequenceLoader", {
         return w;
     },
     _update: function(done, total, state) {
-        this.progress.progressbar('value', 50.0 * state + 50.0 * (done / total));
+        if(total > 0) {
+            this.progress.progressbar('value',
+                                      50.0 * state + 50.0 * (done / total));
+        }
         this._trigger('update', null, {
             'state': this.options.states[state],
             'done': done,
@@ -1736,7 +1843,7 @@ $.widget("bio.sequenceLoader", {
 }(jQuery));
 
 
-/*global next_color:false */
+/*global next_color:false,bio:false */
 (function($, undefined) {
 
 var baseClasses = 'bio-sequence-view ui-widget',
@@ -1775,7 +1882,11 @@ $.widget("bio.sequenceView", $.bio.panel, {
         text: {
             defaultTitle: 'Sequence View',
             defaultHelp: 'Drag to scroll around in the fragment',
-            defaultStatus: 'No fragment loaded'
+            defaultStatus: 'No fragment loaded',
+            metaError: 'Error fetching metadata: %(message)',
+            featureError: 'Error fetching features: %(message)',
+            loading_status: '%(state) Features: %(loaded) of %(total)',
+            download_start: 'Downloading Features...'
         },
         height: 400
     },
@@ -1790,10 +1901,28 @@ $.widget("bio.sequenceView", $.bio.panel, {
         this._show_meta();
         this._show_loader();
 
+
     },
     _init: function() {
         this._super();
-        this.setStatus(this.options.text.defaultStatus);
+        var self = this,
+            o = this.options;
+        this.loader.sequenceLoader('start');
+
+        this.el.on('metadata.error', function(ev, data){
+            self.setStatus(o.text.metaError, data, 'error');
+        });
+
+        bio.read_data(function(data){
+            self._update_meta(data);
+        }, o.metadata, o.post_data, this.el, 'metadata');
+    },
+    _update_meta: function(data) {
+        this.name.text(data.name);
+        this.desc.text(data.description);
+        this.length = data.length;
+        this.meta = data;
+        this._refresh();
     },
     _build_elements: function() {
         
@@ -1806,11 +1935,11 @@ $.widget("bio.sequenceView", $.bio.panel, {
 
         this.name = $('<p>')
             .addClass(nameClass)
-            .text('Fragment Name')
+            .text('')
             .appendTo(m);
         this.desc = $('<p>')
             .addClass(descClass)
-            .text('Fragment Description')
+            .text('')
             .appendTo(m);
         
         // --------------------------------------------------------------
@@ -1853,7 +1982,10 @@ $.widget("bio.sequenceView", $.bio.panel, {
         // Make sequenceLoader
         // --------------------------------------------------------------
         
-        this.loader = $('<div>').sequenceLoader();
+        this.loader = $('<div>').sequenceLoader({
+            features: this.options.features,
+            post_data: this.options.post_data
+        });
         this.loaderpanel = this._panel_item()
             .addClass(loadpanelC)
             .append(this.loader);
@@ -1862,14 +1994,29 @@ $.widget("bio.sequenceView", $.bio.panel, {
         this.panel.append(this.metadata);
     },
     _show_loader: function() {
+        var t = this.options.text,
+            self = this;
         this.panel.append(this.loaderpanel);
         this.stretch_factors = {
             'loaderpanel': 1
         };
         this._refresh();
+        this.loader
+            .on('sequenceloadererror', function(ev, data) {
+                self.setStatus(t.featureError, data, 'error');
+            })
+            .on('sequenceloaderupdate', function(ev, data) {
+                self.setStatus(t.loading_status, data, 'loading');
+            })
+            .on('sequenceloaderstart', function(ev) {
+                console.log('caught sequenceloaderstart');
+                console.log('self.setStatus('+t.download_start+', \'loading\');');
+                self.setStatus(t.download_start, 'loading');
+            });
     },
     _hide_loader: function() {
         this.loaderpanel.remove();
+        this.loader.off();
     },
     _show_seqview: function() {
         //set the stretch_factors
