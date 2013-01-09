@@ -1,4 +1,4 @@
-/*! jQuery Ui Bio - v0.1.0 - 2013-01-08
+/*! jQuery Ui Bio - v0.1.0 - 2013-01-09
 * https://github.com/Gibthon/jquery-ui-bio
 * Copyright (c) 2013 Haydn King; Licensed MIT, GPL */
 
@@ -1755,6 +1755,23 @@ $.widget("bio.sequenceView", $.bio.panel, {
     options: {
         title: undefined,
         help: undefined,
+        //The post_data to send when fetching metadata, features or sequence
+        post_data: null,
+        /* metadata: source of metadata 
+         *  - url: url from which to GET JSON data
+         *  - function(cb, data) -> XHR: function to call to return data
+         *  - object: {
+         *      name: 'fragment name',
+         *      description: 'fragment desc',
+         *      length: len(fragment.seq)
+         *      }
+         */
+        metadata: null,
+        /* features: source of features 
+         *  - url: url from which to GET JSON data
+         *  - function(cb, post_data) -> XHR: function to call to return data
+         */
+        features: null,
         text: {
             defaultTitle: 'Sequence View',
             defaultHelp: 'Drag to scroll around in the fragment',
