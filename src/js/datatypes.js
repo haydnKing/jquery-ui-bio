@@ -276,8 +276,8 @@ this.bio = this.bio || {};
             start = true;
         }
 
-        var done = 0,
-            total = this.features.length;
+        this.done = 0,
+        this.total = this.features.length;
 
         this.stacks = {'fwd':{}, 'rev':{}};
 
@@ -318,7 +318,7 @@ this.bio = this.bio || {};
 
         var process_all = function(t) {
             self._process_type(self.types[t]);
-            $(self).trigger('progress', null, {
+            $(self).trigger('progress', {
                 done: self.done, 
                 total:self.total
             });

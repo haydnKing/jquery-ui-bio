@@ -51,7 +51,8 @@ $.widget("bio.sequenceView", $.bio.panel, {
             featureError: 'Error fetching features: %(message)',
             download_status: 'Downloading Features: %(loaded) of %(total)',
             process_status: 'Processing Features: %(loaded) of %(total)',
-            download_start: 'Downloading Features...'
+            download_start: 'Downloading Features...',
+            loading_graphics: 'Loading Graphics...'
         },
         height: 400
     },
@@ -180,7 +181,16 @@ $.widget("bio.sequenceView", $.bio.panel, {
             })
             .on('sequenceloaderstart', function(ev) {
                 self.setStatus(t.download_start, 'loading');
+            }) 
+            .on('sequenceloadercompleted', function(ev, fs) {
+                self.setStatus(t.loading_graphics, 'loading');
+                self._load_graphics(fs);
             });
+    },
+    _load_graphics: function(fs){
+        this.fs = fs;
+        this._hide_loader();
+        this._show_seqview();
     },
     _hide_loader: function() {
         this.loaderpanel.remove();

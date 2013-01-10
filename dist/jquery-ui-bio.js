@@ -273,8 +273,8 @@ this.bio = this.bio || {};
             start = true;
         }
 
-        var done = 0,
-            total = this.features.length;
+        this.done = 0,
+        this.total = this.features.length;
 
         this.stacks = {'fwd':{}, 'rev':{}};
 
@@ -315,7 +315,7 @@ this.bio = this.bio || {};
 
         var process_all = function(t) {
             self._process_type(self.types[t]);
-            $(self).trigger('progress', null, {
+            $(self).trigger('progress', {
                 done: self.done, 
                 total:self.total
             });
@@ -1848,9 +1848,18 @@ $.widget("bio.sequenceLoader", {
     },
     _process: function(features)
     {
+        var self = this;
         this.fs = new bio.FeatureStore(features, 
-                                       this.length || this.options.seq_length);
-        this._update(features.length, features.length, 1);
+                                       this.length || this.options.seq_length,
+                                       false);
+        $(this.fs)
+            .on('progress', function(ev, data){
+                self._update(data.done, data.total, 1);
+            })
+            .on('completed', function(ev, data){
+                self._update(features.length, features.length, 1);
+                self._trigger('completed', null, this.fs);
+            });
     },
     start: function(length) {
         var self = this,
@@ -1961,7 +1970,8 @@ $.widget("bio.sequenceView", $.bio.panel, {
             featureError: 'Error fetching features: %(message)',
             download_status: 'Downloading Features: %(loaded) of %(total)',
             process_status: 'Processing Features: %(loaded) of %(total)',
-            download_start: 'Downloading Features...'
+            download_start: 'Downloading Features...',
+            loading_graphics: 'Loading Graphics...'
         },
         height: 400
     },
@@ -2090,7 +2100,16 @@ $.widget("bio.sequenceView", $.bio.panel, {
             })
             .on('sequenceloaderstart', function(ev) {
                 self.setStatus(t.download_start, 'loading');
+            }) 
+            .on('sequenceloadercompleted', function(ev, fs) {
+                self.setStatus(t.loading_graphics, 'loading');
+                self._load_graphics(fs);
             });
+    },
+    _load_graphics: function(fs){
+        this.fs = fs;
+        this._hide_loader();
+        this._show_seqview();
     },
     _hide_loader: function() {
         this.loaderpanel.remove();

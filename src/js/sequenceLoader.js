@@ -84,9 +84,18 @@ $.widget("bio.sequenceLoader", {
     },
     _process: function(features)
     {
+        var self = this;
         this.fs = new bio.FeatureStore(features, 
-                                       this.length || this.options.seq_length);
-        this._update(features.length, features.length, 1);
+                                       this.length || this.options.seq_length,
+                                       false);
+        $(this.fs)
+            .on('progress', function(ev, data){
+                self._update(data.done, data.total, 1);
+            })
+            .on('completed', function(ev, data){
+                self._update(features.length, features.length, 1);
+                self._trigger('completed', null, this.fs);
+            });
     },
     start: function(length) {
         var self = this,
