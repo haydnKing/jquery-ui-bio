@@ -182,15 +182,24 @@ $.widget("bio.sequenceView", $.bio.panel, {
             .on('sequenceloaderstart', function(ev) {
                 self.setStatus(t.download_start, 'loading');
             }) 
-            .on('sequenceloadercompleted', function(ev, fs) {
+            .on('sequenceloadercompleted', function(ev) {
                 self.setStatus(t.loading_graphics, 'loading');
-                self._load_graphics(fs);
+                self._load_graphics(self.loader.sequenceLoader('featureStore'));
             });
     },
     _load_graphics: function(fs){
         this.fs = fs;
         this._hide_loader();
         this._show_seqview();
+
+        var self = this;
+        setTimeout( function() {
+            self.overview.overview({
+                featureStore: fs,
+                colorScheme: self.colorscheme,
+                seq_length: self.meta.length
+            });
+        }, 50);
     },
     _hide_loader: function() {
         this.loaderpanel.remove();

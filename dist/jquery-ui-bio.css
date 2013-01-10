@@ -59,6 +59,12 @@
   margin-left: 1em;
   font-style: italic;
 }
+.bio-sequence-overview.ui-widget {
+  padding: 0 1em;
+}
+.bio-sequence-overview.ui-widget > div {
+  height: 100%;
+}
 .ui-widget.bio-search {
   position: relative;
   height: 1.3em;

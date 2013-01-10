@@ -94,7 +94,7 @@ $.widget("bio.sequenceLoader", {
             })
             .on('completed', function(ev, data){
                 self._update(features.length, features.length, 1);
-                self._trigger('completed', null, this.fs);
+                self._trigger('completed');
             });
     },
     start: function(length) {
@@ -104,6 +104,9 @@ $.widget("bio.sequenceLoader", {
         bio.read_data(function(data) {self._got_data(data);},
             o.features, o.post_data, this.el);
         this._trigger('start');
+    },
+    featureStore: function() {
+        return this.fs;
     },
     _build_elements: function() {
         var self = this, t = this.options.text;
