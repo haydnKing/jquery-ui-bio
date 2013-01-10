@@ -1,4 +1,4 @@
-/*! jQuery Ui Bio - v0.1.0 - 2013-01-09
+/*! jQuery Ui Bio - v0.1.0 - 2013-01-10
 * https://github.com/Gibthon/jquery-ui-bio
 * Copyright (c) 2013 Haydn King; Licensed MIT, GPL */
 
@@ -185,9 +185,9 @@ this.bio = this.bio || {};
      *      tile_size: size of tiles to use internally, optional
      */
 
-    var FeatureStore = function(features, length, tile_size)
+    var FeatureStore = function(features, length, tile_size, auto_start)
     {
-        this.init(features, length, tile_size);
+        this.init(features, length, tile_size, auto_start);
     };
     var fs = FeatureStore.prototype;
 
@@ -202,9 +202,9 @@ this.bio = this.bio || {};
      */
     fs.tile_size = 1024;
     /*
-     * length: end of all the features
+     * seq_length: end of all the features
      */
-    fs.length = 0;
+    fs.seq_length = 0;
     /*
      * types: array of all different feature types
      */
@@ -259,26 +259,36 @@ this.bio = this.bio || {};
      * Private Functions -----------------------------------------------------
      */
 
-    fs.init = function(f,l,s)
-    {
+    fs.init = function(f,l,s,start){
         this.features = f || [];
         if(s != null)
         {
             this.tile_size = parseInt(s,10);
         }
-        this.length = l;
-        if(this.length == null){
+        this.seq_length = l;
+        if(this.seq_length == null){
             throw('Error: sequence length must be specified');
         }
-        console.log('tiles: length / tile_size = '+this.length+' / '+
-                    this.tile_size+' =  '+(this.length / this.tile_size));
+        if(start == null){
+            start = true;
+        }
 
-        console.log('types');
+        var done = 0,
+            total = this.features.length;
+
+        this.stacks = {'fwd':{}, 'rev':{}};
+
+        if(start){
+            this.go();
+        }
+    };
+
+    fs.go = function(){
         this._calc_types();
-        console.log('tracks');
-        this._calc_tracks();
-        console.log('tiles');
-        this._calc_tiles();
+        this._alloc_tiles();
+
+        this._process();
+
     };
 
     fs._calc_types = function()
@@ -299,33 +309,52 @@ this.bio = this.bio || {};
         }
     };
 
-    fs._calc_tracks = function()
+    fs._process = function()
     {
-        var type, feats, fwd, rev;
-        this.stacks = {'fwd':{}, 'rev':{}};
-        for(type=0; type < this.types.length; type++)
-        {
-            feats = this.getFeaturesByType(this.types[type]);
-            fwd = [];
+        var self = this;
+
+        var process_all = function(t) {
+            self._process_type(self.types[t]);
+            $(self).trigger('progress', null, {
+                done: self.done, 
+                total:self.total
+            });
+            if((t+1) < self.types.length){
+                setTimeout(function(){
+                    process_all(t+1);
+                }, 50);
+            }
+            else {
+                $(self).trigger('completed');
+            }
+        };
+
+        process_all(0);
+    };
+
+    fs._process_type = function(type){
+        var feats = this.getFeaturesByType(type),
+            fwd = [],
             rev = [];
 
-            //split feats into fwd and reverse features
-            for(var f = 0; f < feats.length; f++)
+        //split feats into fwd and reverse features
+        for(var f = 0; f < feats.length; f++)
+        {
+            if(feats[f].strand() >= 0)
             {
-                if(feats[f].strand() >= 0)
-                {
-                    fwd.push(feats[f]);
-                }
-                else
-                {
-                    rev.push(feats[f]);
-                }
+                fwd.push(feats[f]);
             }
-            
-            //set the tracks for each
-            this.stacks.fwd[this.types[type]] = this._set_tracks(fwd);
-            this.stacks.rev[this.types[type]] = this._set_tracks(rev);
+            else
+            {
+                rev.push(feats[f]);
+            }
         }
+        
+        //set the tracks for each
+        this.stacks.fwd[type] = this._set_tracks(fwd);
+        this._calc_tiles(fwd);
+        this.stacks.rev[type] = this._set_tracks(rev);
+        this._calc_tiles(rev);
     };
 
     fs._set_tracks = function(features)
@@ -370,13 +399,13 @@ this.bio = this.bio || {};
         return stack.length;    
     };
 
-    fs._calc_tiles = function()
+    fs._alloc_tiles = function()
     {
-        var f,i,j,t,first,last;
+        var i,j,t;
 
         //make enough blank tiles
         this.tiles = [];
-        for(i = 0; i < this.length / this.tile_size; i++)
+        for(i = 0; i < this.seq_length / this.tile_size; i++)
         {
             t = {};
             for(j = 0; j < this.types.length; j++)
@@ -385,10 +414,17 @@ this.bio = this.bio || {};
             }
             this.tiles.push(t);
         }
+    };
 
-        for(i = 0; i < this.features.length; i++)
+    fs._calc_tiles = function(feats)
+    {
+        var f,i,j,t,first,last;
+
+        feats = feats || this.features;
+
+        for(i = 0; i < feats.length; i++)
         {
-            f = this.features[i];
+            f = feats[i];
            
             //find the positions of the first and last tiles for the feature
             first = this.pos2tile(f.location.start);
@@ -400,6 +436,7 @@ this.bio = this.bio || {};
                 this.tiles[t][f.type.toLowerCase()].push(f);
             }
         }
+        this.done += feats.length;
     };
 
     //Export to namespace

@@ -2,6 +2,7 @@
 /*global start:false, stop:false ok:false, equal:false, notEqual:false, deepEqual:false*/
 /*global notDeepEqual:false, strictEqual:false, notStrictEqual:false, raises:false*/
 /*global bio:false */
+/*global _$:false */
 (function($) {
 
   /*
@@ -238,8 +239,17 @@
                 }
             }];
 
+            //stop testing until the store is built
+            stop();
+
             this.fs = new bio.FeatureStore(bio.loadSeqFeature(this.json), 
-                                           200, 50);
+                                           200, 50, false);
+
+            var $fs = _$(this.fs);
+            $fs.one('completed', function() {
+                start();
+            });
+            this.fs.go();
         }
     });
 
