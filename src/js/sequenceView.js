@@ -5,7 +5,7 @@
  * Copyright (c) 2012 Gibthon Developers
  * Licensed under the MIT, GPL licenses.
  */
-/*global next_color:false,bio:false */
+/*global next_color:false,bio:false,Raphael:false */
 (function($, undefined) {
 
 var baseClasses = 'bio-sequence-view ui-widget',
@@ -196,7 +196,7 @@ $.widget("bio.sequenceView", $.bio.panel, {
         setTimeout( function() {
             self.overview.overview({
                 featureStore: fs,
-                colorScheme: self.colorscheme,
+                colorScheme: self._get_color_scheme(fs.types),
                 seq_length: self.meta.length
             });
         }, 50);
@@ -214,6 +214,18 @@ $.widget("bio.sequenceView", $.bio.panel, {
         };
         this.panel.append(this.seqview);
         this._refresh();
+    },
+    _get_color_scheme: function(types)
+    {
+        if(this.colorscheme == null){
+            this.colorscheme = {};
+            var step = 360 / types.length;
+            for(var i = 0; i < types.length; i++){
+                this.colorscheme[types[i].toLowerCase()] = 
+                    Raphael.hsl(i*step,50,50);
+            }
+        }
+        return this.colorscheme;
     },
     _readable: function(bytes) {
         var i = 0;

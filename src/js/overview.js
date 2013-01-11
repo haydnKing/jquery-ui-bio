@@ -12,6 +12,7 @@ var baseC   = 'bio-sequence-overview ui-widget';
 
 var small_tick = 3,
     separation = 5,
+    click_range = 3,
     names = ['bp', 'kb', 'Mb', 'Gb', 'Tb', 'Pb', 'Yb'];
 
 $.widget("bio.overview", {
@@ -44,6 +45,21 @@ $.widget("bio.overview", {
         this.w2 = this.w/2.0;
         this.h2 = this.h/2.0;
     },
+/*    _eneable_tooltip: function(){
+        var self = this,
+            o = this.options;
+
+        $(this.paper).tooltip({
+            title: "Select a Fragment",
+            content: function(ev){
+                var pos = self._loc_from_ev(ev),
+                    dp = math.round(o.seq_length * click_range / self.w);
+
+
+
+            },
+        });
+    },*/
     _get_heights: function() {
         var i = 0,
             fwd = 0,
@@ -98,7 +114,8 @@ $.widget("bio.overview", {
     _draw_features: function(feats) {
         var feat, i, h, type,
             scale = this.w / this.options.seq_length,
-            fs = this.options.featureStore;
+            fs = this.options.featureStore,
+            cs = this.options.colorScheme;
         feats = feats || fs.features;
 
         for(i = 0; i < feats.length; i++) {
@@ -114,8 +131,9 @@ $.widget("bio.overview", {
                             'L'+scale*feat.location.end+','+h)
                 .attr({
                     'stroke-width': 0.8*this._feat_height,
-                    stroke: this.scale_color
+                    stroke: cs[type]
                 });
+            //console.log('stroke = cs['+type+'] = '+cs[type]);
         }
     },
     _draw_centerline: function() {
@@ -178,6 +196,25 @@ $.widget("bio.overview", {
                     .attr({'font-size': size}));
         }
 
+    },
+    _loc_from_ev: function(ev){
+        var loc = $(this.paper).offset(),
+            ret;
+        ret.x = ev.pageX - loc.left;
+        ret.y = ev.pageY - loc.top;
+        ret.dir = (ret.x > this.h2) ? 'rev' : 'fwd';
+        var elev = ret.dir === 'fwd' ? 
+            this.h2 - separation - ret.y :
+            ret.y - (this.h2 + separation);
+        ret.type = this.types[this.types.length-1];
+        for(var i = 1; i < this.types.length; i++){
+            if(elev < this.stack[ret.dir][this.types[i]]){
+                ret.type = this.types[i];
+                break;
+            }
+        }
+        ret.pos = Math.round(this.options.seq_length * ret.y / this.w);
+        return ret;
     }
 });
 
