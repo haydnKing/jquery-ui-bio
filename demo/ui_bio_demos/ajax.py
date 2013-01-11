@@ -81,6 +81,7 @@ _fragment_sets = [[
 ]
 
 files = [os.path.join(os.path.dirname(__file__), 'ecoli.gb'),
+				os.path.join(os.path.dirname(__file__), 'pSB3K3.gb'),
 		]
 
 meta = [{
@@ -88,7 +89,13 @@ meta = [{
 	'id': "U00096.2",
 	'name': "U00096",
 	'length': 4639675,
-	},]
+	},
+	{
+		'name': 'pSB3K3',
+		'description': 'Low to medium copy BioBrick standard vector',
+		'length': 2750,
+	},
+	]
 
 def load_features():
 	ret = []
