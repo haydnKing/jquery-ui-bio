@@ -300,6 +300,45 @@
         }
     });
 
+    test('getFeaturesInRange', 3, function(){
+        var f = this.fs.getFeaturesInRange(100,105);
+        //we only want to test the ids
+        for(var i in f){
+            for(var j in f[i]){
+                f[i][j] = f[i][j].id;
+            }
+        }
+        deepEqual(f.one.sort(), [1,2]);
+        deepEqual(f.two.sort(), [3]);
+        deepEqual(f.three.sort(), [4]);
+    });
+
+    test('getFeaturesInRange - accross tiles', 3, function(){
+        var f = this.fs.getFeaturesInRange(40,107);
+        //we only want to test the ids
+        for(var i in f){
+            for(var j in f[i]){
+                f[i][j] = f[i][j].id;
+            }
+        }
+        deepEqual(f.one.sort(), [0,1,2]);
+        deepEqual(f.two.sort(), [3]);
+        deepEqual(f.three.sort(), [4]);
+    });
+
+    test('getFeaturesInRange - inner range', 3, function(){
+        var f = this.fs.getFeaturesInRange(70,80);
+        //we only want to test the ids
+        for(var i in f){
+            for(var j in f[i]){
+                f[i][j] = f[i][j].id;
+            }
+        }
+        deepEqual(f.one.sort(), [0,1]);
+        deepEqual(f.two.sort(), [3]);
+        deepEqual(f.three.sort(), []);
+    });
+
     test('tracks', 5, function(){
         equal(this.fs.features[0].track, 1);
         equal(this.fs.features[1].track, 0);

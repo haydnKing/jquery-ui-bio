@@ -96,6 +96,7 @@ $.widget("bio.sequenceLoader", {
                 self._update(features.length, features.length, 1);
                 self._trigger('completed');
             });
+        this.fs.go();
     },
     start: function(length) {
         var self = this,

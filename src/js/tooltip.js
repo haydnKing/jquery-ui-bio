@@ -81,7 +81,11 @@ $.widget("bio.tooltip", {
             this.hide();
         }
         this._create_tip();
-        this._set_content();
+        if(!this._set_content()){
+            this._tooltip.remove();
+            this._tooltip = null;
+            return;
+        }
         this._set_size();
         this._set_location();
         this._set_color();
@@ -190,6 +194,10 @@ $.widget("bio.tooltip", {
             c = c(this._evt);
         }
 
+        if(c === false){
+            return false;
+        }
+
         if(this.el.attr(attr) != null){
             c = this._get_title()
                     .add($('<p>')
@@ -241,6 +249,8 @@ $.widget("bio.tooltip", {
                 self._set_location();
             });
         }
+
+        return true;
     },
     _get_title: function() {
         var t = this.options.title;
@@ -433,7 +443,8 @@ $.widget("bio.tooltip", {
                 self._trigger('selected', evt, {
                     index:index, 
                     tooltip: self.el,
-                    item: item
+                    item: item,
+                    data: data
                 });
             });
         return item;

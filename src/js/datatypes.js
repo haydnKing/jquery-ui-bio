@@ -48,7 +48,7 @@ this.bio = this.bio || {};
         {
             if( this.contains(rhs[i].start) ||
                 this.contains(rhs[i].end) ||
-                rhs[i].contains(this.start) )
+                (rhs[i].start <= this.start) && (rhs[i].end > this.start) )
             {
                 return true;
             }
@@ -116,6 +116,10 @@ this.bio = this.bio || {};
             }
         }
         return false;
+    };
+
+    sf.inRange = function(range){
+       return this.location.overlaps(range); 
     };
 
     sf.toString = function(){
@@ -257,6 +261,52 @@ this.bio = this.bio || {};
         return [this.tile_size * i, this.tile_size * (i+1)];
     };
 
+    var copy = function(src, dest, range){
+        var type, i;
+        for(type in src){
+            for(i=0; i < src[type].length; i+=1){
+                if(range != null && !src[type][i].inRange(range)){
+                    continue;
+                }
+                if($.inArray(src[type][i], dest[type]) < 0){
+                    dest[type].push(src[type][i]);
+                }
+            }
+        }
+    };
+
+    fs.getFeaturesInRange = function(start, end){
+        var start_tile, end_tile, t, i;
+        if(start > end){
+            t = end;
+            end = start;
+            start = t;
+        }
+        start_tile = this.pos2tile(start);
+        end_tile = this.pos2tile(end);
+
+        var ret = {};
+        for(i in this.types){
+            ret[this.types[i]] = [];
+        }
+
+        var r = {start: start, end: end};
+        //first tile
+        copy(this.tiles[start_tile], ret, r);
+        
+        for(i = start_tile+1; i <= end_tile-1; i+=1){
+            t = this.tiles[i];
+            copy(this.tiles[i], ret);
+        }
+
+        //last tile
+        if(start_tile !== end_tile){
+            copy(this.tiles[end_tile], ret, r);
+        }
+
+        return ret;
+    };
+
 
     /*
      * Private Functions -----------------------------------------------------
@@ -264,6 +314,10 @@ this.bio = this.bio || {};
 
     fs.init = function(f,l,s,start){
         this.features = f || [];
+        if(start == null && typeof(s)==='boolean'){
+            start = s;
+            s = null;
+        }   
         if(s != null)
         {
             this.tile_size = parseInt(s,10);

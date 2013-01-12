@@ -21,10 +21,25 @@ $.widget("bio.overview", {
         colorScheme: {},
         seq_length: 0
     },
+    setHighlight: function(start, end, anim){
+        anim = anim || false;
+        var s = this.options.seq_length / this.w;
+        var attrs = {
+            x: s * start,
+            width: s * (end - start)
+        };
+        this.highlight.show();
+        if(anim){
+            this.highlight.animate(attrs, 200);
+        }
+        else {
+            this.highlight.attr(attrs);
+        }
+    },
     _create: function(){
         this.el = $(this.element[0])
             .addClass(baseC);
-        var pad = $('<div>').appendTo(this.el);
+        var pad  = this.wrapper = $('<div>').appendTo(this.el);
 
         this.paper = new Raphael(pad.get(0), pad.width(), pad.height());
         this.scale = this.paper.set();
@@ -34,8 +49,8 @@ $.widget("bio.overview", {
         this._draw_centerline();
 
         this._get_heights();
-        console.log('_feat_height = '+this._feat_height);
         this._progressive_draw();
+        this._create_highlight();
     },
     _init: function(){
     },
@@ -45,21 +60,56 @@ $.widget("bio.overview", {
         this.w2 = this.w/2.0;
         this.h2 = this.h/2.0;
     },
-/*    _eneable_tooltip: function(){
+    _enable_tooltip: function(){
         var self = this,
-            o = this.options;
+            o = this.options,
+            fs = o.featureStore,
+            cs = o.colorScheme;
 
-        $(this.paper).tooltip({
+        this.wrapper.tooltip({
+            click: true,
+            hover: 0,
+            location: 'mouse',
+            width: 200,
             title: "Select a Fragment",
             content: function(ev){
-                var pos = self._loc_from_ev(ev),
-                    dp = math.round(o.seq_length * click_range / self.w);
+                var loc = self._loc_from_ev(ev),
+                    dp = Math.round(o.seq_length * click_range / self.w),
+                    feats = fs.getFeaturesInRange(loc.pos-dp, loc.pos+dp),
+                    i, f, type,
+                    ret = [];
 
+                for(type in feats){
+                    for(i = 0; i < feats[type].length; i++){
+                        f = feats[type][i];
+                        ret.push({
+                            title: (f.qualifiers.title!=null) ?
+                                f.qualifiers.title :
+                                f.type,
+                            sub: '('+f.location.start+':'+f.location.end+')',
+                            iconCSS: {
+                                'background-color':cs[f.type.toLowerCase()]
+                            },
+                            feature: f
+                        });
+                    }
+                }
 
+                if(ret.lengt === 1){
+                   self._trigger('selected', null, ret[0].feature); 
+                }
+                if(ret.length <= 1){
+                    return false;
+                }
 
+                return ret;
             },
+            selected: function(ev, data){
+                self._trigger('selected', null, data.data.feature);
+                self.wrapper.tooltip('hide');
+            }
         });
-    },*/
+    },
     _get_heights: function() {
         var i = 0,
             fwd = 0,
@@ -100,6 +150,7 @@ $.widget("bio.overview", {
         var fs = this.options.featureStore;
         if(i >= fs.types.length){
             this._trigger('completed');
+            this._enable_tooltip();
             return;
         }
         this._draw_features(fs.getFeaturesByType(fs.types[i]));
@@ -198,23 +249,30 @@ $.widget("bio.overview", {
 
     },
     _loc_from_ev: function(ev){
-        var loc = $(this.paper).offset(),
-            ret;
+        var loc = this.wrapper.offset(),
+            ret = {},
+            types = this.options.featureStore.types;
         ret.x = ev.pageX - loc.left;
         ret.y = ev.pageY - loc.top;
-        ret.dir = (ret.x > this.h2) ? 'rev' : 'fwd';
+        ret.dir = (ret.y > this.h2) ? 'rev' : 'fwd';
         var elev = ret.dir === 'fwd' ? 
             this.h2 - separation - ret.y :
             ret.y - (this.h2 + separation);
-        ret.type = this.types[this.types.length-1];
-        for(var i = 1; i < this.types.length; i++){
-            if(elev < this.stack[ret.dir][this.types[i]]){
-                ret.type = this.types[i];
+        ret.type = types[types.length-1];
+        for(var i = 1; i < types.length; i++){
+            if(elev < this.stacks[ret.dir][types[i]]){
+                ret.type = types[i];
                 break;
             }
         }
-        ret.pos = Math.round(this.options.seq_length * ret.y / this.w);
+        ret.pos = Math.round(this.options.seq_length * ret.x / this.w);
         return ret;
+    },
+    _create_highlight: function() {
+        this.highlight = this.paper.rect(0,0,this.w,this.h)
+            .attr({fill: '#C0F7FE', stroke: '#3DE4FC'})
+            .toBack()
+            .hide();
     }
 });
 
