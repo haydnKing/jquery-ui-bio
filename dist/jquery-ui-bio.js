@@ -1,4 +1,4 @@
-/*! jQuery Ui Bio - v0.1.0 - 2013-01-11
+/*! jQuery Ui Bio - v0.1.0 - 2013-01-12
 * https://github.com/Gibthon/jquery-ui-bio
 * Copyright (c) 2013 Haydn King; Licensed MIT, GPL */
 
@@ -2269,6 +2269,90 @@ $.widget("bio.overview", {
 /*global next_color:false,bio:false,Raphael:false */
 (function($, undefined) {
 
+var baseC = 'bio-sequence ui-widget';
+
+var sep = 10,
+    tick = 3,
+    tick_text = 6,
+    base_width = 5,
+    marker_height = 10;
+
+$.widget("bio.sequence", $.bio.panel, {
+    options: {
+        tile_length: 1024,
+        tick_color: null,
+        featureStore: null
+    },
+    _create: function(){
+        this.el = $(this.element[0])
+            .addClass(baseC);
+        var o = this.options;
+
+        o.tick_color = o.tick_color || this.el.css('color');
+        o.back_color = o.back_color || this.el.css('background-color');
+
+        this._calc_sizes();
+        this.el.append(this._make_tile(0));
+        this._trigger('completed');
+    },
+    _init: function(){
+    },
+    _calc_sizes: function(){
+        var o = this.options;
+        //measure
+        this.h = this.el.height();
+        this.h2 = this.h / 2;
+        this.w = base_width * o.tile_length;
+    },
+    _make_tile: function(tile_num){
+        var o = this.options,
+            self = this,
+            from = tile_num * o.tile_length,
+            to = from + o.tile_length,
+            d = $('<div>')
+                .height(this.h)
+                .width(this.w);
+        Raphael(d.get(0), this.w, this.h, function(){
+            
+            var tile = this,
+                i,x,y,path;
+
+            y = [self.h2-sep-tick, self.h2+sep+tick];
+            path = '';
+            for(i = 10 * Math.ceil(from/10); i < to; i+=10){
+                x = (0.5+i-from) * base_width;
+                path = path + 'M'+x+','+y[0]+'L'+x+','+y[1];
+                var text = tile.text(x, y[1], String(i))
+                    .attr({
+                        color: o.tick_color,
+                        'font-height': tick_text
+                    });
+                $('tspan:first-child', text.node).attr('dy', tick_text+1);
+            }
+            tile.path(path)
+                .attr({
+                    stroke: o.tick_color
+                });
+
+            tile.rect(-1, self.h2-sep, self.w+2, 2*sep)
+                .attr({
+                    stroke: o.tick_color,
+                    fill: o.back_color
+                });
+
+        });
+
+        return d;
+
+    }
+});
+
+}(jQuery));
+
+
+/*global next_color:false,bio:false,Raphael:false */
+(function($, undefined) {
+
 var baseClasses = 'bio-sequence-view ui-widget',
     metaClass = 'bio-meta',
     nameClass = 'bio-name',
@@ -2276,7 +2360,6 @@ var baseClasses = 'bio-sequence-view ui-widget',
     overviewClass = 'bio-overview',
     spacerClass = 'bio-spacer',
     zoomClass = 'bio-zoomview',
-    arrowClass = 'bio-slidearrow ui-widget-header',
     leftClass = 'bio-slideleft',
     rightClass = 'bio-slideright',
     loadpanelC = 'load-panel';
@@ -2313,7 +2396,8 @@ $.widget("bio.sequenceView", $.bio.panel, {
             download_status: 'Downloading Features: %(loaded) of %(total)',
             process_status: 'Processing Features: %(loaded) of %(total)',
             download_start: 'Downloading Features...',
-            loading_graphics: 'Loading Graphics...'
+            loading_graphics: 'Loading Graphics...',
+            load_complete: 'Loading Complete'
         },
         height: 400
     },
@@ -2385,24 +2469,6 @@ $.widget("bio.sequenceView", $.bio.panel, {
         var zv = this.zoomview = this._panel_item()
             .addClass(zoomClass)
             .appendTo(this.seqview);
-
-        this.right_arrow = $('<div>')
-            .addClass(arrowClass + ' ' + rightClass)
-            .append($('<span>')
-                .addClass('ui-icon ui-icon-triangle-1-e'))
-            .appendTo(zv);
-        this.left_arrow = $('<div>')
-            .addClass(arrowClass + ' ' + leftClass)
-            .append($('<span>')
-                .addClass('ui-icon ui-icon-triangle-1-w'))
-            .appendTo(zv);
-
-        //Events
-        this.right_arrow.add(this.left_arrow).mouseenter(function(){
-            $(this).addClass('ui-state-hover');
-        }).mouseleave(function() {
-            $(this).removeClass('ui-state-hover');
-        });
         
         // --------------------------------------------------------------
         // Make sequenceLoader
@@ -2453,12 +2519,29 @@ $.widget("bio.sequenceView", $.bio.panel, {
         this._hide_loader();
         this._show_seqview();
 
-        var self = this;
+        var self = this,
+            t = this.options.text,
+            l = 0;
+        var completed = function(){
+            l = l+1;
+            if(l===2){
+                self.setStatus(t.load_complete);
+            }
+        };
+
         setTimeout( function() {
             self.overview.overview({
                 featureStore: fs,
                 colorScheme: self._get_color_scheme(fs.types),
-                seq_length: self.meta.length
+                seq_length: self.meta.length,
+                completed: completed
+            });
+            self.zoomview.sequence({
+                featureStore: fs,
+                colorScheme: self._get_color_scheme(fs.types),
+                tile_length: 1024,
+                seq_length: self.meta.length,
+                completed: completed
             });
         }, 50);
     },

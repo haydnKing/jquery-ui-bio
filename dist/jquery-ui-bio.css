@@ -1,6 +1,17 @@
-/*! jQuery Ui Bio - v0.1.0 - 2013-01-11
+/*! jQuery Ui Bio - v0.1.0 - 2013-01-12
 * https://github.com/Gibthon/jquery-ui-bio
 * Copyright (c) 2013 Haydn King; Licensed MIT, GPL */
+.bio-sequence.ui-widget {
+  overflow: hidden;
+}
+.bio-sequence.ui-widget svg > text {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
 .bio-statusbar.ui-widget-content {
   z-index: 5;
   position: relative;
@@ -22,28 +33,6 @@
 .bio-statusbar.ui-widget-content > p {
   margin: 2px 35px;
   text-indent: -10px;
-}
-.bio-zoomview > .bio-slidearrow {
-  position: absolute;
-  width: 32px;
-  top: 0;
-  bottom: 0;
-  background-image: none;
-  border: none;
-  cursor: pointer;
-}
-.bio-zoomview > .bio-slidearrow > .ui-icon {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  margin-top: -8px;
-  margin-left: -8px;
-}
-.bio-zoomview > .bio-slidearrow.bio-slideleft {
-  left: 0;
-}
-.bio-zoomview > .bio-slidearrow.bio-slideright {
-  right: 0;
 }
 .bio-sequence-view .bio-panel-item.load-panel {
   padding: 10em 5em 5em;

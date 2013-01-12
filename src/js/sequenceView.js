@@ -15,7 +15,6 @@ var baseClasses = 'bio-sequence-view ui-widget',
     overviewClass = 'bio-overview',
     spacerClass = 'bio-spacer',
     zoomClass = 'bio-zoomview',
-    arrowClass = 'bio-slidearrow ui-widget-header',
     leftClass = 'bio-slideleft',
     rightClass = 'bio-slideright',
     loadpanelC = 'load-panel';
@@ -52,7 +51,8 @@ $.widget("bio.sequenceView", $.bio.panel, {
             download_status: 'Downloading Features: %(loaded) of %(total)',
             process_status: 'Processing Features: %(loaded) of %(total)',
             download_start: 'Downloading Features...',
-            loading_graphics: 'Loading Graphics...'
+            loading_graphics: 'Loading Graphics...',
+            load_complete: 'Loading Complete'
         },
         height: 400
     },
@@ -124,24 +124,6 @@ $.widget("bio.sequenceView", $.bio.panel, {
         var zv = this.zoomview = this._panel_item()
             .addClass(zoomClass)
             .appendTo(this.seqview);
-
-        this.right_arrow = $('<div>')
-            .addClass(arrowClass + ' ' + rightClass)
-            .append($('<span>')
-                .addClass('ui-icon ui-icon-triangle-1-e'))
-            .appendTo(zv);
-        this.left_arrow = $('<div>')
-            .addClass(arrowClass + ' ' + leftClass)
-            .append($('<span>')
-                .addClass('ui-icon ui-icon-triangle-1-w'))
-            .appendTo(zv);
-
-        //Events
-        this.right_arrow.add(this.left_arrow).mouseenter(function(){
-            $(this).addClass('ui-state-hover');
-        }).mouseleave(function() {
-            $(this).removeClass('ui-state-hover');
-        });
         
         // --------------------------------------------------------------
         // Make sequenceLoader
@@ -192,12 +174,29 @@ $.widget("bio.sequenceView", $.bio.panel, {
         this._hide_loader();
         this._show_seqview();
 
-        var self = this;
+        var self = this,
+            t = this.options.text,
+            l = 0;
+        var completed = function(){
+            l = l+1;
+            if(l===2){
+                self.setStatus(t.load_complete);
+            }
+        };
+
         setTimeout( function() {
             self.overview.overview({
                 featureStore: fs,
                 colorScheme: self._get_color_scheme(fs.types),
-                seq_length: self.meta.length
+                seq_length: self.meta.length,
+                completed: completed
+            });
+            self.zoomview.sequence({
+                featureStore: fs,
+                colorScheme: self._get_color_scheme(fs.types),
+                tile_length: 1024,
+                seq_length: self.meta.length,
+                completed: completed
             });
         }, 50);
     },
