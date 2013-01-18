@@ -2269,7 +2269,8 @@ $.widget("bio.overview", {
 /*global next_color:false,bio:false,createjs:false */
 (function($, undefined) {
 
-var baseC = 'bio-sequence ui-widget';
+var baseC = 'bio-sequence ui-widget',
+    labelC = 'label';
 
 var sep = 10,
     tick = 3,
@@ -2305,13 +2306,12 @@ p.draw = function(ctx, ignoreCache){
     //if(this._DisplayObject_draw(ctx, ignoreCache)) {return true;}
     
     var p = this.seq.pos,
-        o = this.seq.offset,
         h2 = this.seq.h2,
         w = this.seq.w,
         step = 10,
+        step_p = step * base_width,
         start = step * Math.ceil(p / step),
-        stop = start + w / base_width,
-        start_p = (start - p) * base_width - o,
+        start_p = (start - p) * base_width,
         y = [h2 - sep - tick, h2 - sep, h2 + sep, h2 + sep + tick],
         x, i;
 
@@ -2327,16 +2327,23 @@ p.draw = function(ctx, ignoreCache){
     ctx.lineTo(w,y[2]);
     ctx.stroke();
 
-    for(i = start; i < stop; i+= step){
-        x = start_p + (i-start)*base_width;
+    for(x = start_p; x < w; x += step_p){
         ctx.beginPath();
         ctx.moveTo(x,y[0]);
         ctx.lineTo(x,y[1]);
         ctx.moveTo(x,y[2]);
         ctx.lineTo(x,y[3]);
         ctx.stroke();
-        
-        //ctx.strokeText(String(i),x,y[3]+tick_text);
+    }
+
+    this.seq.labels.css('left', start_p - step_p / 2);
+
+    if(start !== parseInt(this.seq.labels.children(':first-child').text(), 10)){
+        i = start;
+        this.seq.labels.children().each(function(){
+            $(this).text(i);
+            i += step;
+        });
     }
 
     ctx.strokeStyle = s;
@@ -2364,6 +2371,7 @@ $.widget("bio.sequence", $.ui.mouse, {
         this._init_position();
         this._create_canvas();
         this._calc_sizes();
+        this._create_labels();
 
         this._trigger('completed');
 
@@ -2375,6 +2383,11 @@ $.widget("bio.sequence", $.ui.mouse, {
     _destroy: function(){
         this._mouseDestroy();
     },
+    moveTo: function(pos){
+        this.pos = Math.max(0, Math.min(pos, 
+                        this.options.featureStore.seq_length - this.bw));
+        this.stage.update();
+    },
     _calc_sizes: function(){
         var o = this.options;
         //measure
@@ -2382,6 +2395,7 @@ $.widget("bio.sequence", $.ui.mouse, {
         this.h2 = this.h / 2;
         this.w = this.el.width();
         this.w2 = this.w / 2;
+        this.bw = Math.floor(this.w / base_width);
 
         this.canvas.width(this.w);
         this.canvas.height(this.h);
@@ -2389,8 +2403,6 @@ $.widget("bio.sequence", $.ui.mouse, {
     },
     _init_position: function(){
         this.pos = 0;
-        this.offset = 0;
-        this.bw = Math.floor(this.w / base_width);
     },
     _create_canvas: function(){
         this.canvas = $('<canvas>')
@@ -2402,34 +2414,41 @@ $.widget("bio.sequence", $.ui.mouse, {
         var a = new Axis(this);
         this.stage.addChild(a);
     },
+    _create_labels: function() {
+        if(this.labels != null){
+            this.labels.remove();
+        }
+        this.labels = $('<div>').addClass(labelC);
+        var num = Math.ceil(this.w / (10 * base_width)),
+            gap = 10 * base_width,
+            i;
+        for(i = 0; i < num; i+=1){
+            $('<div>')
+                .text(10*i)
+                .css('width', gap+'px')
+                .appendTo(this.labels);
+        }
+
+        this.labels
+            .css({
+                'top': this.h2 + sep + tick + 1,
+                'left': -gap / 2
+            })
+            .appendTo(this.el);
+    },
     _mouseStart: function(ev){
         this.mouse = {x: ev.pageX, y: ev.pageY};
-        console.log('mouseStart');
     },
     _mouseStop: function(ev){
-        console.log('mouseStop');
     },
     _mouseDrag: function(ev){
         var _mouse = {x: ev.pageX, y: ev.pageY},
             fs = this.options.featureStore,
             dx = _mouse.x - this.mouse.x,
-            dy = _mouse.y - this.mouse.y,
-            pos = this.pos * base_width + this.offset - dx;
+            dy = _mouse.y - this.mouse.y;
 
-        this.pos = Math.floor(pos / base_width);
-        this.offset = pos - this.pos * base_width;
-        if(this.pos > fs.seq_length - this.bw){
-            this.pos = fs.seq_length - this.bw;
-            this.offset = 0;
-        }
-        else if(this.pos < 0){
-            this.pos = 0;
-            this.offset = 0;
-        }
-
+        this.moveTo(this.pos - dx / base_width);
         this.mouse = _mouse;
-
-        this.stage.update();
     }
 });
 

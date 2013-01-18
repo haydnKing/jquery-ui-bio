@@ -185,6 +185,19 @@
 }
 .bio-sequence.ui-widget {
   overflow: hidden;
+  position: relative;
+}
+.bio-sequence.ui-widget .label {
+  position: absolute;
+  left: 0;
+  right: -50px;
+  font-size: 10px;
+  height: 13px;
+  overflow: hidden;
+}
+.bio-sequence.ui-widget .label  > div {
+  float: left;
+  text-align: center;
 }
 .bio-length:after {
   content: " bp";
