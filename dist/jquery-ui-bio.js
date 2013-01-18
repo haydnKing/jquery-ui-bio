@@ -2083,7 +2083,7 @@ $.widget("bio.overview", {
                     }
                 }
 
-                if(ret.lengt === 1){
+                if(ret.length === 1){
                    self._trigger('selected', null, ret[0].feature); 
                 }
                 if(ret.length <= 1){
@@ -2639,7 +2639,11 @@ $.widget("bio.sequenceView", $.bio.panel, {
                 featureStore: fs,
                 colorScheme: self._get_color_scheme(fs.types),
                 seq_length: self.meta.length,
-                completed: completed
+                completed: completed,
+                selected: function(ev, feat){
+                    var loc = feat.location.start;
+                    self.zoomview.sequence('moveTo', loc);
+                }
             });
             self.zoomview.sequence({
                 featureStore: fs,

@@ -95,7 +95,7 @@ $.widget("bio.overview", {
                     }
                 }
 
-                if(ret.lengt === 1){
+                if(ret.length === 1){
                    self._trigger('selected', null, ret[0].feature); 
                 }
                 if(ret.length <= 1){
