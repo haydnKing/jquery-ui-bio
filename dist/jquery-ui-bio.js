@@ -2337,17 +2337,6 @@ p.draw = function(ctx, ignoreCache){
         ctx.stroke();
     }
 
-    this.seq.labels.css('left', start_p - step_p / 2);
-
-    if(start !== this.first){
-        i = start;
-        this.seq.labels.children().each(function(){
-            $(this).text(i);
-            i += step;
-        });
-        this.first = start;
-    }
-
     ctx.strokeStyle = s;
     return true;
 };
@@ -2370,7 +2359,6 @@ $.widget("bio.sequence", $.ui.mouse, {
         o.tick_color = o.tick_color || this.el.css('color');
         o.back_color = o.back_color || this.el.css('background-color');
 
-        this._init_position();
         this._create_canvas();
         this._calc_sizes();
         this._create_labels();
@@ -2378,7 +2366,7 @@ $.widget("bio.sequence", $.ui.mouse, {
         this._trigger('completed');
 
         this._mouseInit();
-        this.stage.update();
+        this.moveTo(0);
     },
     _init: function(){
     },
@@ -2389,6 +2377,19 @@ $.widget("bio.sequence", $.ui.mouse, {
         this.pos = Math.max(0, Math.min(pos, 
                         this.options.featureStore.seq_length - this.bw));
         this.stage.update();
+
+
+        var first = parseInt(this.labels.children(':first-child'), 10),
+            start = 50 * Math.ceil(this.pos / 50);
+        if(start !== first){
+            var i = start;
+            this.labels.children().each(function(){
+                $(this).text(i);
+                i += 50;
+            });
+        }
+        this.labels.css('left', (start - this.pos - 25)*base_width);
+
         this._trigger('moved', null, {start: this.pos, width: this.bw});
     },
     _calc_sizes: function(){
@@ -2403,9 +2404,6 @@ $.widget("bio.sequence", $.ui.mouse, {
         this.canvas.width(this.w);
         this.canvas.height(this.h);
         this.canvas.attr({width: this.w, height: this.h});
-    },
-    _init_position: function(){
-        this.pos = 0;
     },
     _create_canvas: function(){
         this.canvas = $('<canvas>')
@@ -2422,20 +2420,19 @@ $.widget("bio.sequence", $.ui.mouse, {
             this.labels.remove();
         }
         this.labels = $('<div>').addClass(labelC);
-        var num = Math.ceil(this.w / (10 * base_width)),
-            gap = 10 * base_width,
+        var num = Math.ceil(this.w / (50 * base_width)),
+            gap = 50 * base_width,
             i;
         for(i = 0; i < num; i+=1){
             $('<div>')
-                .text(10*i)
+                .text(50*i)
                 .css('width', gap+'px')
                 .appendTo(this.labels);
         }
 
         this.labels
             .css({
-                'top': this.h2 + sep + tick + 1,
-                'left': -gap / 2
+                'top': this.h2 + sep + tick + 1
             })
             .appendTo(this.el);
     },
