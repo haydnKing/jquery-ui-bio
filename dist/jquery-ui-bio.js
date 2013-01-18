@@ -2009,12 +2009,12 @@ $.widget("bio.overview", {
         colorScheme: {},
         seq_length: 0
     },
-    setHighlight: function(start, end, anim){
+    setHighlight: function(start, width, anim){
         anim = anim || false;
-        var s = this.options.seq_length / this.w;
+        var s = this.w / this.options.seq_length;
         var attrs = {
             x: s * start,
-            width: s * (end - start)
+            width: s * width
         };
         this.highlight.show();
         if(anim){
@@ -2298,6 +2298,7 @@ p.initialize = function(sequence, color){
     console.log('Returned from DisplayObject.initialize()');
     this.seq = sequence;
     this.color = this.color || color;
+    this.first = 0;
 };
 
 p._DisplayObject_draw = p.draw;
@@ -2338,12 +2339,13 @@ p.draw = function(ctx, ignoreCache){
 
     this.seq.labels.css('left', start_p - step_p / 2);
 
-    if(start !== parseInt(this.seq.labels.children(':first-child').text(), 10)){
+    if(start !== this.first){
         i = start;
         this.seq.labels.children().each(function(){
             $(this).text(i);
             i += step;
         });
+        this.first = start;
     }
 
     ctx.strokeStyle = s;
@@ -2387,6 +2389,7 @@ $.widget("bio.sequence", $.ui.mouse, {
         this.pos = Math.max(0, Math.min(pos, 
                         this.options.featureStore.seq_length - this.bw));
         this.stage.update();
+        this._trigger('moved', null, {start: this.pos, width: this.bw});
     },
     _calc_sizes: function(){
         var o = this.options;
@@ -2646,7 +2649,11 @@ $.widget("bio.sequenceView", $.bio.panel, {
                 colorScheme: self._get_color_scheme(fs.types),
                 tile_length: 1024,
                 seq_length: self.meta.length,
-                completed: completed
+                completed: completed,
+                moved: function(ev, data) {
+                    self.overview.overview('setHighlight',
+                                           data.start, data.width);
+                }
             });
         }, 50);
     },

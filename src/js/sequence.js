@@ -37,6 +37,7 @@ p.initialize = function(sequence, color){
     console.log('Returned from DisplayObject.initialize()');
     this.seq = sequence;
     this.color = this.color || color;
+    this.first = 0;
 };
 
 p._DisplayObject_draw = p.draw;
@@ -77,12 +78,13 @@ p.draw = function(ctx, ignoreCache){
 
     this.seq.labels.css('left', start_p - step_p / 2);
 
-    if(start !== parseInt(this.seq.labels.children(':first-child').text(), 10)){
+    if(start !== this.first){
         i = start;
         this.seq.labels.children().each(function(){
             $(this).text(i);
             i += step;
         });
+        this.first = start;
     }
 
     ctx.strokeStyle = s;
@@ -107,7 +109,6 @@ $.widget("bio.sequence", $.ui.mouse, {
         o.tick_color = o.tick_color || this.el.css('color');
         o.back_color = o.back_color || this.el.css('background-color');
 
-        this._init_position();
         this._create_canvas();
         this._calc_sizes();
         this._create_labels();
@@ -115,7 +116,7 @@ $.widget("bio.sequence", $.ui.mouse, {
         this._trigger('completed');
 
         this._mouseInit();
-        this.stage.update();
+        this.moveTo(0);
     },
     _init: function(){
     },
@@ -126,6 +127,7 @@ $.widget("bio.sequence", $.ui.mouse, {
         this.pos = Math.max(0, Math.min(pos, 
                         this.options.featureStore.seq_length - this.bw));
         this.stage.update();
+        this._trigger('moved', null, {start: this.pos, width: this.bw});
     },
     _calc_sizes: function(){
         var o = this.options;
@@ -139,9 +141,6 @@ $.widget("bio.sequence", $.ui.mouse, {
         this.canvas.width(this.w);
         this.canvas.height(this.h);
         this.canvas.attr({width: this.w, height: this.h});
-    },
-    _init_position: function(){
-        this.pos = 0;
     },
     _create_canvas: function(){
         this.canvas = $('<canvas>')

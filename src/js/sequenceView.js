@@ -196,7 +196,11 @@ $.widget("bio.sequenceView", $.bio.panel, {
                 colorScheme: self._get_color_scheme(fs.types),
                 tile_length: 1024,
                 seq_length: self.meta.length,
-                completed: completed
+                completed: completed,
+                moved: function(ev, data) {
+                    self.overview.overview('setHighlight',
+                                           data.start, data.width);
+                }
             });
         }, 50);
     },

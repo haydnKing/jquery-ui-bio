@@ -21,12 +21,12 @@ $.widget("bio.overview", {
         colorScheme: {},
         seq_length: 0
     },
-    setHighlight: function(start, end, anim){
+    setHighlight: function(start, width, anim){
         anim = anim || false;
-        var s = this.options.seq_length / this.w;
+        var s = this.w / this.options.seq_length;
         var attrs = {
             x: s * start,
-            width: s * (end - start)
+            width: s * width
         };
         this.highlight.show();
         if(anim){
