@@ -16,7 +16,7 @@ var sep = 10,
     base_width = 5,
     marker_height = 10;
 
-$.widget("bio.sequence", $.bio.panel, {
+$.widget("bio.sequence", $.ui.mouse, { 
     options: {
         tile_length: 1024,
         tick_color: null,
@@ -31,60 +31,105 @@ $.widget("bio.sequence", $.bio.panel, {
         o.back_color = o.back_color || this.el.css('background-color');
 
         this._calc_sizes();
-        this.el.append(this._make_tile(0));
+        this._init_position();
+        this._make_paper();
+        this._redraw();
         this._trigger('completed');
+
+        this._mouseInit();
     },
     _init: function(){
+    },
+    _destroy: function(){
+        this._mouseDestroy();
     },
     _calc_sizes: function(){
         var o = this.options;
         //measure
         this.h = this.el.height();
         this.h2 = this.h / 2;
-        this.w = base_width * o.tile_length;
+        this.w = this.el.width();
+        this.w2 = this.w / 2;
     },
-    _make_tile: function(tile_num){
+    _init_position: function(){
+        this.pos = 0;
+        this.offset = 0;
+        this.bw = Math.floor(this.w / base_width);
+    },
+    _make_paper: function(tile_num){
         var o = this.options,
-            self = this,
-            from = tile_num * o.tile_length,
-            to = from + o.tile_length,
             d = $('<div>')
                 .height(this.h)
                 .width(this.w);
-        Raphael(d.get(0), this.w, this.h, function(){
-            
-            var tile = this,
-                i,x,y,path;
+        this.paper = Raphael(d.get(0), this.w, this.h); 
+        this.el.append(d);
 
-            y = [self.h2-sep-tick, self.h2+sep+tick];
-            path = '';
-            for(i = 10 * Math.ceil(from/10); i < to; i+=10){
-                x = (0.5+i-from) * base_width;
-                path = path + 'M'+x+','+y[0]+'L'+x+','+y[1];
-                var text = tile.text(x, y[1], String(i))
+        this.paper.rect(-1, this.h2-sep, this.w+2, 2*sep)
+            .attr({
+                stroke: o.tick_color,
+                fill: o.back_color
+            })
+            .toFront();
+    },
+    _redraw: function() {
+        this._update_markers();
+    },
+    _update_markers: function(){
+        var i,x,y,path,
+            o = this.options;
+
+        this.markers = this.markers || this.paper.set();
+        this.markers.remove();
+
+        y = [this.h2-sep-tick, this.h2+sep+tick];
+        path = '';
+        for(i = 10 * Math.ceil(this.pos/10); i < this.pos+this.bw; i+=10){
+            x = (0.5+i-this.pos) * base_width;
+            path = path + 'M'+x+','+y[0]+'L'+x+','+y[1];
+            this.markers.push(
+                this.paper.text(x, y[1]+tick_text+1, String(i))
                     .attr({
                         color: o.tick_color,
                         'font-height': tick_text
-                    });
-                $('tspan:first-child', text.node).attr('dy', tick_text+1);
-            }
-            tile.path(path)
+                    }));
+        }
+        this.markers.push(
+            this.paper.path(path)
                 .attr({
                     stroke: o.tick_color
-                });
+                })
+                .toBack());
 
-            tile.rect(-1, self.h2-sep, self.w+2, 2*sep)
-                .attr({
-                    stroke: o.tick_color,
-                    fill: o.back_color
-                });
+    },
+    _mouseStart: function(ev){
+        this.mouse = {x: ev.pageX, y: ev.pageY};
+        console.log('mouseStart');
+    },
+    _mouseStop: function(ev){
+        console.log('mouseStop');
+    },
+    _mouseDrag: function(ev){
+        var _mouse = {x: ev.pageX, y: ev.pageY},
+            fs = this.options.featureStore,
+            dx = _mouse.x - this.mouse.x,
+            dy = _mouse.y - this.mouse.y,
+            pos = this.pos * base_width + this.offset - dx;
 
-            tile.path('M-5,'+self.h2+'L'+(self.w+5)+','+self.h2);
+        this.pos = Math.floor(pos / base_width);
+        this.offset = pos - this.pos * base_width;
+        if(this.pos > fs.seq_length - this.bw){
+            this.pos = fs.seq_length - this.bw;
+            this.offset = 0;
+        }
+        else if(this.pos < 0){
+            this.pos = 0;
+            this.offset = 0;
+        }
 
-        });
+        this.mouse = _mouse;
+        this._redraw();
 
-        return d;
-
+        console.log('mouseDrag('+this.pos+'bp + '+this.offset+'px)');
     }
 });
 

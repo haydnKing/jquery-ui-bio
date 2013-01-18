@@ -330,7 +330,7 @@ this.bio = this.bio || {};
             start = true;
         }
 
-        this.done = 0,
+        this.done = 0;
         this.total = this.features.length;
 
         this.stacks = {'fwd':{}, 'rev':{}};
