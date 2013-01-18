@@ -2281,7 +2281,11 @@ $.widget("bio.sequence", $.ui.mouse, {
     options: {
         tile_length: 1024,
         tick_color: null,
-        featureStore: null
+        featureStore: null,
+        text: {
+            noCanvas: "Sorry, your browser does not support HTML5 canvas.\n"+
+                "Please upgrade your browser to use this widget"
+        }
     },
     _create: function(){
         this.el = $(this.element[0])
@@ -2291,8 +2295,9 @@ $.widget("bio.sequence", $.ui.mouse, {
         o.tick_color = o.tick_color || this.el.css('color');
         o.back_color = o.back_color || this.el.css('background-color');
 
-        this._calc_sizes();
         this._init_position();
+        this._create_canvas();
+        this._calc_sizes();
 
         this._trigger('completed');
 
@@ -2310,11 +2315,20 @@ $.widget("bio.sequence", $.ui.mouse, {
         this.h2 = this.h / 2;
         this.w = this.el.width();
         this.w2 = this.w / 2;
+
+        this.canvas.width(this.w);
+        this.canvas.height(this.h);
     },
     _init_position: function(){
         this.pos = 0;
         this.offset = 0;
         this.bw = Math.floor(this.w / base_width);
+    },
+    _create_canvas: function(){
+        this.canvas = $('<canvas>')
+            .append($('<div>')
+                .append($('<p>').text(this.options.text.noCanvas)))
+            .appendTo(this.el);
     },
     _mouseStart: function(ev){
         this.mouse = {x: ev.pageX, y: ev.pageY};
