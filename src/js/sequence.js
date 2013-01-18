@@ -33,7 +33,7 @@ $.widget("bio.sequence", $.ui.mouse, {
         this._calc_sizes();
         this._init_position();
         this._make_paper();
-        this._redraw();
+        this._init_markers();
         this._trigger('completed');
 
         this._mouseInit();
@@ -75,31 +75,40 @@ $.widget("bio.sequence", $.ui.mouse, {
         this._update_markers();
     },
     _update_markers: function(){
+        var pos = 10 * Math.ceil(this.pos/10),
+            off = (pos - this.pos) * base_width,
+            i = 0,
+            step = 10 * base_width;
+
+        this.markers.attr({x: off});
+        this.markertext.forEach(function(e){
+            e.attr({x: off+i*step, text: 10*i+pos});
+            i += 1;
+        });
+    },
+    _init_markers: function(){
         var i,x,y,path,
             o = this.options;
 
-        this.markers = this.markers || this.paper.set();
-        this.markers.remove();
+        this.markertext = this.paper.set();
 
         y = [this.h2-sep-tick, this.h2+sep+tick];
         path = '';
         for(i = 10 * Math.ceil(this.pos/10); i < this.pos+this.bw; i+=10){
             x = (0.5+i-this.pos) * base_width;
             path = path + 'M'+x+','+y[0]+'L'+x+','+y[1];
-            this.markers.push(
+            this.markertext.push(
                 this.paper.text(x, y[1]+tick_text+1, String(i))
                     .attr({
                         color: o.tick_color,
                         'font-height': tick_text
                     }));
         }
-        this.markers.push(
-            this.paper.path(path)
+        this.markers = this.paper.path(path)
                 .attr({
                     stroke: o.tick_color
                 })
-                .toBack());
-
+                .toBack();
     },
     _mouseStart: function(ev){
         this.mouse = {x: ev.pageX, y: ev.pageY};
