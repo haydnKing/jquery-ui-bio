@@ -147,5 +147,5 @@ def getTestFeatures(request, **kwargs):
 def getTestSequence(request, **kwargs):
 	id = int(kwargs.get('id', 0))
 	f = int(kwargs.get('from'))
-	t = int(fwargs.get('to'))
+	t = int(kwargs.get('to'))
 	return sequence[id][f:t]

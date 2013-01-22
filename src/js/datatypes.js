@@ -553,7 +553,7 @@ this.bio = this.bio || {};
         {
             if(!this.seq[t]){
                 calls += 1;
-                this.cb(t*this.tile_size, (t+1)*this.tile_size, _get_handler(t));
+                this.cb(_get_handler(t), t*this.tile_size, (t+1)*this.tile_size);
             }
             else{
                 ret.push({
@@ -563,18 +563,20 @@ this.bio = this.bio || {};
                 });
             }
         }
-        ret[ret.length-1] = ret[ret.length-1].seq.slice(0,
-                            Math.min(this.tile_size, end-e_t*this.tile_size));
-        ret[ret.length-1].end = end;
+        if(ret.length > 0){
+            ret[ret.length-1].seq = ret[ret.length-1].seq.slice(0,
+                                Math.min(this.tile_size, end-e_t*this.tile_size));
+            ret[ret.length-1].end = end;
 
-        ret[0].seq = ret[0].seq.slice(Math.max(0,start-s_t*this.tile_size));
-        ret[0].from = start;
+            ret[0].seq = ret[0].seq.slice(Math.max(0,start-s_t*this.tile_size));
+            ret[0].from = start;
+        }
 
         return ret;
     };
 
     sc._add_tile = function(tile, seq){
-        this.seq[tile] = seq;
+        this.seq[tile] = seq.toLowerCase();
     };
 
     bio.SequenceCache = SequenceCache;

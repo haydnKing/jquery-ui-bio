@@ -42,6 +42,12 @@ $.widget("bio.sequenceView", $.bio.panel, {
          *  - function(cb, post_data) -> XHR: function to call to return data
          */
         features: null,
+        /*
+         * sequence source of features
+         *  - function(cb, from, to)
+         *      call cb with the returned sequence
+         */
+        sequence: null,
         text: {
             defaultTitle: 'Sequence View',
             defaultHelp: 'Drag to scroll around in the fragment',
@@ -200,6 +206,7 @@ $.widget("bio.sequenceView", $.bio.panel, {
                 colorScheme: self._get_color_scheme(fs.types),
                 tile_length: 1024,
                 seq_length: self.meta.length,
+                sequence: self.options.sequence,
                 completed: completed,
                 moved: function(ev, data) {
                     self.overview.overview('setHighlight',

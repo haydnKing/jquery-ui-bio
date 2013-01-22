@@ -30,6 +30,11 @@ $(window).ready( function(){
             return Dajaxice.call('ui_bio_demos.getTestFeatures', 'POST',
                 cb, data);
         },
+        sequence: function(cb, from, to){
+            console.log('sequence(cb, '+from+', '+to+');');
+            return Dajaxice.call('ui_bio_demos.getTestSequence', 'POST',
+            cb, {id:1, from:from, to: to});
+        },
         post_data: {id: 1,}
     });
 });

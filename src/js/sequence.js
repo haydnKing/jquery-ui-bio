@@ -14,7 +14,7 @@ var baseC = 'bio-sequence ui-widget',
 var sep = 10,
     tick = 3,
     tick_text = 6,
-    base_width = 5,
+    base_width = 10,
     marker_height = 10,
     feat_offset = sep+marker_height;
 
@@ -87,6 +87,7 @@ p.type_offsets = null;
 
 p._DO_init = p.initialize;
 p.initialize = function(seq){
+    this._DO_init();
     this.seq = seq;
     this.fs = seq.options.featureStore;
     this.cs = seq.options.colorScheme;
@@ -144,6 +145,63 @@ p.draw = function(ctx){
     }
 };
 
+var Sequence = function(sequence, seqCache){
+    this.initialize(sequence, seqCache);
+};
+p = Sequence.prototype = new createjs.DisplayObject();
+
+p._DO_init = p.initialize;
+p.initialize = function(seq, seqCache){
+    this._DO_init();
+    this.seq = seq;
+    this.sc = seqCache;
+
+    this.bases = {
+        a: this._canvas('A', 'T'),
+        t: this._canvas('T', 'A'),
+        g: this._canvas('G', 'C'),
+        c: this._canvas('C', 'G')
+    };
+};
+
+p._canvas = function(a,b){
+    var c = document.createElement('canvas'),
+        ctx;
+    c.width = base_width;
+    c.height = 2*sep;
+    ctx = c.getContext('2d');
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    ctx.font = 'normal ' + 0.9 * sep + 'px "Helvetica Neue",Helvetica,Arial,sans-serif';
+
+    ctx.fillText(a, 0.5*base_width, 1);
+
+    ctx.textBaseline = 'alphabetic';
+    ctx.fillText(b, 0.5*base_width, 2*sep - 1);
+
+    return c;
+};
+
+p.draw = function(ctx){
+    var self = this,
+        from = this.seq.pos,
+        to = from + this.seq.bw,
+        seq = this.sc.get(Math.floor(from), Math.floor(to), function(){
+            self.getStage().update();
+        }),
+        y = this.seq.h2 - sep,
+        i, j, snip, char, x;
+
+    for(i = 0; i < seq.length; i+=1){
+        snip = seq[i];
+        for(j = 0; j < snip.seq.length; j+=1){
+            char = snip.seq[j];
+            x = (snip.from + j - from) * base_width;
+            ctx.drawImage(this.bases[char], x,y);
+        }
+    }
+};
+
 //Monkey patch a createjs.stage so as not to respond to mousemove events
 //and thus save a load of CPU
 
@@ -158,6 +216,7 @@ $.widget("bio.sequence", $.ui.mouse, {
         tile_length: 1024,
         tick_color: null,
         featureStore: null,
+        sequence: null,
         text: {
             noCanvas: "Sorry, your browser does not support HTML5 canvas.\n"+
                 "Please upgrade your browser to use this widget"
@@ -228,6 +287,8 @@ $.widget("bio.sequence", $.ui.mouse, {
 
         this.stage.addChild(new Axis(this));
         this.stage.addChild(new Features(this));
+        this.stage.addChild(new Sequence(this, 
+                                new bio.SequenceCache(this.options.sequence)));
     },
     _create_labels: function() {
         if(this.labels != null){
