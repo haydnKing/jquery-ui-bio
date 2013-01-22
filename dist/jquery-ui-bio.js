@@ -1,4 +1,4 @@
-/*! jQuery Ui Bio - v0.1.0 - 2013-01-18
+/*! jQuery Ui Bio - v0.1.0 - 2013-01-22
 * https://github.com/Gibthon/jquery-ui-bio
 * Copyright (c) 2013 Haydn King; Licensed MIT, GPL */
 
@@ -245,9 +245,17 @@ this.bio = this.bio || {};
     {
         return this.by_type[type.toLowerCase()];
     };
-    fs.getFeaturesByTile = function(tile)
+    fs.getFeaturesByTile = function(start, end)
     {
-        return this.tiles[tile];
+        if(!end){
+            return this.tiles[start];
+        }
+        var ret = this.tiles[start],
+            i;
+        for(i = start; i <= end; i += 1){
+            copy(this.tiles[i], ret);
+        }
+        return ret;
     };
     fs.pos2tile = function(pos)
     {

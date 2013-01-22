@@ -300,6 +300,19 @@
         }
     });
 
+    test('getFeaturesByTile', 3, function(){
+        var f = this.fs.getFeaturesByTile(0,1);
+        //we only want to test the ids
+        for(var i in f){
+            for(var j in f[i]){
+                f[i][j] = f[i][j].id;
+            }
+        }
+        deepEqual(f.one.sort(), [0,1]);
+        deepEqual(f.two.sort(), [3]);
+        deepEqual(f.three.sort(), []);
+    });
+    
     test('getFeaturesInRange', 3, function(){
         var f = this.fs.getFeaturesInRange(100,105);
         //we only want to test the ids
