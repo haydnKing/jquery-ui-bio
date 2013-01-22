@@ -237,6 +237,9 @@ this.bio = this.bio || {};
     {
         return this.types;
     };
+    fs.getStackHeight = function(){
+        return this.stacks;
+    };
     fs.getFeatures = function()
     {
         return this.features;
@@ -2284,14 +2287,14 @@ var sep = 10,
     tick = 3,
     tick_text = 6,
     base_width = 5,
-    marker_height = 10;
+    marker_height = 10,
+    feat_offset = sep+marker_height;
 
 /*
  * Override createjs.DisplayObject with axis
  */
 
 var Axis = function(sequence, color){
-    console.log('call Axis.initialize');
     this.initialize(sequence, color);
 };
 var p = Axis.prototype = new createjs.DisplayObject();
@@ -2301,9 +2304,7 @@ p.color = 'rgb(50,50,50)';
 p._DisplayObject_initialize = p.initialize;
 
 p.initialize = function(sequence, color){
-    console.log('Call DisplayObject.initialize()');
     this._DisplayObject_initialize();
-    console.log('Returned from DisplayObject.initialize()');
     this.seq = sequence;
     this.color = this.color || color;
     this.first = 0;
@@ -2325,9 +2326,8 @@ p.draw = function(ctx, ignoreCache){
         x, i;
 
     var s = ctx.strokeStyle;
-    ctx.strokeStype = this.color;
-    ctx.textAlign = 'center';
-    ctx.font = tick_text + "px sans-serif";
+    ctx.strokeStyle = this.color;
+    ctx.lineWidth = 1.0;
 
     ctx.beginPath();
     ctx.moveTo(0,y[1]);
@@ -2349,6 +2349,82 @@ p.draw = function(ctx, ignoreCache){
     return true;
 };
 
+var Features = function(sequence){
+    this.initialize(sequence);
+};
+p = Features.prototype = new createjs.DisplayObject();
+
+p.track_height = 0;
+p.type_offsets = null;
+
+p._DO_init = p.initialize;
+p.initialize = function(seq){
+    this.seq = seq;
+    this.fs = seq.options.featureStore;
+    this.cs = seq.options.colorScheme;
+
+    this.type_offsets = {'fwd': {}, 'rev': {}};
+    
+    var i,fwd=0,rev=0,h,
+        t = this.fs.getTypes(),
+        s = this.fs.getStackHeight();
+
+    for(i in t){
+        this.type_offsets.fwd[t[i]] = fwd;
+        fwd += s.fwd[t[i]];
+        this.type_offsets.rev[t[i]] = rev;
+        rev += s.rev[t[i]];
+    }
+
+    console.log('rev,fwd = '+rev+','+fwd);
+    this.track_height = (this.seq.h2-feat_offset) / Math.max(rev,fwd,5);
+};
+
+p.draw = function(ctx){
+    var feats,
+        start = this.seq.pos,
+        end = this.seq.pos + this.seq.bw,
+        type, t,
+        feat, f,
+        y, o;
+
+    //get the features to draw
+    feats = this.fs.getFeaturesByTile(this.fs.pos2tile(start),
+                                      this.fs.pos2tile(end));
+
+    ctx.lineWidth = 0.8 * this.track_height;
+
+    for(type in feats){
+        ctx.strokeStyle = this.cs[type];
+        t = feats[type];
+    
+        for(f in t){
+            feat = t[f];
+            y = (feat.strand() >= 0) ?
+                this.seq.h2 - (feat_offset + 
+                               (this.type_offsets.fwd[type] +0.5+feat.track) *
+                                this.track_height) :
+                this.seq.h2 + (feat_offset + 
+                               (this.type_offsets.rev[type] +0.5+feat.track) *
+                                this.track_height);
+
+            ctx.beginPath();
+            ctx.moveTo(base_width * (feat.location.start - start), y);
+            ctx.lineTo(base_width * (feat.location.end - start), y);
+            ctx.stroke();
+        }
+    }
+};
+
+//Monkey patch a createjs.stage so as not to respond to mousemove events
+//and thus save a load of CPU
+
+var _patch_stage = function(stage){
+    stage.__handleMouseMove = stage._handleMouseMove;
+    stage._handleMouseMove = function() {};
+    return stage;
+};
+
 $.widget("bio.sequence", $.ui.mouse, { 
     options: {
         tile_length: 1024,
@@ -2368,7 +2444,6 @@ $.widget("bio.sequence", $.ui.mouse, {
         o.back_color = o.back_color || this.el.css('background-color');
 
         this._create_canvas();
-        this._calc_sizes();
         this._create_labels();
 
         this._trigger('completed');
@@ -2418,10 +2493,13 @@ $.widget("bio.sequence", $.ui.mouse, {
             .append($('<div>')
                 .append($('<p>').text(this.options.text.noCanvas)))
             .appendTo(this.el);
-        this.stage = new createjs.Stage(this.canvas.get(0));
+        this.stage = _patch_stage(new createjs.Stage(this.canvas.get(0)));
+        this.stage.enableMouseOver(0);
         
-        var a = new Axis(this);
-        this.stage.addChild(a);
+        this._calc_sizes();
+
+        this.stage.addChild(new Axis(this));
+        this.stage.addChild(new Features(this));
     },
     _create_labels: function() {
         if(this.labels != null){

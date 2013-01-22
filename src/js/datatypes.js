@@ -240,6 +240,9 @@ this.bio = this.bio || {};
     {
         return this.types;
     };
+    fs.getStackHeight = function(){
+        return this.stacks;
+    };
     fs.getFeatures = function()
     {
         return this.features;
