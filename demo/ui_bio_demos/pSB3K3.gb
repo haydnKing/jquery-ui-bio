@@ -29,6 +29,9 @@ FEATURES             Location/Qualifiers
                      /title="terminator stem loop"
      BioBrick        2729..2750
                      /title="Prefix"
+     misc            complement(2687..2690)
+                     /title="A reverse Feature"
+     
 ORIGIN
         1 tactagtagc ggccgctgca gtccggcaaa aaaacgggca aggtgtcacc accctgccct
        61 ttttctttaa aaccgaaaag attacttcgc gttatgcagg cttcctcgct cactgactcg
