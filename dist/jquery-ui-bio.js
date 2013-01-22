@@ -506,6 +506,75 @@ this.bio = this.bio || {};
 
     //Export to namespace
     bio.FeatureStore = FeatureStore;
+    
+
+    /*
+     * SequenceCache: cache parts of the sequence that have been downloaded
+     *
+     * callback: function(from, to, function(seq))
+     */
+    var SequenceCache = function(callback, tile_size){
+        this.tile_size = tile_size || this.tile_size;
+        this.cb = callback;
+        this.seq = {};
+    };
+    var sc = SequenceCache.prototype;
+
+    sc.tile_size = 1024;
+
+    /*
+     * return as much of the range as is available now as 
+     *  [{from: int, to: int, seq: sequence}, ...]
+     * call update_fn when the whole of the range is available, if it isn't
+     * already
+     */
+    sc.get = function(start, end, update_fn){
+        var self = this,
+            calls = 0,
+            ret = [],
+            s_t = Math.floor(start / this.tile_size),
+            e_t = Math.floor(end / this.tile_size),
+            t;
+
+        var _get_handler = function(tile){
+            return function(seq){
+                calls -= 1;
+                self._add_tile(tile, seq);
+                if(calls === 0 && $.isFunction(update_fn)){
+                    update_fn();
+                }
+            };
+        };
+
+        for(t = s_t; t <= e_t; t+=1)
+        {
+            if(!this.seq[t]){
+                calls += 1;
+                this.cb(t*this.tile_size, (t+1)*this.tile_size, _get_handler(t));
+            }
+            else{
+                ret.push({
+                    from: this.tile_size * t,
+                    to: this.tile_size * (t+1),
+                    seq: this.seq[t]
+                });
+            }
+        }
+        ret[ret.length-1] = ret[ret.length-1].seq.slice(0,
+                            Math.min(this.tile_size, end-e_t*this.tile_size));
+        ret[ret.length-1].end = end;
+
+        ret[0].seq = ret[0].seq.slice(Math.max(0,start-s_t*this.tile_size));
+        ret[0].from = start;
+
+        return ret;
+    };
+
+    sc._add_tile = function(tile, seq){
+        this.seq[tile] = seq;
+    };
+
+    bio.SequenceCache = SequenceCache;
 
 }(jQuery));
 

@@ -117,6 +117,12 @@ def load_features():
 		ret.append(feats)
 	return ret
 
+def load_sequence():
+	seq = SeqIO.read(files[1], 'genbank')
+	return [None, seq.seq]
+
+
+sequence = load_sequence()
 features = load_features()
 
 @dajaxice_register
@@ -136,3 +142,10 @@ def getTestMeta(request, **kwargs):
 def getTestFeatures(request, **kwargs):
 	id = int(kwargs.get('id', 0))
 	return json.dumps(features[id])
+
+@dajaxice_register
+def getTestSequence(request, **kwargs):
+	id = int(kwargs.get('id', 0))
+	f = int(kwargs.get('from'))
+	t = int(fwargs.get('to'))
+	return sequence[id][f:t]
