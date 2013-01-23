@@ -2581,7 +2581,7 @@ p.draw = function(ctx){
     var self = this,
         from = this.seq.pos,
         to = from + this.seq.bw,
-        seq = this.sc.get(Math.floor(from), Math.floor(to), function(){
+        seq = this.sc.get(Math.floor(from), Math.ceil(to)+1, function(){
             self.getStage().update();
         }),
         y = this.seq.h2 - sep,
