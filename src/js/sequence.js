@@ -11,7 +11,7 @@
 var baseC = 'bio-sequence ui-widget',
     labelC = 'label';
 
-var sep = 10,
+var sep = 12,
     tick = 3,
     tick_text = 6,
     base_width = 10,
@@ -156,30 +156,82 @@ p.initialize = function(seq, seqCache){
     this.seq = seq;
     this.sc = seqCache;
 
+    this.textC = "#000000";
+    this.colors = {
+        a: "#6258FF",
+        t: "#FFD13D",
+        g: "#57FF3D",
+        c: "#FF3D4B"
+    };
+
     this.bases = {
-        a: this._canvas('A', 'T'),
-        t: this._canvas('T', 'A'),
-        g: this._canvas('G', 'C'),
-        c: this._canvas('C', 'G')
+        a: this._draw_base('A'),
+        t: this._draw_base('T'),
+        g: this._draw_base('G'),
+        c: this._draw_base('C')
     };
 };
 
-p._canvas = function(a,b){
-    var c = document.createElement('canvas'),
-        ctx;
-    c.width = base_width;
-    c.height = 2*sep;
-    ctx = c.getContext('2d');
+p._draw_base = function(b){
+    var cv = document.createElement('canvas');
+    cv.width = base_width;
+    cv.height = 2*sep;
+    var c = cv.getContext('2d'),
+        col = this.colors,
+        p = 2;
+
+    switch(b.toLowerCase()){
+        case 'a':
+            this._draw_arrow(c,p,col.a,col.t);
+            this._draw_base_text(c,'A','T');
+            break;
+        case 't':
+            this._draw_arrow(c,-p,col.t,col.a);
+            this._draw_base_text(c,'T','A');
+            break;
+        case 'g':
+            this._draw_arrow(c,p,col.g,col.c);
+            this._draw_base_text(c,'G','C');
+            break;
+        case 'c':
+            this._draw_arrow(c,-p,col.c,col.g);
+            this._draw_base_text(c,'C','G');
+            break;
+    }
+    return cv;
+};
+
+p._draw_base_text = function(ctx, a,b){
+    console.log('_draw_base_text('+a+','+b+')');
+    ctx.fillStyle = this.textC;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'top';
-    ctx.font = 'normal ' + 0.9 * sep + 'px "Helvetica Neue",Helvetica,Arial,sans-serif';
+    ctx.font = 'normal ' + (sep-3) + 
+                        'px "Helvetica Neue",Helvetica,Arial,sans-serif';
 
     ctx.fillText(a, 0.5*base_width, 1);
-
     ctx.textBaseline = 'alphabetic';
     ctx.fillText(b, 0.5*base_width, 2*sep - 1);
+};
 
-    return c;
+p._draw_arrow = function(c, d, c1, c2){
+    c.fillStyle = c1;
+    c.beginPath();
+    c.moveTo(0,0);
+    c.lineTo(0,sep-d);
+    c.lineTo(0.5*base_width, sep+d);
+    c.lineTo(base_width, sep-d);
+    c.lineTo(base_width, 0);
+    c.fill();
+
+    c.beginPath();
+    c.fillStyle = c2;
+    c.moveTo(0,2*sep);
+    c.lineTo(0,sep-d);
+    c.lineTo(0.5*base_width, sep+d);
+    c.lineTo(base_width, sep-d);
+    c.lineTo(base_width, 2*sep);
+    c.fill();
 };
 
 p.draw = function(ctx){
