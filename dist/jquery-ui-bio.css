@@ -1,4 +1,4 @@
-/*! jQuery Ui Bio - v0.1.0 - 2013-01-23
+/*! jQuery Ui Bio - v0.1.0 - 2013-01-26
 * https://github.com/Gibthon/jquery-ui-bio
 * Copyright (c) 2013 Haydn King; Licensed MIT, GPL */
 .bio-help {
@@ -186,6 +186,7 @@
 .bio-sequence.ui-widget {
   overflow: hidden;
   position: relative;
+  cursor: pointer;
 }
 .bio-sequence.ui-widget .label {
   position: absolute;
