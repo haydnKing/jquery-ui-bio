@@ -196,9 +196,8 @@ $.widget("bio.sequenceView", $.bio.panel, {
                 colorScheme: self._get_color_scheme(fs.types),
                 seq_length: self.meta.length,
                 completed: completed,
-                selected: function(ev, feat){
-                    var loc = feat.location.start;
-                    self.zoomview.sequence('moveTo', loc);
+                clicked: function(ev, loc){
+                    self.zoomview.sequence('center', loc.pos);
                 }
             });
             self.zoomview.sequence({

@@ -61,53 +61,11 @@ $.widget("bio.overview", {
         this.h2 = this.h/2.0;
     },
     _enable_tooltip: function(){
-        var self = this,
-            o = this.options,
-            fs = o.featureStore,
-            cs = o.colorScheme;
+        var self = this;
 
-        this.wrapper.tooltip({
-            click: true,
-            hover: 0,
-            location: 'mouse',
-            width: 200,
-            title: "Select a Fragment",
-            content: function(ev){
-                var loc = self._loc_from_ev(ev),
-                    dp = Math.round(o.seq_length * click_range / self.w),
-                    feats = fs.getFeaturesInRange(loc.pos-dp, loc.pos+dp),
-                    i, f, type,
-                    ret = [];
-
-                for(type in feats){
-                    for(i = 0; i < feats[type].length; i++){
-                        f = feats[type][i];
-                        ret.push({
-                            title: (f.qualifiers.title!=null) ?
-                                f.qualifiers.title :
-                                f.type,
-                            sub: '('+f.location.start+':'+f.location.end+')',
-                            iconCSS: {
-                                'background-color':cs[f.type.toLowerCase()]
-                            },
-                            feature: f
-                        });
-                    }
-                }
-
-                if(ret.length === 1){
-                   self._trigger('selected', null, ret[0].feature); 
-                }
-                if(ret.length <= 1){
-                    return false;
-                }
-
-                return ret;
-            },
-            selected: function(ev, data){
-                self._trigger('selected', null, data.data.feature);
-                self.wrapper.tooltip('hide');
-            }
+        this.el.click(function(ev){
+            var loc = self._loc_from_ev(ev);
+            self._trigger('clicked', null, loc);
         });
     },
     _get_heights: function() {

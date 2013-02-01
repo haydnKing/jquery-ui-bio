@@ -292,7 +292,74 @@ var _patch_stage = function(stage){
     return stage;
 };
 
-$.widget("bio.sequence", $.ui.mouse, { 
+$.widget("bio.kineticScroll", $.ui.mouse, {
+    options: {
+        slow: 0.9,
+        stop: 0.1,
+        fps: 25,
+        scroll: function(ev, data){}
+    },
+    _create: function(){
+        var self = this;
+        this.last_pos = {x: 0, y: 0};
+        this.vel = {dx: 0, dy: 0};
+        this._mouseInit();
+        this.timer = null;
+        $(this.element[0]).bind('mousedown', function(ev){
+            self.vel.dx = self.vel.dy = 0;
+            if(self.timer){
+                clearTimeout(self.timer);
+                self.timer = null;
+            }
+        });
+    },
+    _mouseDrag: function(ev){
+        var dx = ev.pageX - this.last_pos.x,
+            dy = ev.pageY - this.last_pos.y,
+            dt = ev.timeStamp - this.last_pos.time;
+
+        this._scroll(dx, dy);
+
+        this.vel.dy = 0.5 * (this.vel.dy + 1000*dy/dt);
+        this.vel.dx = 0.5 * (this.vel.dx + 1000*dx/dt);
+
+        this._update(ev);
+    },
+    _step: function(){
+        var o = this.options,
+            self = this,
+            dt = 1 / o.fps;
+
+        this.vel.dx = o.slow * this.vel.dx;
+        this.vel.dy = o.slow * this.vel.dy;
+
+        if((this.vel.dx*this.vel.dx+this.vel.dy*this.vel.dy) < o.stop*o.stop){
+            this.vel.dx = this.vel.dy = 0;
+            return;
+        }
+
+        this._scroll(dt * this.vel.dx, dt * this.vel.dy);
+
+        this.timer = setTimeout(function() {self._step();}, 1000*dt);
+    },
+    _mouseStart: function(ev){
+        this._update(ev);
+    },
+    _mouseStop: function(ev){
+        var self = this;
+        this.timer = setTimeout(function() {self._step();}, 
+                                1000/this.options.fps);
+    },
+    _scroll: function(dx,dy){},
+    _update: function(ev){
+        this.last_pos.x = ev.pageX;
+        this.last_pos.y = ev.pageY;
+        this.last_pos.time = ev.timeStamp;
+    }
+
+});
+
+$.widget("bio.sequence", $.bio.kineticScroll, { 
     options: {
         tile_length: 1024,
         tick_color: null,
@@ -304,6 +371,7 @@ $.widget("bio.sequence", $.ui.mouse, {
         }
     },
     _create: function(){
+        this._super();
         this.el = $(this.element[0])
             .addClass(baseC);
         var o = this.options;
@@ -316,7 +384,7 @@ $.widget("bio.sequence", $.ui.mouse, {
 
         this._trigger('completed');
 
-        this._mouseInit();
+        //this._mouseInit();
         this.moveTo(0);
     },
     _init: function(){
@@ -342,6 +410,26 @@ $.widget("bio.sequence", $.ui.mouse, {
         this.labels.css('left', (start - this.pos - 25)*base_width);
 
         this._trigger('moved', null, {start: this.pos, width: this.bw});
+    },
+    center: function(pos){
+        this.moveTo(pos - this.bw / 2);
+    },
+    _bind_events: function(){
+        var self = this;
+        this.el.click(function(ev){
+
+        });
+    },
+    _ev_to_pos: function(ev){
+        var o = this.el.offset(),
+            p = {
+                    'left': ev.pageX - o.left,
+                    'top': ev.pageY - o.top,
+                    'loc': this.pos + (ev.pageX-o.left)*this.bw/this.w,
+                    'feature': null
+            };
+
+
     },
     _calc_sizes: function(){
         var o = this.options;
@@ -394,8 +482,11 @@ $.widget("bio.sequence", $.ui.mouse, {
             })
             .appendTo(this.el);
     },
+    _scroll: function(dx,dy){
+        this.moveTo(this.pos - dx / base_width);
+    }/*,
     _mouseStart: function(ev){
-        this.mouse = {x: ev.pageX, y: ev.pageY};
+        //this.mouse = {x: ev.pageX, y: ev.pageY};
     },
     _mouseStop: function(ev){
     },
@@ -407,7 +498,7 @@ $.widget("bio.sequence", $.ui.mouse, {
 
         this.moveTo(this.pos - dx / base_width);
         this.mouse = _mouse;
-    }
+    }*/
 });
 
 }(jQuery));

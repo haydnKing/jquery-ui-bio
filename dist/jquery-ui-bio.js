@@ -1,4 +1,4 @@
-/*! jQuery Ui Bio - v0.1.0 - 2013-01-26
+/*! jQuery Ui Bio - v0.1.0 - 2013-02-01
 * https://github.com/Gibthon/jquery-ui-bio
 * Copyright (c) 2013 Haydn King; Licensed MIT, GPL */
 
@@ -2131,53 +2131,11 @@ $.widget("bio.overview", {
         this.h2 = this.h/2.0;
     },
     _enable_tooltip: function(){
-        var self = this,
-            o = this.options,
-            fs = o.featureStore,
-            cs = o.colorScheme;
+        var self = this;
 
-        this.wrapper.tooltip({
-            click: true,
-            hover: 0,
-            location: 'mouse',
-            width: 200,
-            title: "Select a Fragment",
-            content: function(ev){
-                var loc = self._loc_from_ev(ev),
-                    dp = Math.round(o.seq_length * click_range / self.w),
-                    feats = fs.getFeaturesInRange(loc.pos-dp, loc.pos+dp),
-                    i, f, type,
-                    ret = [];
-
-                for(type in feats){
-                    for(i = 0; i < feats[type].length; i++){
-                        f = feats[type][i];
-                        ret.push({
-                            title: (f.qualifiers.title!=null) ?
-                                f.qualifiers.title :
-                                f.type,
-                            sub: '('+f.location.start+':'+f.location.end+')',
-                            iconCSS: {
-                                'background-color':cs[f.type.toLowerCase()]
-                            },
-                            feature: f
-                        });
-                    }
-                }
-
-                if(ret.length === 1){
-                   self._trigger('selected', null, ret[0].feature); 
-                }
-                if(ret.length <= 1){
-                    return false;
-                }
-
-                return ret;
-            },
-            selected: function(ev, data){
-                self._trigger('selected', null, data.data.feature);
-                self.wrapper.tooltip('hide');
-            }
+        this.el.click(function(ev){
+            var loc = self._loc_from_ev(ev);
+            self._trigger('clicked', null, loc);
         });
     },
     _get_heights: function() {
@@ -2512,12 +2470,6 @@ p.initialize = function(seq, seqCache){
         g: this._draw_base('G'),
         c: this._draw_base('C')
     };
-
-    this.tile = document.createElement('canvas');
-    this.tile.width = base_width * Math.ceil(3 * this.seq.bw);
-    this.tile.height = 2*sep;
-
-    this._update_tile();
 };
 
 p._draw_base = function(b){
@@ -2581,49 +2533,24 @@ p._draw_arrow = function(c, d, c1, c2){
     c.fill();
 };
 
-p._update_tile = function(){
+p.draw = function(ctx){
     var self = this,
-        ctx = this.tile.getContext('2d'),
-        from = Math.floor(Math.max(0, this.seq.pos - this.seq.bw)),
-        to = Math.ceil(from + 3*this.seq.bw),
+        from = this.seq.pos,
+        to = from + this.seq.bw,
         seq = this.sc.get(Math.floor(from), Math.ceil(to)+1, function(){
-            self._update_tile();
             self.getStage().update();
         }),
-        i, j, snip, char;
-
-    console.log('p._update_tile ['+from+', '+to+']');
-
-    this.tile_start = from;
-    this.tile_end = to;
-    ctx.clearRect(0,0,this.tile.width, this.tile.height);
+        y = this.seq.h2 - sep,
+        i, j, snip, char, x;
 
     for(i = 0; i < seq.length; i+=1){
         snip = seq[i];
         for(j = 0; j < snip.seq.length; j+=1){
             char = snip.seq[j];
-            ctx.drawImage(this.bases[char], 
-                          (snip.from + j - from) * base_width,0);
+            x = (snip.from + j - from) * base_width;
+            ctx.drawImage(this.bases[char], x,y);
         }
     }
-};
-
-p.draw = function(ctx){
-    if((this.seq.pos < this.tile_start) || 
-        (this.seq.pos + this.seq.bw > this.tile_end)){
-        this._update_tile();
-    }
-   ctx.drawImage(this.tile,  
-                    Math.round(base_width * (this.seq.pos - this.tile_start)),
-                                        //in float sx,
-                    0,                  //in float sy,
-                    this.seq.w,         //in float sw,
-                    2*sep,              //in float sh,
-                    0,                  //in float dx, 
-                    this.seq.h2-sep,    //in float dy,
-                    this.seq.w,         //in float dw,
-                    2*sep               //in float dh
-                );
 };
 
 //Monkey patch a createjs.stage so as not to respond to mousemove events
@@ -2635,7 +2562,74 @@ var _patch_stage = function(stage){
     return stage;
 };
 
-$.widget("bio.sequence", $.ui.mouse, { 
+$.widget("bio.kineticScroll", $.ui.mouse, {
+    options: {
+        slow: 0.9,
+        stop: 0.1,
+        fps: 25,
+        scroll: function(ev, data){}
+    },
+    _create: function(){
+        var self = this;
+        this.last_pos = {x: 0, y: 0};
+        this.vel = {dx: 0, dy: 0};
+        this._mouseInit();
+        this.timer = null;
+        $(this.element[0]).bind('mousedown', function(ev){
+            self.vel.dx = self.vel.dy = 0;
+            if(self.timer){
+                clearTimeout(self.timer);
+                self.timer = null;
+            }
+        });
+    },
+    _mouseDrag: function(ev){
+        var dx = ev.pageX - this.last_pos.x,
+            dy = ev.pageY - this.last_pos.y,
+            dt = ev.timeStamp - this.last_pos.time;
+
+        this._scroll(dx, dy);
+
+        this.vel.dy = 0.5 * (this.vel.dy + 1000*dy/dt);
+        this.vel.dx = 0.5 * (this.vel.dx + 1000*dx/dt);
+
+        this._update(ev);
+    },
+    _step: function(){
+        var o = this.options,
+            self = this,
+            dt = 1 / o.fps;
+
+        this.vel.dx = o.slow * this.vel.dx;
+        this.vel.dy = o.slow * this.vel.dy;
+
+        if((this.vel.dx*this.vel.dx+this.vel.dy*this.vel.dy) < o.stop*o.stop){
+            this.vel.dx = this.vel.dy = 0;
+            return;
+        }
+
+        this._scroll(dt * this.vel.dx, dt * this.vel.dy);
+
+        this.timer = setTimeout(function() {self._step();}, 1000*dt);
+    },
+    _mouseStart: function(ev){
+        this._update(ev);
+    },
+    _mouseStop: function(ev){
+        var self = this;
+        this.timer = setTimeout(function() {self._step();}, 
+                                1000/this.options.fps);
+    },
+    _scroll: function(dx,dy){},
+    _update: function(ev){
+        this.last_pos.x = ev.pageX;
+        this.last_pos.y = ev.pageY;
+        this.last_pos.time = ev.timeStamp;
+    }
+
+});
+
+$.widget("bio.sequence", $.bio.kineticScroll, { 
     options: {
         tile_length: 1024,
         tick_color: null,
@@ -2647,6 +2641,7 @@ $.widget("bio.sequence", $.ui.mouse, {
         }
     },
     _create: function(){
+        this._super();
         this.el = $(this.element[0])
             .addClass(baseC);
         var o = this.options;
@@ -2659,7 +2654,7 @@ $.widget("bio.sequence", $.ui.mouse, {
 
         this._trigger('completed');
 
-        this._mouseInit();
+        //this._mouseInit();
         this.moveTo(0);
     },
     _init: function(){
@@ -2686,6 +2681,26 @@ $.widget("bio.sequence", $.ui.mouse, {
 
         this._trigger('moved', null, {start: this.pos, width: this.bw});
     },
+    center: function(pos){
+        this.moveTo(pos - this.bw / 2);
+    },
+    _bind_events: function(){
+        var self = this;
+        this.el.click(function(ev){
+
+        });
+    },
+    _ev_to_pos: function(ev){
+        var o = this.el.offset(),
+            p = {
+                    'left': ev.pageX - o.left,
+                    'top': ev.pageY - o.top,
+                    'loc': this.pos + (ev.pageX-o.left)*this.bw/this.w,
+                    'feature': null
+            };
+
+
+    },
     _calc_sizes: function(){
         var o = this.options;
         //measure
@@ -2706,8 +2721,6 @@ $.widget("bio.sequence", $.ui.mouse, {
             .appendTo(this.el);
         this.stage = _patch_stage(new createjs.Stage(this.canvas.get(0)));
         this.stage.enableMouseOver(0);
-
-        this.pos = 0;
         
         this._calc_sizes();
 
@@ -2737,8 +2750,11 @@ $.widget("bio.sequence", $.ui.mouse, {
             })
             .appendTo(this.el);
     },
+    _scroll: function(dx,dy){
+        this.moveTo(this.pos - dx / base_width);
+    }/*,
     _mouseStart: function(ev){
-        this.mouse = {x: ev.pageX, y: ev.pageY};
+        //this.mouse = {x: ev.pageX, y: ev.pageY};
     },
     _mouseStop: function(ev){
     },
@@ -2750,7 +2766,7 @@ $.widget("bio.sequence", $.ui.mouse, {
 
         this.moveTo(this.pos - dx / base_width);
         this.mouse = _mouse;
-    }
+    }*/
 });
 
 }(jQuery));
@@ -2947,9 +2963,8 @@ $.widget("bio.sequenceView", $.bio.panel, {
                 colorScheme: self._get_color_scheme(fs.types),
                 seq_length: self.meta.length,
                 completed: completed,
-                selected: function(ev, feat){
-                    var loc = feat.location.start;
-                    self.zoomview.sequence('moveTo', loc);
+                clicked: function(ev, loc){
+                    self.zoomview.sequence('center', loc.pos);
                 }
             });
             self.zoomview.sequence({
