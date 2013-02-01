@@ -314,6 +314,9 @@ $.widget("bio.sequence", $.ui.mouse, {
 
         this._trigger('moved', null, {start: this.pos, width: this.bw});
     },
+    center: function(pos){
+        this.moveTo(pos - this.bw / 2);
+    },
     _calc_sizes: function(){
         var o = this.options;
         //measure

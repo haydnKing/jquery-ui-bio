@@ -1,29 +1,48 @@
-/*! jQuery Ui Bio - v0.1.0 - 2013-01-23
+/*! jQuery Ui Bio - v0.1.0 - 2013-02-01
 * https://github.com/Gibthon/jquery-ui-bio
 * Copyright (c) 2013 Haydn King; Licensed MIT, GPL */
 
-.bio-help {
-    opacity: 0.6;
-    cursor: pointer;
+.bio-sequence.ui-widget {
+    overflow: hidden;
     position: relative;
-    height: 1em;
-    width: 0.5em;
-    z-index: 100;
-
-    &:before {
-        content: '?';
-    }
-    &:hover {
-        opacity: 1.0;
-    }
-}
-.bio-help-tip {
-    & > * {
-        margin: 1em 0.5em;
-        text-align: center;
+    & .label {
+        position : absolute;
+        left: 0;
+        right: -50px;
+        font-size: 10px;
+        height: 13px;
+        overflow: hidden;
+        & > div {
+            float: left;
+            text-align: center;
+        }
     }
 }
 
+
+
+.bio-statusbar.ui-widget-content {
+    z-index: 5;
+    position: relative;
+    min-height: 20px;
+    text-size: 12px;
+    padding: 0.2em;
+    border-bottom: none;
+    margin: -1px 0 0;
+    -webkit-border-radius: 0px;
+    -moz-border-radius: 0px;
+    border-radius: 0px;
+    & > .ui-icon {
+        position: absolute;
+        top: 50%;
+        margin-top: -8px;
+        left: 6px;
+    }
+    & > p {
+        margin: 2px 35px;
+        text-indent: -10px;
+    }
+}
 
 .bio-sequence-view .bio-panel-item.load-panel
 {
@@ -42,6 +61,15 @@
     }
 }
 
+
+.bio-sequence-overview.ui-widget {
+    padding: 0.5em 1em;
+    & > div {
+        height: 100%;
+        cursor: pointer;
+    }
+
+}
 
 .ui-widget.bio-search {
     position: relative;
@@ -132,6 +160,81 @@
             
         
 
+@def_color: hsl(0,40%,50%);
+@fragHeight: 1.5em;
+
+.bio-fragment.ui-widget
+{
+    position: relative;
+    display: inline-block;
+    height: @fragHeight;
+    background-image: none;
+    cursor: pointer;
+    font-size: 0.75 * @fragHeight;
+    line-height: 100%;
+    width: 10em;
+
+    & > svg{
+        z-index: 0;
+    }
+}
+.bio-fragment-placeholder.ui-widget-content {
+    background: none;
+    border-style: dotted;
+    height: @fragHeight;
+}
+.bio-fragment-info {
+    cursor: auto;
+
+    &  > div {
+        padding: 0.5em 0;
+    }
+    & a
+    {
+        display: block;
+        &:hover {
+            color: white;
+            background-color: gray;
+        }
+    }
+}
+
+.bio-length:after {
+    content: " bp";
+}
+.ui-icon-loading, .ui-state-default .ui-icon-loading  {
+    background-image: url('images/loading16.gif');
+}
+.ui-corner-inherit {
+    -moz-border-radius: inherit; 
+    -webkit-border-radius: inherit;
+    -khtml-border-radius: inherit; 
+    border-radius: inherit;
+}
+
+.bio-help {
+    opacity: 0.6;
+    cursor: pointer;
+    position: relative;
+    height: 1em;
+    width: 0.5em;
+    z-index: 100;
+
+    &:before {
+        content: '?';
+    }
+    &:hover {
+        opacity: 1.0;
+    }
+}
+.bio-help-tip {
+    & > * {
+        margin: 1em 0.5em;
+        text-align: center;
+    }
+}
+
+
 .bio-panel {
     background-image: none;
     & > .ui-widget-header {
@@ -162,30 +265,6 @@
     }
 }
 
-
-
-.bio-statusbar.ui-widget-content {
-    z-index: 5;
-    position: relative;
-    min-height: 20px;
-    text-size: 12px;
-    padding: 0.2em;
-    border-bottom: none;
-    margin: -1px 0 0;
-    -webkit-border-radius: 0px;
-    -moz-border-radius: 0px;
-    border-radius: 0px;
-    & > .ui-icon {
-        position: absolute;
-        top: 50%;
-        margin-top: -8px;
-        left: 6px;
-    }
-    & > p {
-        margin: 2px 35px;
-        text-indent: -10px;
-    }
-}
 
 .bio-fragment-select  > .bio-panel-content {
 
@@ -295,85 +374,6 @@
         border-left-color: inherit; 
         top: 50%; 
         margin-top: -@size - @border-width; 
-    }
-}
-
-.bio-sequence.ui-widget {
-    overflow: hidden;
-    position: relative;
-    & .label {
-        position : absolute;
-        left: 0;
-        right: -50px;
-        font-size: 10px;
-        height: 13px;
-        overflow: hidden;
-        & > div {
-            float: left;
-            text-align: center;
-        }
-    }
-}
-
-
-.bio-length:after {
-    content: " bp";
-}
-.ui-icon-loading, .ui-state-default .ui-icon-loading  {
-    background-image: url('images/loading16.gif');
-}
-.ui-corner-inherit {
-    -moz-border-radius: inherit; 
-    -webkit-border-radius: inherit;
-    -khtml-border-radius: inherit; 
-    border-radius: inherit;
-}
-
-.bio-sequence-overview.ui-widget {
-    padding: 0.5em 1em;
-    & > div {
-        height: 100%;
-        cursor: pointer;
-    }
-
-}
-
-@def_color: hsl(0,40%,50%);
-@fragHeight: 1.5em;
-
-.bio-fragment.ui-widget
-{
-    position: relative;
-    display: inline-block;
-    height: @fragHeight;
-    background-image: none;
-    cursor: pointer;
-    font-size: 0.75 * @fragHeight;
-    line-height: 100%;
-    width: 10em;
-
-    & > svg{
-        z-index: 0;
-    }
-}
-.bio-fragment-placeholder.ui-widget-content {
-    background: none;
-    border-style: dotted;
-    height: @fragHeight;
-}
-.bio-fragment-info {
-    cursor: auto;
-
-    &  > div {
-        padding: 0.5em 0;
-    }
-    & a
-    {
-        display: block;
-        &:hover {
-            color: white;
-            background-color: gray;
-        }
     }
 }
 
