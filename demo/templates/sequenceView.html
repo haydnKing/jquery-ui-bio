@@ -31,7 +31,6 @@ $(window).ready( function(){
                 cb, data);
         },
         sequence: function(cb, from, to){
-            console.log('sequence(cb, '+from+', '+to+');');
             return Dajaxice.call('ui_bio_demos.getTestSequence', 'POST',
             cb, {id:1, from:from, to: to});
         },

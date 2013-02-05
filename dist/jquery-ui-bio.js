@@ -2550,8 +2550,6 @@ p._update_tile = function(){
         }),
         i, j, snip, char;
 
-    console.log('p._update_tile ['+from+', '+to+']');
-
     this.tile_start = from;
     this.tile_end = to;
     ctx.clearRect(0,0,this.tile.width, this.tile.height);
