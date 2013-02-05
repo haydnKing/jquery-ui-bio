@@ -351,6 +351,9 @@ $.widget("bio.kineticScroll", $.ui.mouse, {
                                 1000/this.options.fps);
     },
     _scroll: function(dx,dy){},
+    cancelScroll: function(){
+        this.vel.dx = this.vel.dy = 0;
+    },
     _update: function(ev){
         this.last_pos.x = ev.pageX;
         this.last_pos.y = ev.pageY;
@@ -413,6 +416,7 @@ $.widget("bio.sequence", $.bio.kineticScroll, {
     },
     center: function(pos){
         this.moveTo(pos - this.bw / 2);
+        this.cancelScroll();
     },
     _bind_events: function(){
         var self = this;
@@ -484,21 +488,7 @@ $.widget("bio.sequence", $.bio.kineticScroll, {
     },
     _scroll: function(dx,dy){
         this.moveTo(this.pos - dx / base_width);
-    }/*,
-    _mouseStart: function(ev){
-        //this.mouse = {x: ev.pageX, y: ev.pageY};
-    },
-    _mouseStop: function(ev){
-    },
-    _mouseDrag: function(ev){
-        var _mouse = {x: ev.pageX, y: ev.pageY},
-            fs = this.options.featureStore,
-            dx = _mouse.x - this.mouse.x,
-            dy = _mouse.y - this.mouse.y;
-
-        this.moveTo(this.pos - dx / base_width);
-        this.mouse = _mouse;
-    }*/
+    }
 });
 
 }(jQuery));

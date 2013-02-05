@@ -1,4 +1,4 @@
-/*! jQuery Ui Bio - v0.1.0 - 2013-02-01
+/*! jQuery Ui Bio - v0.1.0 - 2013-02-05
 * https://github.com/Gibthon/jquery-ui-bio
 * Copyright (c) 2013 Haydn King; Licensed MIT, GPL */
 
@@ -2470,6 +2470,12 @@ p.initialize = function(seq, seqCache){
         g: this._draw_base('G'),
         c: this._draw_base('C')
     };
+
+    this.tile = document.createElement('canvas');
+    this.tile.width = base_width * Math.ceil(3 * this.seq.bw);
+    this.tile.height = 2*sep;
+
+    this._update_tile();
 };
 
 p._draw_base = function(b){
@@ -2533,24 +2539,49 @@ p._draw_arrow = function(c, d, c1, c2){
     c.fill();
 };
 
-p.draw = function(ctx){
+p._update_tile = function(){
     var self = this,
-        from = this.seq.pos,
-        to = from + this.seq.bw,
+        ctx = this.tile.getContext('2d'),
+        from = Math.floor(Math.max(0, this.seq.pos - this.seq.bw)),
+        to = Math.ceil(from + 3*this.seq.bw),
         seq = this.sc.get(Math.floor(from), Math.ceil(to)+1, function(){
+            self._update_tile();
             self.getStage().update();
         }),
-        y = this.seq.h2 - sep,
-        i, j, snip, char, x;
+        i, j, snip, char;
+
+    console.log('p._update_tile ['+from+', '+to+']');
+
+    this.tile_start = from;
+    this.tile_end = to;
+    ctx.clearRect(0,0,this.tile.width, this.tile.height);
 
     for(i = 0; i < seq.length; i+=1){
         snip = seq[i];
         for(j = 0; j < snip.seq.length; j+=1){
             char = snip.seq[j];
-            x = (snip.from + j - from) * base_width;
-            ctx.drawImage(this.bases[char], x,y);
+            ctx.drawImage(this.bases[char], 
+                          (snip.from + j - from) * base_width,0);
         }
     }
+};
+
+p.draw = function(ctx){
+    if((this.seq.pos < this.tile_start) || 
+        (this.seq.pos + this.seq.bw > this.tile_end)){
+        this._update_tile();
+    }
+   ctx.drawImage(this.tile,  
+                    Math.round(base_width * (this.seq.pos - this.tile_start)),
+                                        //in float sx,
+                    0,                  //in float sy,
+                    this.seq.w,         //in float sw,
+                    2*sep,              //in float sh,
+                    0,                  //in float dx, 
+                    this.seq.h2-sep,    //in float dy,
+                    this.seq.w,         //in float dw,
+                    2*sep               //in float dh
+                );
 };
 
 //Monkey patch a createjs.stage so as not to respond to mousemove events
@@ -2621,6 +2652,9 @@ $.widget("bio.kineticScroll", $.ui.mouse, {
                                 1000/this.options.fps);
     },
     _scroll: function(dx,dy){},
+    cancelScroll: function(){
+        this.vel.dx = this.vel.dy = 0;
+    },
     _update: function(ev){
         this.last_pos.x = ev.pageX;
         this.last_pos.y = ev.pageY;
@@ -2683,6 +2717,7 @@ $.widget("bio.sequence", $.bio.kineticScroll, {
     },
     center: function(pos){
         this.moveTo(pos - this.bw / 2);
+        this.cancelScroll();
     },
     _bind_events: function(){
         var self = this;
@@ -2721,6 +2756,8 @@ $.widget("bio.sequence", $.bio.kineticScroll, {
             .appendTo(this.el);
         this.stage = _patch_stage(new createjs.Stage(this.canvas.get(0)));
         this.stage.enableMouseOver(0);
+
+        this.pos = 0;
         
         this._calc_sizes();
 
@@ -2752,21 +2789,7 @@ $.widget("bio.sequence", $.bio.kineticScroll, {
     },
     _scroll: function(dx,dy){
         this.moveTo(this.pos - dx / base_width);
-    }/*,
-    _mouseStart: function(ev){
-        //this.mouse = {x: ev.pageX, y: ev.pageY};
-    },
-    _mouseStop: function(ev){
-    },
-    _mouseDrag: function(ev){
-        var _mouse = {x: ev.pageX, y: ev.pageY},
-            fs = this.options.featureStore,
-            dx = _mouse.x - this.mouse.x,
-            dy = _mouse.y - this.mouse.y;
-
-        this.moveTo(this.pos - dx / base_width);
-        this.mouse = _mouse;
-    }*/
+    }
 });
 
 }(jQuery));
