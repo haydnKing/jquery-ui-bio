@@ -33,6 +33,21 @@
   margin-left: 1em;
   font-style: italic;
 }
+.bio-key {
+  text-align: center;
+  padding: 0.2em;
+}
+.bio-key  > .bio-keyitem {
+  margin: 0 0.5em;
+  display: inline-block;
+}
+.bio-key  > .bio-keyitem  > span {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin: -1px 2px;
+  border-radius: 3px;
+}
 .ui-widget.bio-search {
   position: relative;
   height: 1.3em;

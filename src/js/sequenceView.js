@@ -13,7 +13,8 @@ var baseClasses = 'bio-sequence-view ui-widget',
     nameClass = 'bio-name',
     descClass = 'bio-desc',
     overviewClass = 'bio-overview',
-    spacerClass = 'bio-spacer',
+    keyClass = 'bio-key',
+    keyItemClass = 'bio-keyitem',
     zoomClass = 'bio-zoomview',
     leftClass = 'bio-slideleft',
     rightClass = 'bio-slideright',
@@ -123,8 +124,8 @@ $.widget("bio.sequenceView", $.bio.panel, {
             .addClass(overviewClass)
             .appendTo(this.seqview);
 
-        this.spacer = this._panel_item()
-            .addClass(spacerClass)
+        this.key = this._panel_item()
+            .addClass(keyClass)
             .appendTo(this.seqview);
 
         var zv = this.zoomview = this._panel_item()
@@ -212,6 +213,7 @@ $.widget("bio.sequenceView", $.bio.panel, {
                                            data.start, data.width);
                 }
             });
+            self._show_key(self._get_color_scheme(fs.types));
         }, 50);
     },
     _hide_loader: function() {
@@ -222,11 +224,20 @@ $.widget("bio.sequenceView", $.bio.panel, {
         //set the stretch_factors
         this.stretch_factors = {
             'zoomview': 5,
-            'spacer': 1,
+            'key': 1,
             'overview': 2
         };
         this.panel.append(this.seqview);
         this._refresh();
+    },
+    _show_key: function(cs){
+        var key, item;
+        for(key in cs){
+            item = $('<p>').addClass(keyItemClass)
+                .text(key)
+                .prepend($('<span>').css('background-color', cs[key]));
+            this.key.append(item);
+        }
     },
     _get_color_scheme: function(types)
     {
