@@ -201,7 +201,7 @@
 .bio-sequence.ui-widget {
   overflow: hidden;
   position: relative;
-  cursor: pointer;
+  cursor: move;
 }
 .bio-sequence.ui-widget .label {
   position: absolute;

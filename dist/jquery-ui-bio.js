@@ -2335,10 +2335,10 @@ var p = Axis.prototype = new createjs.DisplayObject();
 
 p.color = 'rgb(50,50,50)';
 
-p._DisplayObject_initialize = p.initialize;
+p._DOinit = p.initialize;
 
 p.initialize = function(sequence, color){
-    this._DisplayObject_initialize();
+    this._DOinit();
     this.seq = sequence;
     this.color = this.color || color;
     this.first = 0;
@@ -2386,14 +2386,15 @@ p.draw = function(ctx, ignoreCache){
 var Features = function(sequence){
     this.initialize(sequence);
 };
-p = Features.prototype = new createjs.DisplayObject();
+var f = Features.prototype = new createjs.DisplayObject();
 
-p.track_height = 0;
-p.type_offsets = null;
+f.track_height = 0;
+f.type_offsets = null;
+f.highlight = null;
 
-p._DO_init = p.initialize;
-p.initialize = function(seq){
-    this._DO_init();
+f._DOinit = f.initialize;
+f.initialize = function(seq){
+    this._DOinit();
     this.seq = seq;
     this.fs = seq.options.featureStore;
     this.cs = seq.options.colorScheme;
@@ -2414,7 +2415,44 @@ p.initialize = function(seq){
     this.track_height = (this.seq.h2-feat_offset) / Math.max(rev,fwd,5);
 };
 
-p.draw = function(ctx){
+f.getFeature = function(base, top){
+    base = Math.floor(base);
+    var h2 = this.seq.h2,
+        strand = top <= h2 ? 1 : -1,
+        o = (strand > 0) ? this.type_offsets.fwd : this.type_offsets.rev,
+        y = Math.abs(top - h2),
+        type, track, feat, feats;
+    
+    if(y < feat_offset) {return null;}
+    y = (y - feat_offset) / this.track_height;
+
+    feats = this.fs.getFeaturesInRange(base, base + 1);
+
+    for(var t in o){
+        if(o[t] > y){
+            break;
+        }
+        type = t;
+    }
+    track = Math.floor(y - o[type]);
+
+    feats = feats[type];
+    for(feat in feats){
+        if(feats[feat].strand() === strand && feats[feat].track === track){
+            return feats[feat];
+        }
+    }
+    return null;
+};
+
+f.setHighlight = function(f){
+    if(f !== this.highlight){
+        this.highlight = f;
+        this.getStage().update();
+    }
+};
+
+f.draw = function(ctx){
     var feats,
         start = this.seq.pos,
         end = this.seq.pos + this.seq.bw,
@@ -2434,6 +2472,8 @@ p.draw = function(ctx){
     
         for(f in t){
             feat = t[f];
+            ctx.globalAlpha = (feat === this.highlight) ? 0.8 : 1.0;
+            
             y = (feat.strand() >= 0) ?
                 this.seq.h2 - (feat_offset + 
                                (this.type_offsets.fwd[type] +0.5+feat.track) *
@@ -2453,11 +2493,11 @@ p.draw = function(ctx){
 var Sequence = function(sequence, seqCache){
     this.initialize(sequence, seqCache);
 };
-p = Sequence.prototype = new createjs.DisplayObject();
+var s = Sequence.prototype = new createjs.DisplayObject();
 
-p._DO_init = p.initialize;
-p.initialize = function(seq, seqCache){
-    this._DO_init();
+s._DOinit = s.initialize;
+s.initialize = function(seq, seqCache){
+    this._DOinit();
     this.seq = seq;
     this.sc = seqCache;
 
@@ -2483,7 +2523,7 @@ p.initialize = function(seq, seqCache){
     this._update_tile();
 };
 
-p._draw_base = function(b){
+s._draw_base = function(b){
     var cv = document.createElement('canvas');
     cv.width = base_width;
     cv.height = 2*sep;
@@ -2512,7 +2552,7 @@ p._draw_base = function(b){
     return cv;
 };
 
-p._draw_base_text = function(ctx, a,b){
+s._draw_base_text = function(ctx, a,b){
     ctx.fillStyle = this.textC;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'top';
@@ -2524,7 +2564,7 @@ p._draw_base_text = function(ctx, a,b){
     ctx.fillText(b, 0.5*base_width, 2*sep - 1);
 };
 
-p._draw_arrow = function(c, d, c1, c2){
+s._draw_arrow = function(c, d, c1, c2){
     c.fillStyle = c1;
     c.beginPath();
     c.moveTo(0,0);
@@ -2544,7 +2584,7 @@ p._draw_arrow = function(c, d, c1, c2){
     c.fill();
 };
 
-p._update_tile = function(){
+s._update_tile = function(){
     var self = this,
         ctx = this.tile.getContext('2d'),
         from = Math.floor(Math.max(0, this.seq.pos - this.seq.bw)),
@@ -2569,7 +2609,7 @@ p._update_tile = function(){
     }
 };
 
-p.draw = function(ctx){
+s.draw = function(ctx){
     if((this.seq.pos < this.tile_start) || 
         (this.seq.pos + this.seq.bw > this.tile_end)){
         this._update_tile();
@@ -2693,6 +2733,8 @@ $.widget("bio.sequence", $.bio.kineticScroll, {
 
         //this._mouseInit();
         this.moveTo(0);
+
+        this._bind_events();
     },
     _init: function(){
     },
@@ -2724,8 +2766,10 @@ $.widget("bio.sequence", $.bio.kineticScroll, {
     },
     _bind_events: function(){
         var self = this;
-        this.el.click(function(ev){
-
+        this.el.mousemove(function(ev){
+            var p = self._ev_to_pos(ev);
+            self.featureObject.setHighlight(p.feature);
+            self.el.css('cursor', (p.feature == null) ? 'move' : 'pointer');
         });
     },
     _ev_to_pos: function(ev){
@@ -2733,11 +2777,10 @@ $.widget("bio.sequence", $.bio.kineticScroll, {
             p = {
                     'left': ev.pageX - o.left,
                     'top': ev.pageY - o.top,
-                    'loc': this.pos + (ev.pageX-o.left)*this.bw/this.w,
-                    'feature': null
+                    'loc': this.pos + (ev.pageX-o.left)*this.bw/this.w
             };
-
-
+        p.feature = this.featureObject.getFeature(p.loc, p.top);
+        return p;
     },
     _calc_sizes: function(){
         var o = this.options;
@@ -2765,7 +2808,8 @@ $.widget("bio.sequence", $.bio.kineticScroll, {
         this._calc_sizes();
 
         this.stage.addChild(new Axis(this));
-        this.stage.addChild(new Features(this));
+        this.featureObject = new Features(this);
+        this.stage.addChild(this.featureObject);
         this.stage.addChild(new Sequence(this, 
                                 new bio.SequenceCache(this.options.sequence)));
     },
