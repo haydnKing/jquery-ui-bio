@@ -124,6 +124,13 @@ $.widget("bio.tooltip", {
     updateContent: function(c) {
         this._set_content(c, true);
     },
+    option: function(k, v){
+        if(v === null){
+            return this.options[k];
+        }
+        this.options[k] = v;
+        return this.el;
+    },
     _bind_events: function() {
         var self = this;
         this.el

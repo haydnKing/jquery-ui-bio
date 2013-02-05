@@ -777,6 +777,13 @@ $.widget("bio.tooltip", {
     updateContent: function(c) {
         this._set_content(c, true);
     },
+    option: function(k, v){
+        if(v === null){
+            return this.options[k];
+        }
+        this.options[k] = v;
+        return this.el;
+    },
     _bind_events: function() {
         var self = this;
         this.el
@@ -2315,7 +2322,8 @@ $.widget("bio.overview", $.ui.mouse, {
 (function($, undefined) {
 
 var baseC = 'bio-sequence ui-widget',
-    labelC = 'label';
+    labelC = 'label',
+    fragC = 'bio-fraginfo';
 
 var sep = 12,
     tick = 3,
@@ -2728,6 +2736,12 @@ $.widget("bio.sequence", $.bio.kineticScroll, {
 
         this._create_canvas();
         this._create_labels();
+        this.el.tooltip({
+            hover: 0,
+            autoClose: false,
+            width: 200,
+            location: 'mouse'
+        });
 
         this._trigger('completed');
 
@@ -2771,6 +2785,16 @@ $.widget("bio.sequence", $.bio.kineticScroll, {
             self.featureObject.setHighlight(p.feature);
             self.el.css('cursor', (p.feature == null) ? 'move' : 'pointer');
         });
+        this.el.click(function(ev){
+            var p = self._ev_to_pos(ev);
+            if(p.feature != null){
+                self._showTooltip(p.feature);
+            }
+        });
+        this.el.mousedown(function(ev){
+            self.el.tooltip('hide');
+        });
+
     },
     _ev_to_pos: function(ev){
         var o = this.el.offset(),
@@ -2781,6 +2805,23 @@ $.widget("bio.sequence", $.bio.kineticScroll, {
             };
         p.feature = this.featureObject.getFeature(p.loc, p.top);
         return p;
+    },
+    _showTooltip: function(f){
+        var table = $('<table>'), q;
+        table.append('<tr><td>Location:</td><td>['+
+                     f.location.start+':'+f.location.end+']</td></tr>');
+        for(q in f.qualifiers){
+            table.append('<tr><td>'+q+':</td><td>'+f.qualifiers[q]+'</td></tr>');
+        }
+        var html = $('<div>')
+            .addClass(fragC)
+            .append(table);
+            
+        this.el.tooltip('option', 'title', f.type + ' ('+f.location.length()+'bp)');
+        this.el.tooltip('option', 'content', html);
+        this.el.tooltip('option', 'color', 
+                        this.options.colorScheme[f.type.toLowerCase()]);
+        this.el.tooltip('show');
     },
     _calc_sizes: function(){
         var o = this.options;
