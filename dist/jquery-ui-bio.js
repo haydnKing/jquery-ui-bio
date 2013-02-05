@@ -2085,7 +2085,7 @@ var small_tick = 3,
     click_range = 3,
     names = ['bp', 'kb', 'Mb', 'Gb', 'Tb', 'Pb', 'Yb'];
 
-$.widget("bio.overview", {
+$.widget("bio.overview", $.ui.mouse, {
     options: {
         featureStore: null,
         colorScheme: {},
@@ -2107,6 +2107,7 @@ $.widget("bio.overview", {
         }
     },
     _create: function(){
+        var self = this;
         this.el = $(this.element[0])
             .addClass(baseC);
         var pad  = this.wrapper = $('<div>').appendTo(this.el);
@@ -2121,6 +2122,10 @@ $.widget("bio.overview", {
         this._get_heights();
         this._progressive_draw();
         this._create_highlight();
+        this._mouseInit();
+        this.el.mousedown(function(ev){
+            self._triggerClicked(ev);
+        });
     },
     _init: function(){
     },
@@ -2130,13 +2135,14 @@ $.widget("bio.overview", {
         this.w2 = this.w/2.0;
         this.h2 = this.h/2.0;
     },
-    _enable_tooltip: function(){
-        var self = this;
-
-        this.el.click(function(ev){
-            var loc = self._loc_from_ev(ev);
-            self._trigger('clicked', null, loc);
-        });
+    _triggerClicked: function(ev){
+        this._trigger('clicked', null, this._loc_from_ev(ev));
+    },
+    _mouseDrag: function(ev){
+        this._triggerClicked(ev);
+    },
+    _mouseStop: function(ev){
+        this._triggerClicked(ev);
     },
     _get_heights: function() {
         var i = 0,
@@ -2178,7 +2184,6 @@ $.widget("bio.overview", {
         var fs = this.options.featureStore;
         if(i >= fs.types.length){
             this._trigger('completed');
-            this._enable_tooltip();
             return;
         }
         this._draw_features(fs.getFeaturesByType(fs.types[i]));
